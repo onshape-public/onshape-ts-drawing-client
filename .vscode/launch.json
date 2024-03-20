@@ -1,0 +1,23 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Create Note",
+            "console": "integratedTerminal",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/.compiledjs/create-note.js",
+            "args": [
+                "--documenturi=https://demo-c.dev.onshape.com/documents/61c4c3f6c490bac4c9db5d58/w/289385821d88d91849a7cd70/e/ae3c0bd456a8cd3f3d40dddc",
+                "--notetext=Hello",
+                "--stack=democ"
+            ]
+        }
+    ]
+}

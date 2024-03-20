@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "es2022",
+    "outDir": ".compiledjs",
+    "sourceMap": true,
+    "removeComments": true,
+    "strictNullChecks": false,
+    "moduleResolution": "node16",
+    "allowSyntheticDefaultImports": true,
+    "strict": true
+  },
+  "include": [
+    "*.ts",
+    "./utils/*.ts",
+    "./decl/*.d.ts"
+  ],
+  "exclude": [
+    "./node_modules"
+  ],
+}
