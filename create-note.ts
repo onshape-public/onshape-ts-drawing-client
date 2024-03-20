@@ -12,13 +12,9 @@ function usage() {
 
 try {
   const documentUri: string = ArgumentParser.get('documenturi');
-  let noteText: string = ArgumentParser.get('notetext');
   let stackToUse: string = ArgumentParser.get('stack');
   if (!documentUri) {
     throw new Error('Please specify --documenturi=XXX as argument');
-  }
-  if (!noteText) {
-    throw new Error('Please specify --notetext=XXX as argument');
   }
 
   LOG.info(`Processing docuri=${documentUri}`);
@@ -47,6 +43,7 @@ try {
   const xNotePosition: number = Math.random() * 10.0;
   const yNotePosition: number = Math.random() * 10.0;
   const textHeight = 0.12;
+  const noteText = "Note at x: " + xNotePosition + "y: " + yNotePosition;
 
   LOG.info(`documentId=${documentId}, workspaceId=${workspaceId}, elementId=${elementId}`);
 
@@ -107,6 +104,8 @@ try {
       LOG.debug(`Waited for modify seconds=${elapsedSeconds}`);
       jobStatus = await apiClient.get(`api/drawings/modify/status/${modifyRequest.id}`) as ModifyJob;
     }
+
+    LOG.info(`Created ${noteText}`);
 
   } catch (error) {
     console.error(error);
