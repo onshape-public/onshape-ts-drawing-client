@@ -1,73 +1,25 @@
 import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
-import { ArgumentParser } from './utils/argumentparser.js';
 import { ApiClient } from './utils/apiclient.js';
 import { BasicNode } from './utils/onshapetypes.js';
+import { usage, ModifyJob, DrawingScriptArgs, parseDrawingScriptArgs, getRandomLocation } from './utils/drawingutils.js';
 
 const LOG = mainLog();
 
-function usage() {
-  console.error("Usage: npm run create-note --documenturi=Xxx [--stack=Xxx]");
-}
-
 try {
-  const documentUri: string = ArgumentParser.get('documenturi');
-  let stackToUse: string = ArgumentParser.get('stack');
-  if (!documentUri) {
-    throw new Error('Please specify --documenturi=XXX as argument');
-  }
+  const drawingScriptArgs: DrawingScriptArgs = parseDrawingScriptArgs();
+  LOG.info(`documentId=${drawingScriptArgs.documentId}, workspaceId=${drawingScriptArgs.workspaceId}, elementId=${drawingScriptArgs.elementId}`);
 
-  LOG.info(`Processing docuri=${documentUri}`);
-  let url: URL = null;
-  try {
-    url = new URL(documentUri);
-  } catch (error) {
-    throw new Error(`Failed to parse ${documentUri} as valid URL`);
-  }
-
-  const lowerCasePath = url.pathname.toLowerCase();
-  const regexMatch = lowerCasePath.match(/^\/documents\/([0-9a-f]{24})\/([wv])\/([0-9a-f]{24})\/e\/([0-9a-f]{24})$/);
-  if (!regexMatch) {
-    throw new Error(`Failed to extract documentId, workspaceId and elementId from ${lowerCasePath}`);
-  }
-
-  const documentId: string = regexMatch[1];
-  const wv: string = regexMatch[2];
-  if (wv != 'w') {
-    throw new Error('--documenturi must specify a drawing in a workspace');
-  }
-  const workspaceId: string = regexMatch[3];
-  const elementId: string = regexMatch[4];
-
-  // Position of note is random between (0.0, 0.0) and (10.0, 10.0)
-  const xPosition: number = Math.random() * 10.0;
-  const yPosition: number = Math.random() * 10.0;
+  const randomLocation: number[] = getRandomLocation();
   const textHeight = 0.12;
-  const annotationText = "Note at x: " + xPosition + "y: " + yPosition;
-
-  LOG.info(`documentId=${documentId}, workspaceId=${workspaceId}, elementId=${elementId}`);
-
-  const apiClient = await ApiClient.createApiClient(stackToUse);
-
-  /**
-   * The typical response of modify POST request
-   */
-  interface ModifyJob extends BasicNode {
-    /** Current completion status of translation job */
-    requestState: 'ACTIVE' | 'DONE' | 'FAILED';
-    /** The document that contains the drawing to be modified */
-    documentId?: string;
-    /** The element that contains the drawing to be modified */
-    drawingElementId?: string;
-    /** Reason why the modification failed if not DONE */
-    failureReason?: string;
-  }
+  const annotationText = "Note at x: " + randomLocation[0] + "y: " + randomLocation[1];
+  const apiClient = await ApiClient.createApiClient(drawingScriptArgs.stackToUse);
 
   /**
    * Modify the drawing to create a note
    */
   try {
-    const modifyRequest = await apiClient.post(`api/v6/drawings/d/${documentId}/w/${workspaceId}/e/${elementId}/modify`,  {
+    const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`,  {
       description: "Add a note to drawing",
       jsonRequests: [ {
         messageName: 'onshapeCreateAnnotations',
@@ -78,7 +30,7 @@ try {
             note: {
               position: {
                 type: 'Onshape::Reference::Point',
-                coordinate: [ xPosition, yPosition, 0.0 ]
+                coordinate: randomLocation
               },
               contents: annotationText,
               textHeight: textHeight
@@ -113,7 +65,7 @@ try {
   }
 
 } catch (error) {
-  usage();
+  usage('create-note');
   console.error(error);
   LOG.error('Create note failed', error);
 }
