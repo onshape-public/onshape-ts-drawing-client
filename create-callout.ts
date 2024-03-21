@@ -7,7 +7,7 @@ import { BasicNode } from './utils/onshapetypes.js';
 const LOG = mainLog();
 
 function usage() {
-  console.error("Usage: npm run create-note --documenturi=Xxx [--stack=Xxx]");
+  console.error("Usage: npm run create-callout --documenturi=Xxx [--stack=Xxx]");
 }
 
 try {
@@ -39,11 +39,11 @@ try {
   const workspaceId: string = regexMatch[3];
   const elementId: string = regexMatch[4];
 
-  // Position of note is random between (0.0, 0.0) and (10.0, 10.0)
+  // Position of annotation is random between (0.0, 0.0) and (10.0, 10.0)
   const xPosition: number = Math.random() * 10.0;
   const yPosition: number = Math.random() * 10.0;
   const textHeight = 0.12;
-  const annotationText = "Note at x: " + xPosition + "y: " + yPosition;
+  const annotationText = "Callout at x: " + xPosition + "y: " + yPosition;
 
   LOG.info(`documentId=${documentId}, workspaceId=${workspaceId}, elementId=${elementId}`);
 
@@ -64,23 +64,29 @@ try {
   }
 
   /**
-   * Modify the drawing to create a note
+   * Modify the drawing to create a callout
    */
   try {
     const modifyRequest = await apiClient.post(`api/v6/drawings/d/${documentId}/w/${workspaceId}/e/${elementId}/modify`,  {
-      description: "Add a note to drawing",
+      description: "Add a callout to drawing",
       jsonRequests: [ {
         messageName: 'onshapeCreateAnnotations',
         formatVersion: '2021-01-01',
         annotations: [
           {
-            type: 'Onshape::Note',
-            note: {
+            type: 'Onshape::Callout',
+            callout: {
+              borderShape: 'Circle',
+              borderSize: 0,
+              contents: annotationText,
+              contentsBottom: 'bottom',
+              contentsLeft: 'left',
+              contentsRight: 'right',
+              contentsTop: 'top',
               position: {
                 type: 'Onshape::Reference::Point',
                 coordinate: [ xPosition, yPosition, 0.0 ]
               },
-              contents: annotationText,
               textHeight: textHeight
             }
           }
@@ -88,7 +94,7 @@ try {
       }]
     }) as BasicNode;
 
-    LOG.info('Initiated creation of note in drawing', modifyRequest);
+    LOG.info('Initiated creation of callout in drawing', modifyRequest);
     let jobStatus: ModifyJob = { requestState: 'ACTIVE', id: '' };
     const end = timeSpan();
     while (jobStatus.requestState === 'ACTIVE') {
@@ -97,7 +103,7 @@ try {
 
       // If modify takes over 1 minute, then log and continue
       if (elapsedSeconds > 60) {
-        LOG.error(`Note creation timed out after ${elapsedSeconds} seconds`);
+        LOG.error(`Callout creation timed out after ${elapsedSeconds} seconds`);
         break;
       }
 
@@ -109,11 +115,11 @@ try {
 
   } catch (error) {
     console.error(error);
-    LOG.error('Create note failed', error);
+    LOG.error('Create callout failed', error);
   }
 
 } catch (error) {
   usage();
   console.error(error);
-  LOG.error('Create note failed', error);
+  LOG.error('Create callout failed', error);
 }

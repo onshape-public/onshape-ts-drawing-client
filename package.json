@@ -6,6 +6,7 @@
   "scripts": {
     "build": "npm install && tsc",
     "cleanoutputdirectory": "rimraf ./output && rimraf ./exports && rimraf ./reports && rimraf logs",
+    "create-callout": "node .compiledjs/create-callout.js",
     "create-note": "node .compiledjs/create-note.js"
   },
   "repository": {
