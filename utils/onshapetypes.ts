@@ -155,3 +155,78 @@ export interface ReleasePackageItemUpdate {
   elementId: string;
   properties: PropertyUpdate[];
 }
+
+// Drawings types
+
+export interface View {
+  includeHiddenInstances: boolean;
+  explodedViewId: string;
+  isSectionOfAlignedSection: boolean;
+  occurrenceOrQueryToGeometryProperties: Object;
+  useParentViewSectionData: boolean;
+  isSectionOfSectionOnBase: boolean;
+  viewId: string;
+  includeSurfaces: boolean;
+  displayStateId: string;
+  hiddenLines: string;
+  namedPositionId: string;
+  isSurface: boolean;
+  computeIntersection: boolean;
+  viewMatrix: number[];
+  includeWires: boolean;
+  showAutoCenterlines: boolean;
+  isCropView: boolean;
+  offsetSectionPoints: [];
+  brokenOutPointNumbers: [];
+  brokenOutEndConditions: [];
+  renderSketches: boolean;
+  isAlignedSection: boolean;
+  brokenOutBBoxes: Object;
+  projectionAngle: string;
+  simplificationOption: number;
+  viewVersion: number;
+  showThreads: boolean;
+  isPartialSection: boolean;
+  simplificationThreshold: number;
+  showTangentLines: boolean;
+  qualityOption: number;
+  associativityChangeId: string;
+  isBrokenOutSection: boolean;
+  viewDirection: [];
+  showAutoCentermarks: boolean;
+  ignoreFaultyParts: boolean;
+  showCutGeomOnly: boolean;
+  sectionId: string;
+  cutPoint: [];
+  modificationId: string;
+  modelReferenceId: string;
+  perspective: boolean;
+  bomReferenceId: string;
+  showViewingPlane: boolean;
+  parentViewId: string;
+  isCopiedView: boolean;
+  errorCode: number;
+}
+
+export interface GetDrawingViewsResponse {
+  items: View[];
+}
+
+export interface EdgeData {
+  start: number[];
+  end: number[];
+}
+
+export interface Edge {
+  type: string;
+  visible: boolean;
+  deterministicId: string;
+  rightRepOccurrences: string[];
+  uniqueId: string;
+  geometryClass: string;
+  data: EdgeData;
+}
+
+export interface GetViewJsonGeometryResponse {
+  bodyData: Edge[];
+}

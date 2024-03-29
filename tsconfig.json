@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2022",
-    "module": "es2022",
+    "module": "Node16",
     "outDir": ".compiledjs",
     "sourceMap": true,
     "removeComments": true,
