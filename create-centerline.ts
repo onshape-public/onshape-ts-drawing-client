@@ -1,7 +1,7 @@
 import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, TranslationStatusResponse } from './utils/onshapetypes.js';
+import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, Sheet, TranslationStatusResponse } from './utils/onshapetypes.js';
 import { usage, ModifyJob, DrawingScriptArgs, parseDrawingScriptArgs, getRandomLocation } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -52,20 +52,36 @@ try {
       translationStatus = await apiClient.get(`api/translations/${exportResponse.id}`) as TranslationStatusResponse;
     }
 
-    let exportData = await apiClient.get(`api/documents/d/${drawingScriptArgs.documentId}/externaldata/${translationStatus.resultExternalDataIds[0]}`) as GetDrawingJsonExportResponse;
+    let translationId: string = translationStatus.resultExternalDataIds[0];
+    console.log(`translation id=`, translationId);
 
-    console.log('exportData = ', exportData);
+    let exportData: GetDrawingJsonExportResponse = await apiClient.get(`api/documents/d/${drawingScriptArgs.documentId}/externaldata/${translationStatus.resultExternalDataIds[0]}`) as GetDrawingJsonExportResponse;
 
-    LOG.info('Initiated retrieval of views in drawing');
-    retrieveViewsResponse = await apiClient.get(`api/appelements/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/views/`) as GetDrawingViewsResponse;
-    LOG.info('Retrieval of views in drawing returned', retrieveViewsResponse);
+    console.log(`exportData =`, exportData);
+    console.log(`Number of sheets =`, exportData.sheets.length);
 
-    if (retrieveViewsResponse.items.length < 1) {
-      console.log('No views found in drawing.');
-      viewId = null;
-    } else {
-      viewId = retrieveViewsResponse.items[0].viewId;
+    for (let indexSheet = 0; indexSheet < exportData.sheets.length; indexSheet++) {
+      let sheet: Sheet = exportData.sheets[indexSheet];
+      if (sheet.active === true) {
+        if (sheet.views !== null && sheet.views.length > 0) {
+          viewId = sheet.views[0].viewId;
+        } else {
+          console.log('Active sheet has no views.');
+          viewId = null;
+        }
+      }
     }
+
+    // LOG.info('Initiated retrieval of views in drawing');
+    // retrieveViewsResponse = await apiClient.get(`api/appelements/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/views/`) as GetDrawingViewsResponse;
+    // LOG.info('Retrieval of views in drawing returned', retrieveViewsResponse);
+
+    // if (retrieveViewsResponse.items.length < 1) {
+    //  console.log('No views found in drawing.');
+    //  viewId = null;
+    // } else {
+    //  viewId = retrieveViewsResponse.items[0].viewId;
+    // }
 
     if (viewId !== null) {
       LOG.info('Initiated retrieval of view json geometry');
