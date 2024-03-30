@@ -54,8 +54,9 @@ try {
 
     let translationId: string = translationStatus.resultExternalDataIds[0];
     console.log(`translation id=`, translationId);
-
-    let exportData: GetDrawingJsonExportResponse = await apiClient.get(`api/documents/d/${drawingScriptArgs.documentId}/externaldata/${translationStatus.resultExternalDataIds[0]}`) as GetDrawingJsonExportResponse;
+    
+    let responseAsString: string = await apiClient.get(`api/documents/d/${drawingScriptArgs.documentId}/externaldata/${translationStatus.resultExternalDataIds[0]}`) as string;
+    let exportData: GetDrawingJsonExportResponse = JSON.parse(responseAsString);
 
     console.log(`exportData =`, exportData);
     console.log(`Number of sheets =`, exportData.sheets.length);
@@ -69,19 +70,9 @@ try {
           console.log('Active sheet has no views.');
           viewId = null;
         }
+        break;
       }
     }
-
-    // LOG.info('Initiated retrieval of views in drawing');
-    // retrieveViewsResponse = await apiClient.get(`api/appelements/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/views/`) as GetDrawingViewsResponse;
-    // LOG.info('Retrieval of views in drawing returned', retrieveViewsResponse);
-
-    // if (retrieveViewsResponse.items.length < 1) {
-    //  console.log('No views found in drawing.');
-    //  viewId = null;
-    // } else {
-    //  viewId = retrieveViewsResponse.items[0].viewId;
-    // }
 
     if (viewId !== null) {
       LOG.info('Initiated retrieval of view json geometry');
@@ -95,7 +86,7 @@ try {
             startPoint = edge.data.start;
             startPointEdgeUniqueId = edge.uniqueId;
           } else if (endPoint === null) {
-            endPoint = edge.data.end;
+            endPoint = edge.data.start;
             endPointEdgeUniqueId = edge.uniqueId;
             break;
           }
