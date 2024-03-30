@@ -1,6 +1,10 @@
-import { BasicNode } from './onshapetypes.js';
+import timeSpan from 'time-span';
 import { mainLog } from './logger.js';
 import { ArgumentParser } from './argumentparser.js';
+import { ApiClient } from './apiclient.js';
+import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, Sheet, TranslationStatusResponse } from './onshapetypes.js';
+
+const LOG = mainLog();
 
 export function usage(scriptName: string) {
   console.error(`Usage: npm run ${scriptName} --documenturi=Xxx [--stack=Yyy]`);
@@ -40,8 +44,6 @@ export class DrawingScriptArgs {
  * @returns the parsed script arguments
  */
 export function parseDrawingScriptArgs(): DrawingScriptArgs {
-
-  const LOG = mainLog();
 
   const documentUri: string = ArgumentParser.get('documenturi');
   if (!documentUri) {
@@ -86,3 +88,64 @@ export function getRandomLocation(): number[] {
   const yPosition: number = Math.random() * 10.0;
   return [xPosition, yPosition, 0.0];
 }
+
+export function getRandomInt(min: number, max: number) {
+  // Return integer between lowerInt and upperInt inclusive
+  let randomInt = Math.floor(Math.random() * (max - min + 1)) + min;
+  return randomInt;
+}
+
+export async function getIdOfRandomViewOnActiveSheet(apiClient: ApiClient, documentId: string, workspaceId: string, elementId: string): Promise<string> {
+  let viewId: string = null;
+
+  try {
+    LOG.info('Initiated export of drawing as json');
+    let exportResponse: ExportDrawingResponse = await apiClient.post(`api/drawings/d/${documentId}/w/${workspaceId}/e/${elementId}/translations`, {
+      formatName: 'DRAWING_JSON',
+      level: 'full',
+      storeInDocument: false
+    }) as ExportDrawingResponse;
+
+    let translationStatus: TranslationStatusResponse = { requestState: 'ACTIVE', id: exportResponse.id, failureReason: '', resultExternalDataIds: [] };
+    const end = timeSpan();
+    while (translationStatus.requestState === 'ACTIVE') {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const elapsedSeconds = end.seconds();
+
+      // If export takes over 1 minute, then log and continue
+      if (elapsedSeconds > 60) {
+        LOG.error(`Export of drawing timed out after ${elapsedSeconds} seconds`);
+        break;
+      }
+
+      LOG.debug(`Waited for export seconds=${elapsedSeconds}`);
+      translationStatus = await apiClient.get(`api/translations/${exportResponse.id}`) as TranslationStatusResponse;
+    }
+
+    let translationId: string = translationStatus.resultExternalDataIds[0];
+    console.log(`translation id=`, translationId);
+    
+    let responseAsString: string = await apiClient.get(`api/documents/d/${documentId}/externaldata/${translationStatus.resultExternalDataIds[0]}`) as string;
+    let exportData: GetDrawingJsonExportResponse = JSON.parse(responseAsString);
+
+    for (let indexSheet = 0; indexSheet < exportData.sheets.length; indexSheet++) {
+      let sheet: Sheet = exportData.sheets[indexSheet];
+      if (sheet.active === true) {
+        if (sheet.views !== null && sheet.views.length > 0) {
+          let randomIndex: number = getRandomInt(0, sheet.views.length-1)
+          viewId = sheet.views[randomIndex].viewId;
+        } else {
+          console.log('Active sheet has no views.');
+          viewId = null;
+        }
+        break;
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    LOG.error('Error getting drawing as json.', error);
+  }
+
+  return viewId;
+}
+

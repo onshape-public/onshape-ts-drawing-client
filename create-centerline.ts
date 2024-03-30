@@ -1,8 +1,8 @@
 import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, Sheet, TranslationStatusResponse } from './utils/onshapetypes.js';
-import { usage, ModifyJob, DrawingScriptArgs, parseDrawingScriptArgs, getRandomLocation } from './utils/drawingutils.js';
+import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse } from './utils/onshapetypes.js';
+import { usage, ModifyJob, DrawingScriptArgs, parseDrawingScriptArgs, getRandomLocation, getIdOfRandomViewOnActiveSheet } from './utils/drawingutils.js';
 
 const LOG = mainLog();
 
@@ -15,9 +15,6 @@ try {
   const annotationText: string = "Note at x: " + randomLocation[0] + "y: " + randomLocation[1];
   const apiClient = await ApiClient.createApiClient(drawingScriptArgs.stackToUse);
 
-  let exportResponse: ExportDrawingResponse = null;
-
-  let retrieveViewsResponse: GetDrawingViewsResponse = null;
   let viewId: string = null;
   let retrieveViewJsonGeometryResponse: GetViewJsonGeometryResponse = null;
   let startPoint: number[] = null;
@@ -29,50 +26,7 @@ try {
    * Retrieve a drawing view and some of its edges to get enough information to create the centerline
    */
   try {
-    LOG.info('Initiated export of drawing as json');
-    exportResponse = await apiClient.post(`api/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/translations`, {
-      formatName: 'DRAWING_JSON',
-      level: 'full',
-      storeInDocument: false
-    }) as ExportDrawingResponse;
-
-    let translationStatus: TranslationStatusResponse = { requestState: 'ACTIVE', id: exportResponse.id, failureReason: '', resultExternalDataIds: [] };
-    const end = timeSpan();
-    while (translationStatus.requestState === 'ACTIVE') {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      const elapsedSeconds = end.seconds();
-
-      // If export takes over 1 minute, then log and continue
-      if (elapsedSeconds > 60) {
-        LOG.error(`Export of drawing timed out after ${elapsedSeconds} seconds`);
-        break;
-      }
-
-      LOG.debug(`Waited for export seconds=${elapsedSeconds}`);
-      translationStatus = await apiClient.get(`api/translations/${exportResponse.id}`) as TranslationStatusResponse;
-    }
-
-    let translationId: string = translationStatus.resultExternalDataIds[0];
-    console.log(`translation id=`, translationId);
-    
-    let responseAsString: string = await apiClient.get(`api/documents/d/${drawingScriptArgs.documentId}/externaldata/${translationStatus.resultExternalDataIds[0]}`) as string;
-    let exportData: GetDrawingJsonExportResponse = JSON.parse(responseAsString);
-
-    console.log(`exportData =`, exportData);
-    console.log(`Number of sheets =`, exportData.sheets.length);
-
-    for (let indexSheet = 0; indexSheet < exportData.sheets.length; indexSheet++) {
-      let sheet: Sheet = exportData.sheets[indexSheet];
-      if (sheet.active === true) {
-        if (sheet.views !== null && sheet.views.length > 0) {
-          viewId = sheet.views[0].viewId;
-        } else {
-          console.log('Active sheet has no views.');
-          viewId = null;
-        }
-        break;
-      }
-    }
+    viewId = await getIdOfRandomViewOnActiveSheet(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as string;
 
     if (viewId !== null) {
       LOG.info('Initiated retrieval of view json geometry');
