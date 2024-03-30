@@ -158,58 +158,101 @@ export interface ReleasePackageItemUpdate {
 
 // Drawings types
 
-export interface View {
-  includeHiddenInstances: boolean;
-  explodedViewId: string;
-  isSectionOfAlignedSection: boolean;
-  occurrenceOrQueryToGeometryProperties: Object;
-  useParentViewSectionData: boolean;
-  isSectionOfSectionOnBase: boolean;
-  viewId: string;
-  includeSurfaces: boolean;
-  displayStateId: string;
-  hiddenLines: string;
-  namedPositionId: string;
-  isSurface: boolean;
-  computeIntersection: boolean;
-  viewMatrix: number[];
-  includeWires: boolean;
-  showAutoCenterlines: boolean;
-  isCropView: boolean;
-  offsetSectionPoints: [];
-  brokenOutPointNumbers: [];
-  brokenOutEndConditions: [];
-  renderSketches: boolean;
-  isAlignedSection: boolean;
-  brokenOutBBoxes: Object;
-  projectionAngle: string;
-  simplificationOption: number;
-  viewVersion: number;
-  showThreads: boolean;
-  isPartialSection: boolean;
-  simplificationThreshold: number;
-  showTangentLines: boolean;
-  qualityOption: number;
+// View object returned from api/appelements/d/did/wv/wvid/e/eid/views/ API
+export interface View1 {
   associativityChangeId: string;
-  isBrokenOutSection: boolean;
-  viewDirection: [];
-  showAutoCentermarks: boolean;
-  ignoreFaultyParts: boolean;
-  showCutGeomOnly: boolean;
-  sectionId: string;
-  cutPoint: [];
-  modificationId: string;
-  modelReferenceId: string;
-  perspective: boolean;
   bomReferenceId: string;
-  showViewingPlane: boolean;
-  parentViewId: string;
-  isCopiedView: boolean;
+  brokenOutBBoxes: Object;
+  brokenOutEndConditions: [];
+  brokenOutPointNumbers: [];
+  computeIntersection: boolean;
+  cutPoint: [];
+  displayStateId: string;
   errorCode: number;
+  explodedViewId: string;
+  hiddenLines: string;
+  ignoreFaultyParts: boolean;
+  includeHiddenInstances: boolean;
+  includeSurfaces: boolean;
+  includeWires: boolean;
+  isAlignedSection: boolean;
+  isBrokenOutSection: boolean;
+  isCopiedView: boolean;
+  isCropView: boolean;
+  isPartialSection: boolean;
+  isSectionOfAlignedSection: boolean;
+  isSectionOfSectionOnBase: boolean;
+  isSurface: boolean;
+  modelReferenceId: string;
+  modificationId: string;
+  namedPositionId: string;
+  occurrenceOrQueryToGeometryProperties: Object;
+  offsetSectionPoints: [];
+  parentViewId: string;
+  perspective: boolean;
+  projectionAngle: string;
+  qualityOption: number;
+  renderSketches: boolean;
+  showAutoCenterlines: boolean;
+  showAutoCentermarks: boolean;
+  showCutGeomOnly: boolean;
+  showTangentLines: boolean;
+  showThreads: boolean;
+  showViewingPlane: boolean;
+  sectionId: string;
+  simplificationOption: number;
+  simplificationThreshold: number;
+  useParentViewSectionData: boolean;
+  viewDirection: [];
+  viewId: string;
+  viewMatrix: number[];
+  viewVersion: number;
 }
 
 export interface GetDrawingViewsResponse {
-  items: View[];
+  items: View1[];
+}
+
+// View object returned from api/drawings/d/did/wv/wvid/e/eid/translations API with DRAWING_JSON format
+export interface View2 {
+  bomReference: string;
+  label: string;
+  name: string;
+  orientation: string;
+  position: {
+    x: number;
+    y: number;
+  };
+  renderMode: string;
+  rotation: number;
+  scale: {
+    denumerator: number;
+    numerator: number;
+    scaleSource: string;
+  };
+  sheet: string;
+  showScaleLabel: boolean;
+  simplification: string;
+  tangentEdges: string;
+  type: string;
+  viewId: string;
+  viewToPaperMatrix: {
+    items: number[];
+  };
+}
+
+// Response from api/drawings/d/did/wv/wvid/e/eid/translations API
+export interface ExportDrawingResponse {
+  failureReason: string;
+  id: string;
+  requestState: string;
+}
+
+export interface TranslationStatusResponse {
+  failureReason: string;
+  id: string;
+  requestState: string;
+  resultExternalDataIds: string[];
 }
 
 export interface EdgeData {
@@ -229,4 +272,23 @@ export interface Edge {
 
 export interface GetViewJsonGeometryResponse {
   bodyData: Edge[];
+}
+
+export interface Sheet {
+  active: boolean;
+  annotations: Object[];
+  format: string;
+  index: number;
+  name: string;
+  reference: string;
+  scale: {
+    denumerator: number,
+    numerator: number
+  };
+  size: string;
+  views: View2[];
+}
+
+export interface GetDrawingJsonExportResponse {
+  sheets: Sheet[];
 }
