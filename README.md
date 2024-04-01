@@ -1,63 +1,31 @@
 #### Description
-Sample Onshape Drawing API client in typescript
+Sample Onshape Drawing API client in typescript.
 
-#### Requirements
-Git, Nodejs and Npm should be installed. **credentials.json** should be populated (see end of this README for instructions to create it)
+This sample has a long set of possible tasks that can be run, all of the form
 
-#### Building
-Clone this github repo locally and run the below command to install all the dependencies and do a build first
+	$ npm run xxx
 
-    $ npm run build
+where xxx is a task name, often followed by arguments that can vary command by command.
 
-----------------------------------------------------------------------------------------------------
-# Examples section
+#### Installation
 
-Listed are the various workflows samples included in this repo. All examples make **Onshape API** calls
-and need a valid **credentials.json**.  Please refer to **Storing credentials** section down below.
+1. Install git, nodejs and npm
+1. Clone this Github repo locally and cd into the folder
+1. Create a credentials.json file in the top level folder that looks like:
 
-## Create note example
-    $ npm run create-note  --did=aa8e16d5387740ee4bacad61 --wid=tbd --eid=tbd
+```
+{
+   "cad": {
+       "url": "https://cad.onshape.com",
+       "accessKey": "your Onshape API access key",
+       "secretKey": "your Onshape API secret key"
+   }
+}
+```
 
-This application will create a note in a drawing with the given document, workspace and element ids.
-Here **aa8e16d5387740ee4bacad61** is the onshape id of the document. You can get this id by navigating to the drawing
-in the webclient like so
+You must obtain an API key from Onshape.  See
 
-    $  https://cad.onshape.com/documents?nodeId=aa8e16d5387740ee4bacad61&resourceType=folder
-
-What the **Create note** does
-
-* Find active sheet in the given drawing
-    * Creates a note in that active sheet
-* Generate **./reports/folder/references.csv** report containing all documents involved and whether any of them are not contained in the folder.
-
-
-----------------------------------------------------------------------------------------------------
-
-#### Storing credentials in *credentials.json*
-This sample expects api keys to make onshape api calls.  Use dev portal to generate api keys as a company admin and
-save in this format in the same folder as **credentials.json**
-
-    {
-        "cad": {
-            "url": "https://cad.onshape.com/",
-            "accessKey": "XXXXXXXXXXXXXXX",
-            "secretKey": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"
-        }
-    }
-
-#### Logging
-
-The application logs both to console and a file called **logs/scriptname.log** . Both of these can be configured by **utils/logger.ts**
-Refer to [log4js](https://log4js-node.github.io/log4js-node/) for additional logging configurations
-
-
-#### Additional information
-
-The credentials file can store multiple api keys. For all of the scripts you can specify an extra argument
-
->  --stack=cad
-
-as needed to pick the right credentials.
+https://onshape-public.github.io/docs/auth/apikeys/
 
 If you are member of multiple companies you can specify an extra argument
 
@@ -65,10 +33,47 @@ If you are member of multiple companies you can specify an extra argument
 
 to pick the right company Id. You can also save it as a **companyId** field in your credentials.json
 
-#### Editing in Visual Studio Code
+#### Building
 
-To customize any of these scripts or add additional ones, using **Visual Studio Code** IDE is highly recommended.
+Run these commands in the top folder:
+
+    $ npm install
+
+    $ npm run build
+    
+You will need to run "npm run build" after any code changes you make to the sample unless you setup the tsc: watch setting in Visual Studio Code, which does it automatically on code changes.
+    
+### Running Sample Tasks
+After building, you can run any of many sample tasks.  The possible tasks are:
+
+
+```
+npm run create-note -documenturi=<document uri> --stack cad
+
+npm run create-callout -documenturi=<document uri> --stack cad
+
+npm run create-centerline -documenturi=<document uri> --stack cad
+```
+
+where document uri is a URL to a drawing in a workspace of an existing document that you have write access to.  For example, this is a possible document uri:
+
+```
+https://cad.onshape.com/documents/61c4c3f6c490bac4c9db5d58/w/289385821d88d91849a7cd70/e/ae3c0bd456a8cd3f3d40dddc
+```
+
+and "--stack cad" is telling the sample which credentials to use from the credentials.json file.  So if you are working with multiple enterprises, you may need multiple credentials in the credentials.json file.
+
+#### Logging
+
+The application logs both to console and a file called **logs/scriptname.log** . Both of these can be configured by **utils/logger.ts**
+Refer to [log4js](https://log4js-node.github.io/log4js-node/) for additional logging configurations
+
+
+#### Visual Studio Code
+
+Using the **Visual Studio Code** IDE is **HIGHLY** recommended to edit this sample code, add additional tasks, debug and run the tasks.  In Visual Studio Code you can:
 
 1. Style and eslint settings are preconfigured for Visual Studio Code workspace.
-2. Debugging various scripts are already setup in **lauch.json**
-3. Simply pick **Tasks: Run Build Task** -> **tsc: watch** to ensure the javascript files are compiled on edit for debugging
+2. Debugging various scripts are already setup in **launch.json**
+3. You can pick which task to run in the **Run and Debug** panel on the left side.
+3. You can pick **Tasks: Run Build Task** -> **tsc: watch** to ensure the javascript files are compiled on edit for debugging.
