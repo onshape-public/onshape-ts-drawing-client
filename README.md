@@ -5,7 +5,7 @@ This sample has a long set of possible tasks that can be run, all of the form
 
 	$ npm run xxx
 
-where xxx is a task name, often followed by arguments that can vary command by command.
+where xxx is a task name, often followed by arguments that can vary task by task.
 
 #### Installation
 
@@ -43,7 +43,7 @@ Run these commands in the top folder:
     
 You will need to run "npm run build" after any code changes you make to the sample unless you setup the tsc: watch setting in Visual Studio Code, which does it automatically on code changes.
     
-### Running Sample Tasks
+#### Running Sample Tasks
 After building, you can run any of many sample tasks.  The possible tasks are:
 
 
