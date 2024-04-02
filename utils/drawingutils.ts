@@ -2,7 +2,7 @@ import timeSpan from 'time-span';
 import { mainLog } from './logger.js';
 import { ArgumentParser } from './argumentparser.js';
 import { ApiClient } from './apiclient.js';
-import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, Sheet, TranslationStatusResponse } from './onshapetypes.js';
+import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, Sheet, TranslationStatusResponse, View2 } from './onshapetypes.js';
 
 const LOG = mainLog();
 
@@ -95,8 +95,8 @@ export function getRandomInt(min: number, max: number) {
   return randomInt;
 }
 
-export async function getIdOfRandomViewOnActiveSheet(apiClient: ApiClient, documentId: string, workspaceId: string, elementId: string): Promise<string> {
-  let viewId: string = null;
+export async function getIdOfRandomViewOnActiveSheet(apiClient: ApiClient, documentId: string, workspaceId: string, elementId: string): Promise<View2> {
+  let viewToReturn: View2 = null;
 
   try {
     LOG.info('Initiated export of drawing as json');
@@ -133,10 +133,10 @@ export async function getIdOfRandomViewOnActiveSheet(apiClient: ApiClient, docum
       if (sheet.active === true) {
         if (sheet.views !== null && sheet.views.length > 0) {
           let randomIndex: number = getRandomInt(0, sheet.views.length-1)
-          viewId = sheet.views[randomIndex].viewId;
+          viewToReturn = sheet.views[randomIndex];
         } else {
           console.log('Active sheet has no views.');
-          viewId = null;
+          viewToReturn = null;
         }
         break;
       }
@@ -146,7 +146,7 @@ export async function getIdOfRandomViewOnActiveSheet(apiClient: ApiClient, docum
     LOG.error('Error getting drawing as json.', error);
   }
 
-  return viewId;
+  return viewToReturn;
 }
 
 /**
@@ -167,5 +167,18 @@ export function isArcAxisPerpendicularToViewPlane(axisDir: number[]): boolean {
   )
 
   return perpendicularToViewPlane;
+}
+
+export function convertPointViewToPaper(pointInView: number[], xViewPosition: number, yViewPosition: number, viewToPaperMatrix: number[]): number[] {
+  let pointInPaper: number[] = null;
+
+  if (pointInView.length === 3 && viewToPaperMatrix.length === 12) {
+    pointInPaper = [0.0, 0.0, 0.0];
+    pointInPaper[0] = xViewPosition + viewToPaperMatrix[0] * pointInView[0] + viewToPaperMatrix[1] * pointInView[1] + viewToPaperMatrix[2] * pointInView[2];
+    pointInPaper[1] = yViewPosition + viewToPaperMatrix[4] * pointInView[0] + viewToPaperMatrix[5] * pointInView[1] + viewToPaperMatrix[6] * pointInView[2];
+    pointInPaper[2] = viewToPaperMatrix[8] * pointInView[0] + viewToPaperMatrix[9] * pointInView[1] + viewToPaperMatrix[10] * pointInView[2];
+  }
+
+  return pointInPaper;
 }
 

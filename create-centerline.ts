@@ -1,7 +1,7 @@
 import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse } from './utils/onshapetypes.js';
+import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, View2 } from './utils/onshapetypes.js';
 import { usage, ModifyJob, DrawingScriptArgs, parseDrawingScriptArgs, getRandomLocation, getIdOfRandomViewOnActiveSheet } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -11,7 +11,7 @@ try {
   LOG.info(`documentId=${drawingScriptArgs.documentId}, workspaceId=${drawingScriptArgs.workspaceId}, elementId=${drawingScriptArgs.elementId}`);
 
   const apiClient = await ApiClient.createApiClient(drawingScriptArgs.stackToUse);
-  let viewId: string = null;
+  let viewToUse: View2 = null;
   let retrieveViewJsonGeometryResponse: GetViewJsonGeometryResponse = null;
   let startPoint: number[] = null;
   let endPoint: number[] = null;
@@ -22,11 +22,11 @@ try {
    * Retrieve a drawing view and some of its edges to get enough information to create the centerline
    */
   try {
-    viewId = await getIdOfRandomViewOnActiveSheet(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as string;
+    viewToUse = await getIdOfRandomViewOnActiveSheet(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as View2;
 
-    if (viewId !== null) {
+    if (viewToUse !== null) {
       LOG.info('Initiated retrieval of view json geometry');
-      retrieveViewJsonGeometryResponse = await apiClient.get(`api/appelements/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/views/${viewId}/jsongeometry`) as GetViewJsonGeometryResponse;
+      retrieveViewJsonGeometryResponse = await apiClient.get(`api/appelements/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/views/${viewToUse.viewId}/jsongeometry`) as GetViewJsonGeometryResponse;
       LOG.info('Retrieval of view json geometry returned', retrieveViewJsonGeometryResponse);
 
       for (let indexEdge = 0; indexEdge < retrieveViewJsonGeometryResponse.bodyData.length; indexEdge++) {
@@ -48,7 +48,7 @@ try {
     LOG.error('Create centerline failed in retrieve view and edges calls.', error);
   }
 
-  if (viewId != null && startPoint !== null && endPoint !== null && startPointEdgeUniqueId !== null && endPointEdgeUniqueId !== null) {
+  if (viewToUse.viewId != null && startPoint !== null && endPoint !== null && startPointEdgeUniqueId !== null && endPointEdgeUniqueId !== null) {
     /**
      * Modify the drawing to create a centerline
      */
@@ -66,13 +66,13 @@ try {
                   coordinate: startPoint,
                   type: 'Onshape::Reference::Point',
                   uniqueId: startPointEdgeUniqueId,
-                  viewId: viewId
+                  viewId: viewToUse.viewId
                 },
                 point2: {
                   coordinate: endPoint,
                   type: 'Onshape::Reference::Point',
                   uniqueId: endPointEdgeUniqueId,
-                  viewId: viewId
+                  viewId: viewToUse.viewId
                 }
               }
             }
