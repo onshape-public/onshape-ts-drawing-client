@@ -27,7 +27,7 @@ You must obtain an API key from Onshape.  See
 
 https://onshape-public.github.io/docs/auth/apikeys/
 
-If you are a member of multiple companies you can specify an extra field in the credentials.json
+If you are working with a company, you can specify an extra field in the credentials.json
 file:
 
 ```
@@ -54,6 +54,8 @@ npm run create-note -documenturi=<document uri> --stack cad
 npm run create-callout -documenturi=<document uri> --stack cad
 
 npm run create-centerline -documenturi=<document uri> --stack cad
+
+npm run create-radial-dimension -documenturi=<document uri> --stack cad
 ```
 
 where document uri is a URL to a drawing in a workspace of an existing document that you have write access to.  For example, this is a possible document uri:
@@ -64,13 +66,13 @@ https://cad.onshape.com/documents/61c4c3f6c490bac4c9db5d58/w/289385821d88d91849a
 
 and "--stack cad" is telling the sample which credentials to use from the credentials.json file.
 
-If you are working with multiple companies, you could also specify an optional argument:
+If you are working with a company, you can specify an optional argument:
 
 ```
   --companyId=XXXX
 ```
 
-to pick the correct company Id.
+to pick the correct company.
 
 #### Logging
 
