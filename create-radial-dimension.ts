@@ -2,7 +2,7 @@ import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
 import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse } from './utils/onshapetypes.js';
-import { usage, ModifyJob, DrawingScriptArgs, parseDrawingScriptArgs, getRandomLocation, getIdOfRandomViewOnActiveSheet } from './utils/drawingutils.js';
+import { usage, ModifyJob, DrawingScriptArgs, parseDrawingScriptArgs, getRandomLocation, getIdOfRandomViewOnActiveSheet, isArcAxisPerpendicularToViewPlane } from './utils/drawingutils.js';
 
 const LOG = mainLog();
 
@@ -13,10 +13,11 @@ try {
   const apiClient = await ApiClient.createApiClient(drawingScriptArgs.stackToUse);
   let viewId: string = null;
   let retrieveViewJsonGeometryResponse: GetViewJsonGeometryResponse = null;
-  let startPoint: number[] = null;
-  let endPoint: number[] = null;
-  let startPointEdgeUniqueId: string = null;
-  let endPointEdgeUniqueId: string = null;
+  let centerPoint: number[] = null;
+  let chordPoint: number[] = null;
+  let textLocation: number[] = null;
+  let centerPointEdgeUniqueId: string = null;
+  let chordPointEdgeUniqueId: string = null;
 
   /**
    * Retrieve a drawing view and some of its edges to get enough information to create the centerline
@@ -31,48 +32,62 @@ try {
 
       for (let indexEdge = 0; indexEdge < retrieveViewJsonGeometryResponse.bodyData.length; indexEdge++) {
         let edge: Edge = retrieveViewJsonGeometryResponse.bodyData[indexEdge];
-        if (edge.type === 'line') {
-          if (startPoint === null) {
-            startPoint = edge.data.start;
-            startPointEdgeUniqueId = edge.uniqueId;
-          } else if (endPoint === null) {
-            endPoint = edge.data.start;
-            endPointEdgeUniqueId = edge.uniqueId;
-            break;
-          }
+        // Want circular arc with view axis perpendicular to view plane
+        if (edge.type === 'circularArc' && isArcAxisPerpendicularToViewPlane(edge.data.axisDir)) {
+          centerPoint = edge.data.center;
+          centerPointEdgeUniqueId = edge.uniqueId;
+          chordPoint = edge.data.start;
+          chordPointEdgeUniqueId = edge.uniqueId;
+          textLocation = chordPoint;
+          textLocation[0] += edge.data.radius;
+          break;
         }
       }
     }
   } catch (error) {
     console.error(error);
-    LOG.error('Create centerline failed in retrieve view and edges calls.', error);
+    LOG.error('Create radial dimension failed in retrieve view and circular arc edge.', error);
   }
 
-  if (viewId != null && startPoint !== null && endPoint !== null && startPointEdgeUniqueId !== null && endPointEdgeUniqueId !== null) {
+  if (viewId != null && centerPoint !== null && chordPoint !== null && centerPointEdgeUniqueId !== null && chordPointEdgeUniqueId !== null) {
     /**
-     * Modify the drawing to create a centerline
+     * Modify the drawing to create a radial dimension
      */
     try {
       const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`,  {
-        description: "Add a centerline to drawing",
+        description: "Add a radial dim",
         jsonRequests: [ {
           messageName: 'onshapeCreateAnnotations',
           formatVersion: '2021-01-01',
           annotations: [
             {
-              type: 'Onshape::Centerline::PointToPoint',
-              pointToPointCenterline: {
-                point1: {
-                  coordinate: startPoint,
+              type: 'Onshape::Dimension::Radial',
+              radialDimension: {
+                centerPoint: {
+                  coordinate: centerPoint,
                   type: 'Onshape::Reference::Point',
-                  uniqueId: startPointEdgeUniqueId,
+                  uniqueId: centerPointEdgeUniqueId,
                   viewId: viewId
                 },
-                point2: {
-                  coordinate: endPoint,
+                chordPoint: {
+                  coordinate: chordPoint,
                   type: 'Onshape::Reference::Point',
-                  uniqueId: endPointEdgeUniqueId,
+                  uniqueId: chordPointEdgeUniqueId,
                   viewId: viewId
+                },
+                formatting: {
+                  dimdec: 2,
+                  dimlim: false,
+                  dimpost: 'R<>',
+                  dimtm: 0,
+                  dimtol: false,
+                  dimtp: 0,
+                  type: 'Onshape::Formatting::Dimension'
+                },
+                textOverride: '',
+                textPosition: {
+                  coordinate: textLocation,
+                  type: 'Onshape::Reference::Point'
                 }
               }
             }
@@ -80,7 +95,7 @@ try {
         }]
       }) as BasicNode;
 
-      LOG.info('Initiated creation of centerline in drawing', modifyRequest);
+      LOG.info('Initiated creation of radial dimension in drawing', modifyRequest);
       let jobStatus: ModifyJob = { requestState: 'ACTIVE', id: '' };
       const end = timeSpan();
       while (jobStatus.requestState === 'ACTIVE') {
@@ -89,7 +104,7 @@ try {
 
         // If modify takes over 1 minute, then log and continue
         if (elapsedSeconds > 60) {
-          LOG.error(`Centerline creation timed out after ${elapsedSeconds} seconds`);
+          LOG.error(`Radial dimension creation timed out after ${elapsedSeconds} seconds`);
           break;
         }
 
@@ -97,18 +112,18 @@ try {
         jobStatus = await apiClient.get(`api/drawings/modify/status/${modifyRequest.id}`) as ModifyJob;
       }
 
-      LOG.info(`Created centerline`);
+      LOG.info(`Created radial dimension`);
     } catch (error) {
       console.error(error);
-      LOG.error('Create centerline failed in modify API call', error);
+      LOG.error('Create radial dimension failed in modify API call', error);
     }
   } else {
-    console.log('Insufficient view and edge information to create the centerline.');
-    LOG.error('Create centerline failed due to insufficient view and edge information.');
+    console.log('Insufficient view and edge information to create the radial dimension.');
+    LOG.error('Create radial dimension failed due to insufficient view and edge information.');
   }
 
 } catch (error) {
-  usage('create-centerline');
+  usage('create-radial-dimension');
   console.error(error);
-  LOG.error('Create centerline failed', error);
+  LOG.error('Create radial dimension failed', error);
 }

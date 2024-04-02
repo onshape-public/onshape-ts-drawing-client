@@ -8,7 +8,8 @@
     "strictNullChecks": false,
     "moduleResolution": "node16",
     "allowSyntheticDefaultImports": true,
-    "strict": true
+    "strict": true,
+    "watch": true
   },
   "include": [
     "*.ts",

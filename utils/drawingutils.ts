@@ -149,3 +149,23 @@ export async function getIdOfRandomViewOnActiveSheet(apiClient: ApiClient, docum
   return viewId;
 }
 
+/**
+ * Return if the given arc axis is perpendicular to the view plane, which would mean
+ * it is acceptable to place a radial or diametric dimension on it.
+ */
+export function isArcAxisPerpendicularToViewPlane(axisDir: number[]): boolean {
+  /**
+   * Arc should have an axis pointing out of the view - approximately (0, 0, 1).
+   */
+  const tolerance: number = 0.001;
+  
+  let perpendicularToViewPlane: boolean = (
+    axisDir.length === 3 &&
+    axisDir[0] < tolerance && axisDir[0] > -tolerance &&
+    axisDir[1] < tolerance && axisDir[1] > -tolerance &&
+    (axisDir[2] > tolerance || axisDir[2] < -tolerance)
+  )
+
+  return perpendicularToViewPlane;
+}
+

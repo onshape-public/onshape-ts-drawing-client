@@ -256,8 +256,11 @@ export interface TranslationStatusResponse {
 }
 
 export interface EdgeData {
-  start: number[];
-  end: number[];
+  center?: number[];
+  axisDir?: number[];
+  radius?: number;
+  start?: number[];
+  end?: number[];
 }
 
 export interface Edge {
