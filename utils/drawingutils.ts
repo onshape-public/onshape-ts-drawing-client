@@ -95,7 +95,7 @@ export function getRandomInt(min: number, max: number) {
   return randomInt;
 }
 
-export async function getIdOfRandomViewOnActiveSheet(apiClient: ApiClient, documentId: string, workspaceId: string, elementId: string): Promise<View2> {
+export async function getRandomViewOnActiveSheet(apiClient: ApiClient, documentId: string, workspaceId: string, elementId: string): Promise<View2> {
   let viewToReturn: View2 = null;
 
   try {
@@ -186,7 +186,7 @@ export function convertPointViewToPaper(pointInView: number[], viewToPaperMatrix
  * Determine the midpoint of an arc.
  * Assume Z is constant, meaning the arc is flat in the view.
  */
-export function midPointOfArc(centerPoint: number[], radius: number, startPoint: number[], endPoint: number[]): number [] {
+export function midPointOfArc(centerPoint: number[], radius: number, startPoint: number[], endPoint: number[]): number[] {
   let midPoint: number[] = null;
 
   if (centerPoint.length === 3 && startPoint.length === 3 && endPoint.length === 3) {
@@ -204,6 +204,20 @@ export function midPointOfArc(centerPoint: number[], radius: number, startPoint:
     midPoint[0] = centerPoint[0] + radius * Math.cos(midPointAngle);
     midPoint[1] = centerPoint[1] + radius * Math.sin(midPointAngle);
     midPoint[2] = (startPoint[2] + endPoint[2]) / 2.0;
+  }
+
+  return midPoint;
+}
+
+export function getMidPoint(pointOne: number[], pointTwo: number[]): number[] {
+  let midPoint: number[] = null;
+
+  if (pointOne.length === 3 && pointTwo.length === 3) {
+    midPoint = [
+      (pointOne[0] + pointTwo[0]) / 2.0,
+      (pointOne[1] + pointTwo[1]) / 2.0,
+      (pointOne[2] + pointTwo[2]) / 2.0
+    ];
   }
 
   return midPoint;

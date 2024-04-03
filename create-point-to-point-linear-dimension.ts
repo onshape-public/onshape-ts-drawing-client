@@ -2,7 +2,8 @@ import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
 import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, View2 } from './utils/onshapetypes.js';
-import { usage, ModifyJob, DrawingScriptArgs, parseDrawingScriptArgs, getRandomLocation, getRandomViewOnActiveSheet } from './utils/drawingutils.js';
+import { usage, ModifyJob, DrawingScriptArgs, parseDrawingScriptArgs, getRandomLocation } from './utils/drawingutils.js';
+import { getRandomViewOnActiveSheet, convertPointViewToPaper, getMidPoint } from './utils/drawingutils.js';
 
 const LOG = mainLog();
 
@@ -15,11 +16,12 @@ try {
   let retrieveViewJsonGeometryResponse: GetViewJsonGeometryResponse = null;
   let startPoint: number[] = null;
   let endPoint: number[] = null;
+  let textLocation: number[] = null;
   let startPointEdgeUniqueId: string = null;
   let endPointEdgeUniqueId: string = null;
 
   /**
-   * Retrieve a drawing view and some of its edges to get enough information to create the centerline
+   * Retrieve a drawing view and some of its edges to get enough information to create the dimension
    */
   try {
     viewToUse = await getRandomViewOnActiveSheet(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as View2;
@@ -31,37 +33,41 @@ try {
 
       for (let indexEdge = 0; indexEdge < retrieveViewJsonGeometryResponse.bodyData.length; indexEdge++) {
         let edge: Edge = retrieveViewJsonGeometryResponse.bodyData[indexEdge];
+        // Want line edge
         if (edge.type === 'line') {
-          if (startPoint === null) {
-            startPoint = edge.data.start;
-            startPointEdgeUniqueId = edge.uniqueId;
-          } else if (endPoint === null) {
-            endPoint = edge.data.start;
-            endPointEdgeUniqueId = edge.uniqueId;
-            break;
-          }
+          startPoint = edge.data.start;
+          startPointEdgeUniqueId = edge.uniqueId;
+          endPoint = edge.data.end;
+          endPointEdgeUniqueId = edge.uniqueId;
+
+          // Put text location out from mid point by arbitrary amount
+          textLocation = getMidPoint(startPoint, endPoint);
+          textLocation[0] += 0.003;
+          textLocation[1] += 0.003;
+          textLocation = convertPointViewToPaper(textLocation, viewToUse.viewToPaperMatrix.items);
+          break;
         }
       }
     }
   } catch (error) {
     console.error(error);
-    LOG.error('Create centerline failed in retrieve view and edges calls.', error);
+    LOG.error('Create point to point linear dimension failed in retrieve view and line edge.', error);
   }
 
-  if (viewToUse.viewId != null && startPoint !== null && endPoint !== null && startPointEdgeUniqueId !== null && endPointEdgeUniqueId !== null) {
+  if (viewToUse != null && startPoint !== null && endPoint !== null && startPointEdgeUniqueId !== null && endPointEdgeUniqueId !== null) {
     /**
-     * Modify the drawing to create a centerline
+     * Modify the drawing to create a dimension
      */
     try {
       const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`,  {
-        description: "Add a centerline to drawing",
+        description: "Add a linear dim",
         jsonRequests: [ {
           messageName: 'onshapeCreateAnnotations',
           formatVersion: '2021-01-01',
           annotations: [
             {
-              type: 'Onshape::Centerline::PointToPoint',
-              pointToPointCenterline: {
+              type: 'Onshape::Dimension::PointToPoint',
+              pointToPointDimension: {
                 point1: {
                   coordinate: startPoint,
                   type: 'Onshape::Reference::Point',
@@ -73,6 +79,20 @@ try {
                   type: 'Onshape::Reference::Point',
                   uniqueId: endPointEdgeUniqueId,
                   viewId: viewToUse.viewId
+                },
+                formatting: {
+                  dimdec: 2,
+                  dimlim: false,
+                  dimpost: '',
+                  dimtm: 0,
+                  dimtol: false,
+                  dimtp: 0,
+                  type: 'Onshape::Formatting::Dimension'
+                },
+                textOverride: '',
+                textPosition: {
+                  coordinate: textLocation,
+                  type: 'Onshape::Reference::Point'
                 }
               }
             }
@@ -80,7 +100,7 @@ try {
         }]
       }) as BasicNode;
 
-      LOG.info('Initiated creation of centerline in drawing', modifyRequest);
+      LOG.info('Initiated creation of point to point dimension in drawing', modifyRequest);
       let jobStatus: ModifyJob = { requestState: 'ACTIVE', id: '' };
       const end = timeSpan();
       while (jobStatus.requestState === 'ACTIVE') {
@@ -89,7 +109,7 @@ try {
 
         // If modify takes over 1 minute, then log and continue
         if (elapsedSeconds > 60) {
-          LOG.error(`Centerline creation timed out after ${elapsedSeconds} seconds`);
+          LOG.error(`Point to point linear dimension creation timed out after ${elapsedSeconds} seconds`);
           break;
         }
 
@@ -97,18 +117,18 @@ try {
         jobStatus = await apiClient.get(`api/drawings/modify/status/${modifyRequest.id}`) as ModifyJob;
       }
 
-      LOG.info(`Created centerline`);
+      LOG.info(`Created point to point linear dimension`);
     } catch (error) {
       console.error(error);
-      LOG.error('Create centerline failed in modify API call', error);
+      LOG.error('Create point to point linear dimension failed in modify API call', error);
     }
   } else {
-    console.log('Insufficient view and edge information to create the centerline.');
-    LOG.error('Create centerline failed due to insufficient view and edge information.');
+    console.log('Insufficient view and edge information to create the dimension.');
+    LOG.error('Create dimension failed due to insufficient view and edge information.');
   }
 
 } catch (error) {
-  usage('create-centerline');
+  usage('create-point-to-point-linear-dimension');
   console.error(error);
-  LOG.error('Create centerline failed', error);
+  LOG.error('Create point to point linear dimension failed', error);
 }

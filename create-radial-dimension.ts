@@ -3,7 +3,7 @@ import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
 import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, View2 } from './utils/onshapetypes.js';
 import { usage, ModifyJob, DrawingScriptArgs, parseDrawingScriptArgs, getRandomLocation } from './utils/drawingutils.js';
-import { getIdOfRandomViewOnActiveSheet, isArcAxisPerpendicularToViewPlane, convertPointViewToPaper, midPointOfArc } from './utils/drawingutils.js';
+import { getRandomViewOnActiveSheet, isArcAxisPerpendicularToViewPlane, convertPointViewToPaper, midPointOfArc } from './utils/drawingutils.js';
 
 const LOG = mainLog();
 
@@ -21,10 +21,10 @@ try {
   let chordPointEdgeUniqueId: string = null;
 
   /**
-   * Retrieve a drawing view and some of its edges to get enough information to create the centerline
+   * Retrieve a drawing view and some of its edges to get enough information to create the radial dimension
    */
   try {
-    viewToUse = await getIdOfRandomViewOnActiveSheet(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as View2;
+    viewToUse = await getRandomViewOnActiveSheet(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as View2;
 
     if (viewToUse !== null) {
       LOG.info('Initiated retrieval of view json geometry');
@@ -40,7 +40,7 @@ try {
           chordPoint = midPointOfArc(edge.data.center, edge.data.radius, edge.data.start, edge.data.end);
           chordPointEdgeUniqueId = edge.uniqueId;
 
-          // Put text radius out from chord point, in appropriate direction
+          // Put text out from chord point by the radius of edge in appropriate direction
           textLocation = chordPoint;
           textLocation[0] += (chordPoint[0] - centerPoint[0]);
           textLocation[1] += (chordPoint[1] - centerPoint[1]);
