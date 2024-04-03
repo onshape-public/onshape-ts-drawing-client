@@ -14,11 +14,14 @@ try {
   const apiClient = await ApiClient.createApiClient(drawingScriptArgs.stackToUse);
   let viewToUse: View2 = null;
   let retrieveViewJsonGeometryResponse: GetViewJsonGeometryResponse = null;
-  let startPoint: number[] = null;
-  let endPoint: number[] = null;
+  let arcPoint: number[] = null;
+  let point1: number[] = null;
+  let point2: number[] = null;
+  let point3: number[] = null;
+  let point4: number[] = null;
   let textLocation: number[] = null;
-  let startPointEdgeUniqueId: string = null;
-  let endPointEdgeUniqueId: string = null;
+  let firstEdgeUniqueId: string = null;
+  let secondEdgeUniqueId: string = null;
 
   /**
    * Retrieve a drawing view and some of its edges to get enough information to create the dimension
@@ -35,49 +38,73 @@ try {
         let edge: Edge = retrieveViewJsonGeometryResponse.bodyData[indexEdge];
         // Want line edge
         if (edge.type === 'line') {
-          startPoint = edge.data.start;
-          startPointEdgeUniqueId = edge.uniqueId;
-          endPoint = edge.data.end;
-          endPointEdgeUniqueId = edge.uniqueId;
-
-          // Put text location out from mid point by arbitrary amount
-          textLocation = getMidPoint(startPoint, endPoint);
-          textLocation[0] += 0.003;
-          textLocation[1] += 0.003;
-          textLocation = convertPointViewToPaper(textLocation, viewToUse.viewToPaperMatrix.items);
-          break;
+          if (point1 === null) {
+            point1 = edge.data.start;
+            point2 = edge.data.end;
+            firstEdgeUniqueId = edge.uniqueId;  
+          } else {
+            point3 = edge.data.start;
+            point4 = edge.data.end;
+            secondEdgeUniqueId = edge.uniqueId;
+          
+            // Put arc point and text location out from mid point by arbitrary amount
+            arcPoint = getMidPoint(point1, point3);
+            textLocation = arcPoint;
+            textLocation[0] += 0.003;
+            textLocation[1] += 0.003;
+            textLocation = convertPointViewToPaper(textLocation, viewToUse.viewToPaperMatrix.items);
+            break;
+          }
         }
       }
     }
   } catch (error) {
     console.error(error);
-    LOG.error('Create point to point linear dimension failed in retrieve view and line edge.', error);
+    LOG.error('Create line to line angular dimension failed in retrieve view and line edges.', error);
   }
 
-  if (viewToUse != null && startPoint !== null && endPoint !== null && startPointEdgeUniqueId !== null && endPointEdgeUniqueId !== null) {
+  if (viewToUse != null && point1 !== null && point3 !== null && firstEdgeUniqueId !== null && secondEdgeUniqueId !== null) {
     /**
      * Modify the drawing to create a dimension
      */
     try {
       const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`,  {
-        description: "Add a linear dim",
+        description: "Add angular dim",
         jsonRequests: [ {
           messageName: 'onshapeCreateAnnotations',
           formatVersion: '2021-01-01',
           annotations: [
             {
-              type: 'Onshape::Dimension::PointToPoint',
-              pointToPointDimension: {
-                point1: {
-                  coordinate: startPoint,
+              type: 'Onshape::Dimension::LineToLineAngular',
+              lineToLineAngularDimension: {
+                arcPoint: {
+                  coordinate: arcPoint,
                   type: 'Onshape::Reference::Point',
-                  uniqueId: startPointEdgeUniqueId,
+                  uniqueId: firstEdgeUniqueId,
+                  viewId: viewToUse.viewId
+                },
+                point1: {
+                  coordinate: point1,
+                  type: 'Onshape::Reference::Point',
+                  uniqueId: firstEdgeUniqueId,
                   viewId: viewToUse.viewId
                 },
                 point2: {
-                  coordinate: endPoint,
+                  coordinate: point2,
                   type: 'Onshape::Reference::Point',
-                  uniqueId: endPointEdgeUniqueId,
+                  uniqueId: firstEdgeUniqueId,
+                  viewId: viewToUse.viewId
+                },
+                point3: {
+                  coordinate: point3,
+                  type: 'Onshape::Reference::Point',
+                  uniqueId: secondEdgeUniqueId,
+                  viewId: viewToUse.viewId
+                },
+                point4: {
+                  coordinate: point4,
+                  type: 'Onshape::Reference::Point',
+                  uniqueId: secondEdgeUniqueId,
                   viewId: viewToUse.viewId
                 },
                 formatting: {
@@ -100,7 +127,7 @@ try {
         }]
       }) as BasicNode;
 
-      LOG.info('Initiated creation of point to point linear dimension in drawing', modifyRequest);
+      LOG.info('Initiated creation of line to line angular dimension in drawing', modifyRequest);
       let jobStatus: ModifyJob = { requestState: 'ACTIVE', id: '' };
       const end = timeSpan();
       while (jobStatus.requestState === 'ACTIVE') {
@@ -109,7 +136,7 @@ try {
 
         // If modify takes over 1 minute, then log and continue
         if (elapsedSeconds > 60) {
-          LOG.error(`Point to point linear dimension creation timed out after ${elapsedSeconds} seconds`);
+          LOG.error(`Line to line angular dimension creation timed out after ${elapsedSeconds} seconds`);
           break;
         }
 
@@ -117,10 +144,10 @@ try {
         jobStatus = await apiClient.get(`api/drawings/modify/status/${modifyRequest.id}`) as ModifyJob;
       }
 
-      LOG.info(`Created point to point linear dimension`);
+      LOG.info(`Created line to line angular dimension`);
     } catch (error) {
       console.error(error);
-      LOG.error('Create point to point linear dimension failed in modify API call', error);
+      LOG.error('Create line to line angular dimension failed in modify API call', error);
     }
   } else {
     console.log('Insufficient view and edge information to create the dimension.');
@@ -128,7 +155,7 @@ try {
   }
 
 } catch (error) {
-  usage('create-point-to-point-linear-dimension');
+  usage('create-line-to-line-angular-dimension');
   console.error(error);
-  LOG.error('Create point to point linear dimension failed', error);
+  LOG.error('Create line to line angular dimension failed', error);
 }

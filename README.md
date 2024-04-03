@@ -65,6 +65,8 @@ npm run create-centerline -drawinguri=<drawing uri> --stack cad
 npm run create-radial-dimension -drawinguri=<drawing uri> --stack cad
 
 npm run create-point-to-point-linear-dimension -drawinguri=<drawing uri> --stack cad
+
+npm run create-line-to-line-angular-dimension -drawinguri=<drawing uri> --stack cad
 ```
 
 where drawing uri is a URL to a drawing in a workspace of an existing document that you have write access to.  For example, this is a possible drawing uri:
