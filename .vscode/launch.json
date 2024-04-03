@@ -14,7 +14,7 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-note.js",
             "args": [
-                "--documenturi=https://demo-c.dev.onshape.com/documents/61c4c3f6c490bac4c9db5d58/w/289385821d88d91849a7cd70/e/ae3c0bd456a8cd3f3d40dddc",
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/61c4c3f6c490bac4c9db5d58/w/289385821d88d91849a7cd70/e/ae3c0bd456a8cd3f3d40dddc",
                 "--stack=democ"
             ]
         },
@@ -28,7 +28,7 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-callout.js",
             "args": [
-                "--documenturi=https://demo-c.dev.onshape.com/documents/61c4c3f6c490bac4c9db5d58/w/289385821d88d91849a7cd70/e/ae3c0bd456a8cd3f3d40dddc",
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/61c4c3f6c490bac4c9db5d58/w/289385821d88d91849a7cd70/e/ae3c0bd456a8cd3f3d40dddc",
                 "--stack=democ"
             ]
         },
@@ -42,7 +42,7 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-centerline.js",
             "args": [
-                "--documenturi=https://demo-c.dev.onshape.com/documents/61c4c3f6c490bac4c9db5d58/w/289385821d88d91849a7cd70/e/ae3c0bd456a8cd3f3d40dddc",
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/61c4c3f6c490bac4c9db5d58/w/289385821d88d91849a7cd70/e/ae3c0bd456a8cd3f3d40dddc",
                 "--stack=democ"
             ]
         },
@@ -56,7 +56,7 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-radial-dimension.js",
             "args": [
-                "--documenturi=https://demo-c.dev.onshape.com/documents/61c4c3f6c490bac4c9db5d58/w/289385821d88d91849a7cd70/e/ae3c0bd456a8cd3f3d40dddc",
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/61c4c3f6c490bac4c9db5d58/w/289385821d88d91849a7cd70/e/ae3c0bd456a8cd3f3d40dddc",
                 "--stack=democ"
             ]
         }

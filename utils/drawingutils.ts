@@ -7,7 +7,7 @@ import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetVie
 const LOG = mainLog();
 
 export function usage(scriptName: string) {
-  console.error(`Usage: npm run ${scriptName} --documenturi=Xxx [--stack=Yyy]`);
+  console.error(`Usage: npm run ${scriptName} --drawinguri=Xxx [--stack=Yyy]`);
 }
 
 /**
@@ -45,9 +45,9 @@ export class DrawingScriptArgs {
  */
 export function parseDrawingScriptArgs(): DrawingScriptArgs {
 
-  const documentUri: string = ArgumentParser.get('documenturi');
-  if (!documentUri) {
-    throw new Error('Please specify --documenturi=Xxx as an argument');
+  const drawingUri: string = ArgumentParser.get('drawinguri');
+  if (!drawingUri) {
+    throw new Error('Please specify --drawinguri=Xxx as an argument');
   }
 
   let drawingScriptArgs: DrawingScriptArgs = {
@@ -57,12 +57,12 @@ export function parseDrawingScriptArgs(): DrawingScriptArgs {
     elementId: ''
   };
 
-  LOG.info(`Processing docuri=${documentUri}`);
+  LOG.info(`Processing docuri=${drawingUri}`);
   let url: URL = null;
   try {
-    url = new URL(documentUri);
+    url = new URL(drawingUri);
   } catch (error) {
-    throw new Error(`Failed to parse ${documentUri} as valid URL`);
+    throw new Error(`Failed to parse ${drawingUri} as valid URL`);
   }
 
   const lowerCasePath = url.pathname.toLowerCase();
@@ -82,10 +82,10 @@ export function parseDrawingScriptArgs(): DrawingScriptArgs {
   return drawingScriptArgs;
 }
 
-export function getRandomLocation(): number[] {
-  // Position of note is random between (0.0, 0.0) and (10.0, 10.0)
-  const xPosition: number = Math.random() * 10.0;
-  const yPosition: number = Math.random() * 10.0;
+export function getRandomLocation(minLocation: number[], maxLocation: number[]): number[] {
+  // Position of note is random between (minLocation[0], minLocation[1]) and (maxLocation[0], maxLocation[1])
+  const xPosition: number = minLocation[0] + (Math.random() * (maxLocation[0] - minLocation[0]));
+  const yPosition: number = minLocation[1] + (Math.random() * (maxLocation[1] - minLocation[1]));
   return [xPosition, yPosition, 0.0];
 }
 
@@ -169,16 +169,43 @@ export function isArcAxisPerpendicularToViewPlane(axisDir: number[]): boolean {
   return perpendicularToViewPlane;
 }
 
-export function convertPointViewToPaper(pointInView: number[], xViewPosition: number, yViewPosition: number, viewToPaperMatrix: number[]): number[] {
+export function convertPointViewToPaper(pointInView: number[], viewToPaperMatrix: number[]): number[] {
   let pointInPaper: number[] = null;
 
   if (pointInView.length === 3 && viewToPaperMatrix.length === 12) {
     pointInPaper = [0.0, 0.0, 0.0];
-    pointInPaper[0] = xViewPosition + viewToPaperMatrix[0] * pointInView[0] + viewToPaperMatrix[1] * pointInView[1] + viewToPaperMatrix[2] * pointInView[2];
-    pointInPaper[1] = yViewPosition + viewToPaperMatrix[4] * pointInView[0] + viewToPaperMatrix[5] * pointInView[1] + viewToPaperMatrix[6] * pointInView[2];
-    pointInPaper[2] = viewToPaperMatrix[8] * pointInView[0] + viewToPaperMatrix[9] * pointInView[1] + viewToPaperMatrix[10] * pointInView[2];
+    pointInPaper[0] = viewToPaperMatrix[0] * pointInView[0] + viewToPaperMatrix[1] * pointInView[1] + viewToPaperMatrix[2] * pointInView[2] + viewToPaperMatrix[3];
+    pointInPaper[1] = viewToPaperMatrix[4] * pointInView[0] + viewToPaperMatrix[5] * pointInView[1] + viewToPaperMatrix[6] * pointInView[2] + viewToPaperMatrix[7];
+    pointInPaper[2] = viewToPaperMatrix[8] * pointInView[0] + viewToPaperMatrix[9] * pointInView[1] + viewToPaperMatrix[10] * pointInView[2] + viewToPaperMatrix[11];
   }
 
   return pointInPaper;
+}
+
+/**
+ * Determine the midpoint of an arc.
+ * Assume Z is constant, meaning the arc is flat in the view.
+ */
+export function midPointOfArc(centerPoint: number[], radius: number, startPoint: number[], endPoint: number[]): number [] {
+  let midPoint: number[] = null;
+
+  if (centerPoint.length === 3 && startPoint.length === 3 && endPoint.length === 3) {
+    let xToStart: number = startPoint[0] - centerPoint[0];
+    let yToStart = startPoint[1] - centerPoint[1];
+
+    let angleToStart: number = Math.atan2(startPoint[1] - centerPoint[1], startPoint[0] - centerPoint[0]);
+    let angleToEnd: number = Math.atan2(endPoint[1] - centerPoint[1], endPoint[0] - centerPoint[0]);
+    if (angleToEnd < angleToStart) {
+      angleToEnd += Math.PI;
+    }
+    let midPointAngle: number = (angleToStart + angleToEnd)/2.0;
+
+    midPoint = [0.0, 0.0, 0.0];
+    midPoint[0] = centerPoint[0] + radius * Math.cos(midPointAngle);
+    midPoint[1] = centerPoint[1] + radius * Math.sin(midPointAngle);
+    midPoint[2] = (startPoint[2] + endPoint[2]) / 2.0;
+  }
+
+  return midPoint;
 }
 

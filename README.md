@@ -42,23 +42,30 @@ Run these commands in the top folder:
 
     $ npm run build
     
-You will need to run "npm run build" after any code changes you make to the sample unless you setup the tsc: watch setting in Visual Studio Code (press (⇧⌘B) and then choose tsc:watch - tsconfig.json from the dropdown to select a task), which will cause it to automatically build on code changes.
-    
+Note that the tsconfig.json file has a line in it:
+
+```
+    "watch": true
+```
+
+When you do 'npm run build', due to this setting, the Typescript compiler will automatically start watching for file changes and will rebuild every time you change and save a file in the project.
+If you do not want this behavior, then you can change the watch value to false.  But after that you will need to rebuild manually after each code change.
+
 #### Running Sample Tasks
 
 After building, you can run any of these sample tasks from the terminal command line:
 
 ```
-npm run create-note -documenturi=<document uri> --stack cad
+npm run create-note -drawinguri=<drawing uri> --stack cad
 
-npm run create-callout -documenturi=<document uri> --stack cad
+npm run create-callout -drawinguri=<drawing uri> --stack cad
 
-npm run create-centerline -documenturi=<document uri> --stack cad
+npm run create-centerline -drawinguri=<drawing uri> --stack cad
 
-npm run create-radial-dimension -documenturi=<document uri> --stack cad
+npm run create-radial-dimension -drawinguri=<drawing uri> --stack cad
 ```
 
-where document uri is a URL to a drawing in a workspace of an existing document that you have write access to.  For example, this is a possible document uri:
+where drawing uri is a URL to a drawing in a workspace of an existing document that you have write access to.  For example, this is a possible drawing uri:
 
 ```
 https://cad.onshape.com/documents/61c4c3f6c490bac4c9db5d58/w/289385821d88d91849a7cd70/e/ae3c0bd456a8cd3f3d40dddc

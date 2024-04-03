@@ -10,7 +10,7 @@ try {
   const drawingScriptArgs: DrawingScriptArgs = parseDrawingScriptArgs();
   LOG.info(`documentId=${drawingScriptArgs.documentId}, workspaceId=${drawingScriptArgs.workspaceId}, elementId=${drawingScriptArgs.elementId}`);
 
-  const randomLocation: number[] = getRandomLocation();
+  const randomLocation: number[] = getRandomLocation([1.0, 1.0], [8.0, 8.0]);
   const textHeight = 0.12;
   const annotationText = "Note at x: " + randomLocation[0] + "y: " + randomLocation[1];
   const apiClient = await ApiClient.createApiClient(drawingScriptArgs.stackToUse);

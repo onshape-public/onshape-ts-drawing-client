@@ -2,7 +2,8 @@ import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
 import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, View2 } from './utils/onshapetypes.js';
-import { usage, ModifyJob, DrawingScriptArgs, parseDrawingScriptArgs, getRandomLocation, getIdOfRandomViewOnActiveSheet, isArcAxisPerpendicularToViewPlane, convertPointViewToPaper } from './utils/drawingutils.js';
+import { usage, ModifyJob, DrawingScriptArgs, parseDrawingScriptArgs, getRandomLocation } from './utils/drawingutils.js';
+import { getIdOfRandomViewOnActiveSheet, isArcAxisPerpendicularToViewPlane, convertPointViewToPaper, midPointOfArc } from './utils/drawingutils.js';
 
 const LOG = mainLog();
 
@@ -32,15 +33,18 @@ try {
 
       for (let indexEdge = 0; indexEdge < retrieveViewJsonGeometryResponse.bodyData.length; indexEdge++) {
         let edge: Edge = retrieveViewJsonGeometryResponse.bodyData[indexEdge];
-        // Want circular arc with view axis perpendicular to view plane
+        // Want circular arcs with view axis perpendicular to view plane
         if (edge.type === 'circularArc' && isArcAxisPerpendicularToViewPlane(edge.data.axisDir)) {
           centerPoint = edge.data.center;
           centerPointEdgeUniqueId = edge.uniqueId;
-          chordPoint = edge.data.start;
+          chordPoint = midPointOfArc(edge.data.center, edge.data.radius, edge.data.start, edge.data.end);
           chordPointEdgeUniqueId = edge.uniqueId;
+
+          // Put text radius out from chord point, in appropriate direction
           textLocation = chordPoint;
-          textLocation[0] += edge.data.radius;
-          textLocation = convertPointViewToPaper(textLocation, viewToUse.position.x, viewToUse.position.y, viewToUse.viewToPaperMatrix.items);
+          textLocation[0] += (chordPoint[0] - centerPoint[0]);
+          textLocation[1] += (chordPoint[1] - centerPoint[1]);
+          textLocation = convertPointViewToPaper(textLocation, viewToUse.viewToPaperMatrix.items);
           break;
         }
       }
