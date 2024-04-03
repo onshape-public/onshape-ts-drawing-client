@@ -56,19 +56,19 @@ If you do not want this behavior, then you can change the watch value to false. 
 After building, you can run any of these sample tasks from the terminal command line:
 
 ```
-npm run create-note -drawinguri=<drawing uri> --stack=cad
+npm run create-note --drawinguri=<drawing uri> --stack=cad
 
-npm run create-callout -drawinguri=<drawing uri> --stack=cad
+npm run create-callout --drawinguri=<drawing uri> --stack=cad
 
-npm run create-centerline -drawinguri=<drawing uri> --stack=cad
+npm run create-centerline --drawinguri=<drawing uri> --stack=cad
 
-npm run create-radial-dimension -drawinguri=<drawing uri> --stack=cad
+npm run create-radial-dimension --drawinguri=<drawing uri> --stack=cad
 
-npm run create-point-to-point-linear-dimension -drawinguri=<drawing uri> --stack=cad
+npm run create-point-to-point-linear-dimension --drawinguri=<drawing uri> --stack=cad
 
-npm run create-line-to-line-angular-dimension -drawinguri=<drawing uri> --stack=cad
+npm run create-line-to-line-angular-dimension --drawinguri=<drawing uri> --stack=cad
 
-npm run create-geometric-tolerance -drawinguri=<drawing uri> --stack=cad
+npm run create-geometric-tolerance --drawinguri=<drawing uri> --stack=cad
 ```
 
 where drawing uri is a URL to a drawing in a workspace of an existing document that you have write access to.  For example, this is a possible drawing uri:
