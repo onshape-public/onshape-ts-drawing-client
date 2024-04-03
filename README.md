@@ -92,6 +92,5 @@ Refer to [log4js](https://log4js-node.github.io/log4js-node/) for additional log
 Using the **Visual Studio Code** IDE is **HIGHLY** recommended to edit this sample code, add additional tasks, debug and run the tasks.  The advantages of Visual Studio Code are:
 
 1. Style and eslint settings are preconfigured for Visual Studio Code workspace.
-2. Debugging various scripts is already setup in **launch.json**.  You can edit that file - launch.json - to set the documenturi, stack and companyId values for each task for your situation.
+2. Debugging various scripts is already setup in **launch.json**.  You can edit that file - launch.json - to set the drawinguri, stack and companyId values for each task for your situation.
 3. You can pick which task to run in the **Run and Debug** panel on the left side.  There's a dropdown at the top where you can choose the task to run and debug.
-4. You can pick **Tasks: Run Build Task** -> **tsc: watch** to ensure the javascript files are compiled on edit for debugging, which allows you to avoid running npm run build after every code change.
