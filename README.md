@@ -69,6 +69,8 @@ npm run create-point-to-point-linear-dimension --drawinguri=<drawing uri> --stac
 npm run create-line-to-line-angular-dimension --drawinguri=<drawing uri> --stack=cad
 
 npm run create-geometric-tolerance --drawinguri=<drawing uri> --stack=cad
+
+npm run create-inspection-symbols --drawinguri=<drawing uri> --stack=cad
 ```
 
 where drawing uri is a URL to a drawing in a workspace of an existing document that you have write access to.  For example, this is a possible drawing uri:
@@ -77,7 +79,7 @@ where drawing uri is a URL to a drawing in a workspace of an existing document t
 https://cad.onshape.com/documents/61c4c3f6c490bac4c9db5d58/w/289385821d88d91849a7cd70/e/ae3c0bd456a8cd3f3d40dddc
 ```
 
-and "--stack cad" is telling the sample which credentials to use from the credentials.json file.
+and "--stack=cad" is telling the sample which credentials to use from the credentials.json file.
 
 If you are working with a company, you can specify an optional argument:
 
@@ -91,7 +93,6 @@ to pick the correct company.
 
 The application logs both to console and a file **logs/scriptname.log** . Both of these can be configured by **utils/logger.ts** .
 Refer to [log4js](https://log4js-node.github.io/log4js-node/) for additional logging configurations.
-
 
 #### Visual Studio Code
 

@@ -1,9 +1,9 @@
 import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, View2 } from './utils/onshapetypes.js';
+import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2 } from './utils/onshapetypes.js';
 import { usage, ModifyJob, DrawingScriptArgs, parseDrawingScriptArgs, getRandomLocation } from './utils/drawingutils.js';
-import { getRandomViewOnActiveSheet, convertPointViewToPaper, getMidPoint } from './utils/drawingutils.js';
+import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData, convertPointViewToPaper, getMidPoint } from './utils/drawingutils.js';
 
 const LOG = mainLog();
 
@@ -24,7 +24,8 @@ try {
    * Retrieve a drawing view and some of its edges to get enough information to create the dimension
    */
   try {
-    viewToUse = await getRandomViewOnActiveSheet(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as View2;
+    let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
+    viewToUse = getRandomViewOnActiveSheetFromExportData(drawingJsonExport);
 
     if (viewToUse !== null) {
       LOG.info('Initiated retrieval of view json geometry');

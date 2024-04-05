@@ -158,6 +158,13 @@ export interface ReleasePackageItemUpdate {
 
 // Drawings types
 
+export class AnnotationType {
+  static RADIAL_DIMENSION = 'Onshape::Dimension::Radial';
+  static NOTE = 'Onshape::Note';
+  static CENTERLINE_POINT_TO_POINT = 'Onshape::Centerline::PointToPoint';
+  static DIMENSION_POINT_TO_POINT_LINEAR = 'Onshape::Dimension::PointToPoint';
+}
+
 // View object returned from api/appelements/d/did/wv/wvid/e/eid/views/ API
 export interface View1 {
   associativityChangeId: string;
@@ -277,9 +284,83 @@ export interface GetViewJsonGeometryResponse {
   bodyData: Edge[];
 }
 
+export interface DimensionFormatting {
+  dimdec: number;
+  dimlim: boolean;
+  dimpost: string;
+  dimtm: number;
+  dimtol: boolean;
+  dimtp: number;
+  type: string;
+}
+
+export interface AssociatedPoint {
+  coordinate: number[];
+  type: string;
+  uniqueId: string;
+  viewId: string;
+}
+
+export interface UnassociatedPoint {
+  coordinate: number[];
+  type: string;
+}
+
+export interface DimensionUnit {
+  dimaunit: Object;
+  dimlunit: Object;
+  insUnit: Object;
+  unit: string;
+}
+
+export interface Note {
+  contents: string;
+  logicalId: string;
+  position: UnassociatedPoint;
+  textHeight: number;
+}
+
+export interface PointToPointCenterline {
+  logicalId: string;
+  point1: AssociatedPoint;
+  point2: AssociatedPoint;
+}
+
+export interface PointToPointLinearDimension {
+  formatting: DimensionFormatting;
+  isDangling: boolean;
+  logicalId: string;
+  measurement: number;
+  point1: AssociatedPoint;
+  point2: AssociatedPoint;
+  textOverride: string;
+  textPosition: UnassociatedPoint;
+  unit: DimensionUnit;
+}
+
+export interface RadialDimension {
+  centerPoint: AssociatedPoint;
+  chordPoint: AssociatedPoint;
+  formatting: DimensionFormatting;
+  isDangling: boolean;
+  logicalId: string;
+  measurement: number;
+  textOverride: string;
+  textPosition: UnassociatedPoint;
+  unit: DimensionUnit;
+}
+
+export interface Annotation {
+  type: string;
+  note?: Note;
+  pointToPointCenterline?: PointToPointCenterline;
+  pointToPointDimension?: PointToPointLinearDimension;
+  radialDimension?: RadialDimension;
+}
+
 export interface Sheet {
   active: boolean;
-  annotations: Object[];
+  annotations: Annotation[];
   format: string;
   index: number;
   name: string;

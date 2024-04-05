@@ -2,7 +2,9 @@ import timeSpan from 'time-span';
 import { mainLog } from './logger.js';
 import { ArgumentParser } from './argumentparser.js';
 import { ApiClient } from './apiclient.js';
-import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, Sheet, TranslationStatusResponse, View2 } from './onshapetypes.js';
+import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse } from './onshapetypes.js';
+import { GetDrawingJsonExportResponse, Sheet, TranslationStatusResponse, Annotation, View2 } from './onshapetypes.js';
+import { AnnotationType } from './onshapetypes.js';
 
 const LOG = mainLog();
 
@@ -95,8 +97,8 @@ export function getRandomInt(min: number, max: number) {
   return randomInt;
 }
 
-export async function getRandomViewOnActiveSheet(apiClient: ApiClient, documentId: string, workspaceId: string, elementId: string): Promise<View2> {
-  let viewToReturn: View2 = null;
+export async function getDrawingJsonExport(apiClient: ApiClient, documentId: string, workspaceId: string, elementId: string): Promise<GetDrawingJsonExportResponse> {
+  let exportData: GetDrawingJsonExportResponse = null;
 
   try {
     LOG.info('Initiated export of drawing as json');
@@ -126,27 +128,66 @@ export async function getRandomViewOnActiveSheet(apiClient: ApiClient, documentI
     console.log(`translation id=`, translationId);
     
     let responseAsString: string = await apiClient.get(`api/documents/d/${documentId}/externaldata/${translationStatus.resultExternalDataIds[0]}`) as string;
-    let exportData: GetDrawingJsonExportResponse = JSON.parse(responseAsString);
+    exportData = JSON.parse(responseAsString);
 
-    for (let indexSheet = 0; indexSheet < exportData.sheets.length; indexSheet++) {
-      let sheet: Sheet = exportData.sheets[indexSheet];
-      if (sheet.active === true) {
-        if (sheet.views !== null && sheet.views.length > 0) {
-          let randomIndex: number = getRandomInt(0, sheet.views.length-1)
-          viewToReturn = sheet.views[randomIndex];
-        } else {
-          console.log('Active sheet has no views.');
-          viewToReturn = null;
-        }
-        break;
-      }
-    }
   } catch (error) {
     console.error(error);
     LOG.error('Error getting drawing as json.', error);
   }
 
+  return exportData;
+}
+
+export function getRandomViewOnActiveSheetFromExportData(exportData: GetDrawingJsonExportResponse): View2 {
+  let viewToReturn: View2 = null;
+
+  for (let indexSheet = 0; indexSheet < exportData.sheets.length; indexSheet++) {
+    let sheet: Sheet = exportData.sheets[indexSheet];
+    if (sheet.active === true) {
+      if (sheet.views !== null && sheet.views.length > 0) {
+        let randomIndex: number = getRandomInt(0, sheet.views.length-1)
+        viewToReturn = sheet.views[randomIndex];
+      } else {
+        console.log('Active sheet has no views.');
+        viewToReturn = null;
+      }
+      break;
+    }
+  }
+
   return viewToReturn;
+}
+
+export function getAnnotationsOfViewFromExportData(exportData: GetDrawingJsonExportResponse, view: View2): Annotation[] {
+  let annotationsInView: Annotation[] = null;
+  let annotationViewId = '';
+
+  for (let indexSheet = 0; indexSheet < exportData.sheets.length; indexSheet++) {
+    let sheet: Sheet = exportData.sheets[indexSheet];
+    if (sheet.name === view.sheet) {
+      for (let indexAnnotation = 0; indexAnnotation < sheet.annotations.length; indexAnnotation++) {
+        let annotation: Annotation = sheet.annotations[indexAnnotation];
+        if (annotation.type === AnnotationType.RADIAL_DIMENSION) {
+          annotationViewId = annotation.radialDimension.centerPoint.viewId;
+        } else if (annotation.type === AnnotationType.DIMENSION_POINT_TO_POINT_LINEAR) {
+          annotationViewId = annotation.pointToPointDimension.point1.viewId;
+        } else {
+          annotationViewId = '';
+        }
+
+        if (annotationViewId === view.viewId) {
+          if (annotationsInView === null) {
+            annotationsInView = [annotation];
+          } else {
+            annotationsInView.push(annotation);
+          }
+        }
+      }
+      break;
+    }
+  }
+
+  return annotationsInView;
 }
 
 /**
@@ -155,7 +196,7 @@ export async function getRandomViewOnActiveSheet(apiClient: ApiClient, documentI
  */
 export function isArcAxisPerpendicularToViewPlane(axisDir: number[]): boolean {
   /**
-   * Arc should have an axis pointing out of the view - approximately (0, 0, 1).
+   * Arc should have an axis pointing in or out of the view - approximately (0, 0, 1) or (0, 0, -1).
    */
   const tolerance: number = 0.001;
   
