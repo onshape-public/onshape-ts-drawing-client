@@ -91,6 +91,20 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Create Line to Line Linear Dimension",
+            "console": "integratedTerminal",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/.compiledjs/create-line-to-line-linear-dimension.js",
+            "args": [
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/61c4c3f6c490bac4c9db5d58/w/289385821d88d91849a7cd70/e/ae3c0bd456a8cd3f3d40dddc",
+                "--stack=democ"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Create Line to Line Angular Dimension",
             "console": "integratedTerminal",
             "skipFiles": [

@@ -282,3 +282,14 @@ export function getMidPoint(pointOne: number[], pointTwo: number[]): number[] {
   return midPoint;
 }
 
+export function areParallelEdges(edgeOneStartPoint: number[], edgeOneEndPoint: number[],
+  edgeTwoStartPoint: number[], edgeTwoEndPoint: number[]): boolean {
+
+  let areParallel: boolean = true;
+
+
+
+
+  return areParallel;
+}
+

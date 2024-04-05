@@ -66,6 +66,10 @@ npm run create-centerline --drawinguri=<drawing uri> --stack=cad
 
 npm run create-point-to-point-linear-dimension --drawinguri=<drawing uri> --stack=cad
 
+npm run create-point-to-line-linear-dimension --drawinguri=<drawing uri> --stack=cad
+
+npm run create-line-to-line-linear-dimension --drawinguri=<drawing uri> --stack=cad
+
 npm run create-line-to-line-angular-dimension --drawinguri=<drawing uri> --stack=cad
 
 npm run create-radial-dimension --drawinguri=<drawing uri> --stack=cad
