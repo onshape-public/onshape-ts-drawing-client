@@ -250,6 +250,24 @@ export function midPointOfArc(centerPoint: number[], radius: number, startPoint:
   return midPoint;
 }
 
+/**
+ * Determine location on a circle at the given angle.
+ * Assume Z is constant, meaning the arc is flat in the view.
+ */
+export function pointOnCircle(centerPoint: number[], radius: number, angleInDegrees: number): number[] {
+  let pointToReturn: number[] = null;
+
+  if (centerPoint.length === 3) {
+    let angleInRadians: number = (angleInDegrees * Math.PI) / 180.0;
+    pointToReturn = [0.0, 0.0, 0.0];
+    pointToReturn[0] = centerPoint[0] + radius * Math.cos(angleInRadians);
+    pointToReturn[1] = centerPoint[1] + radius * Math.sin(angleInRadians);
+    pointToReturn[2] = centerPoint[2];
+  }
+
+  return pointToReturn;
+}
+
 export function getMidPoint(pointOne: number[], pointTwo: number[]): number[] {
   let midPoint: number[] = null;
 

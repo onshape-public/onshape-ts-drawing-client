@@ -35,12 +35,12 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Create Centerline",
+            "name": "Create Geometric Tolerance",
             "console": "integratedTerminal",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/.compiledjs/create-centerline.js",
+            "program": "${workspaceFolder}/.compiledjs/create-geometric-tolerance.js",
             "args": [
                 "--drawinguri=https://demo-c.dev.onshape.com/documents/61c4c3f6c490bac4c9db5d58/w/289385821d88d91849a7cd70/e/ae3c0bd456a8cd3f3d40dddc",
                 "--stack=democ"
@@ -49,12 +49,12 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Create Radial Dimension",
+            "name": "Create Centerline",
             "console": "integratedTerminal",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/.compiledjs/create-radial-dimension.js",
+            "program": "${workspaceFolder}/.compiledjs/create-centerline.js",
             "args": [
                 "--drawinguri=https://demo-c.dev.onshape.com/documents/61c4c3f6c490bac4c9db5d58/w/289385821d88d91849a7cd70/e/ae3c0bd456a8cd3f3d40dddc",
                 "--stack=democ"
@@ -91,12 +91,26 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Create Geometric Tolerance",
+            "name": "Create Radial Dimension",
             "console": "integratedTerminal",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/.compiledjs/create-geometric-tolerance.js",
+            "program": "${workspaceFolder}/.compiledjs/create-radial-dimension.js",
+            "args": [
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/61c4c3f6c490bac4c9db5d58/w/289385821d88d91849a7cd70/e/ae3c0bd456a8cd3f3d40dddc",
+                "--stack=democ"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Create Diameter Dimension",
+            "console": "integratedTerminal",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/.compiledjs/create-diameter-dimension.js",
             "args": [
                 "--drawinguri=https://demo-c.dev.onshape.com/documents/61c4c3f6c490bac4c9db5d58/w/289385821d88d91849a7cd70/e/ae3c0bd456a8cd3f3d40dddc",
                 "--stack=democ"

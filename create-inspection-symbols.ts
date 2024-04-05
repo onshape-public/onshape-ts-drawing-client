@@ -30,7 +30,7 @@ try {
     }
   } catch (error) {
     console.error(error);
-    LOG.error('Create inspection symbol failed in retrieve view and annotations.', error);
+    LOG.error('Create inspection symbols failed in retrieve view and annotations.', error);
   }
 
   if (viewToUse != null && annotationsInView !== null) {
@@ -75,7 +75,7 @@ try {
       
     if (annotationsToRequest !== null) {
       try {
-        // Create request to create an inspection symbol on the annotation
+        // Post request to create inspection symbols on the dimensions
         const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`,  {
           description: "Add Inspection Symbol",
           jsonRequests: [ {
@@ -84,8 +84,8 @@ try {
             annotations: annotationsToRequest
           }]
         }) as BasicNode;
-  
-        LOG.info('Initiated creation of inspection symbol in drawing', modifyRequest);
+        LOG.info('Initiated creation of inspection symbols in the drawing', modifyRequest);
+
         let jobStatus: ModifyJob = { requestState: 'ACTIVE', id: '' };
         const end = timeSpan();
         while (jobStatus.requestState === 'ACTIVE') {

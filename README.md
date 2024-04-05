@@ -60,15 +60,15 @@ npm run create-note --drawinguri=<drawing uri> --stack=cad
 
 npm run create-callout --drawinguri=<drawing uri> --stack=cad
 
-npm run create-centerline --drawinguri=<drawing uri> --stack=cad
+npm run create-geometric-tolerance --drawinguri=<drawing uri> --stack=cad
 
-npm run create-radial-dimension --drawinguri=<drawing uri> --stack=cad
+npm run create-centerline --drawinguri=<drawing uri> --stack=cad
 
 npm run create-point-to-point-linear-dimension --drawinguri=<drawing uri> --stack=cad
 
 npm run create-line-to-line-angular-dimension --drawinguri=<drawing uri> --stack=cad
 
-npm run create-geometric-tolerance --drawinguri=<drawing uri> --stack=cad
+npm run create-radial-dimension --drawinguri=<drawing uri> --stack=cad
 
 npm run create-inspection-symbols --drawinguri=<drawing uri> --stack=cad
 ```
