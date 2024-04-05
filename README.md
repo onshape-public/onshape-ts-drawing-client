@@ -70,6 +70,8 @@ npm run create-line-to-line-angular-dimension --drawinguri=<drawing uri> --stack
 
 npm run create-radial-dimension --drawinguri=<drawing uri> --stack=cad
 
+npm run create-diameter-dimension --drawinguri=<drawing uri> --stack=cad
+
 npm run create-inspection-symbols --drawinguri=<drawing uri> --stack=cad
 ```
 
