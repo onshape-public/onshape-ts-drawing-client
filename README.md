@@ -72,6 +72,8 @@ npm run create-line-to-line-linear-dimension --drawinguri=<drawing uri> --stack=
 
 npm run create-line-to-line-angular-dimension --drawinguri=<drawing uri> --stack=cad
 
+npm run create-three-point-angular-dimension --drawinguri=<drawinguri> --stack=cad
+
 npm run create-radial-dimension --drawinguri=<drawing uri> --stack=cad
 
 npm run create-diameter-dimension --drawinguri=<drawing uri> --stack=cad
