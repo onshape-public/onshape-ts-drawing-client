@@ -159,6 +159,7 @@ export interface ReleasePackageItemUpdate {
 // Drawings types
 
 export class AnnotationType {
+  static CALLOUT = 'Onshape::Callout';
   static CENTERLINE_POINT_TO_POINT = 'Onshape::Centerline::PointToPoint';
   static DIMENSION_DIAMETER = 'Onshape::Dimension::Diametric';
   static DIMENSION_LINE_TO_LINE_ANGULAR = 'Onshape::Dimension::LineToLineAngular';
@@ -166,7 +167,9 @@ export class AnnotationType {
   static DIMENSION_POINT_TO_LINE_LINEAR = 'Onshape::Dimension::PointToLine';
   static DIMENSION_POINT_TO_POINT_LINEAR = 'Onshape::Dimension::PointToPoint';
   static DIMENSION_RADIAL = 'Onshape::Dimension::Radial';
+  static GEOMETRIC_TOLERANCE = 'Onshape::GeometricTolerance';
   static NOTE = 'Onshape::Note';
+  static DIMENSION_THREE_POINT_ANGULAR = 'Onshape::Dimension::ThreePointAngular';
 }
 
 // View object returned from api/appelements/d/did/wv/wvid/e/eid/views/ API
@@ -323,6 +326,19 @@ export interface DimensionUnit {
   unit: string;
 }
 
+export interface Callout {
+  borderShape: string;
+  borderSize: number;
+  contents: string;
+  contentsBottom: string;
+  contentsLeft: string;
+  contentsRight: string;
+  contentsTop: string;
+  logicalId: string;
+  position: UnassociatedPoint;
+  textHeight: number;
+}
+
 export interface GeometricTolerance {
   boundingBoxPoint: UnassociatedPoint[];
   frames: string[];
@@ -365,6 +381,20 @@ export interface LineToLineAngularDimension {
   point2: AssociatedPoint;
   point3: AssociatedPoint;
   point4: AssociatedPoint;
+  textOverride: string;
+  textPosition: UnassociatedPoint;
+  unit: DimensionUnit;
+}
+
+export interface ThreePointAngularDimension {
+  arcPoint: UnassociatedPoint;
+  center: AssociatedPoint;
+  formatting: DimensionFormatting;
+  isDangling: boolean;
+  logicalId: string;
+  measurement: number;
+  point1: AssociatedPoint;
+  point2: AssociatedPoint;
   textOverride: string;
   textPosition: UnassociatedPoint;
   unit: DimensionUnit;
@@ -421,14 +451,17 @@ export interface RadialDimension {
 
 export interface Annotation {
   type: string;
-  note?: Note;
+  callout?: Callout;
   diametricDimension?: DiameterDimension;
+  geometricTolerance?: GeometricTolerance;
   lineToLineAngularDimension?: LineToLineAngularDimension;
   lineToLineDimension?: LineToLineLinearDimension;
+  note?: Note;
   pointToLineDimension?: PointToLineLinearDimension;
   pointToPointCenterline?: PointToPointCenterline;
   pointToPointDimension?: PointToPointLinearDimension;
   radialDimension?: RadialDimension;
+  threePointAngularDimension?: ThreePointAngularDimension;
 }
 
 export interface Sheet {

@@ -2,7 +2,7 @@ import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
 import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2, Annotation, AnnotationType, UnassociatedPoint } from './utils/onshapetypes.js';
-import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, getRandomLocation, getAnnotationsOfViewFromExportData } from './utils/drawingutils.js';
+import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, getRandomLocation, getAnnotationsOfViewAndSheetFromExportData } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData, convertPointViewToPaper, getMidPoint } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -15,7 +15,7 @@ try {
   let viewToUse: View2 = null;
   let symbolPosition: number[] = null;
   let parentAnnotationLogicalId: string = null;
-  let annotationsInView: Annotation[] = null;
+  let annotationsInViewAndSheet: Annotation[] = null;
   let annotationsToRequest: Object[] = null;
 
   /**
@@ -25,14 +25,20 @@ try {
   viewToUse = getRandomViewOnActiveSheetFromExportData(drawingJsonExport);
 
   if (viewToUse != null) {
-    annotationsInView = getAnnotationsOfViewFromExportData(drawingJsonExport, viewToUse);
+    annotationsInViewAndSheet = getAnnotationsOfViewAndSheetFromExportData(drawingJsonExport, viewToUse, true);
   }
 
-  if (viewToUse != null && annotationsInView !== null) {
+  if (viewToUse != null && annotationsInViewAndSheet !== null) {
     // Create the message to create inspection symbols for multiple dimensions in view
-    for (let indexAnnotation = 0; indexAnnotation < annotationsInView.length; indexAnnotation++) {
-      let annotation: Annotation = annotationsInView[indexAnnotation];
+    for (let indexAnnotation = 0; indexAnnotation < annotationsInViewAndSheet.length; indexAnnotation++) {
+      let annotation: Annotation = annotationsInViewAndSheet[indexAnnotation];
       switch (annotation.type) {
+        case AnnotationType.CALLOUT: {
+          symbolPosition = annotation.callout.position.coordinate;
+          symbolPosition[0] += 1.0;
+          parentAnnotationLogicalId = annotation.callout.logicalId;
+          break;
+        }
         case AnnotationType.DIMENSION_DIAMETER: {
           symbolPosition = annotation.diametricDimension.textPosition.coordinate;
           symbolPosition[0] += 0.5;
@@ -67,6 +73,25 @@ try {
           symbolPosition = annotation.radialDimension.textPosition.coordinate;
           symbolPosition[0] += 0.5;
           parentAnnotationLogicalId = annotation.radialDimension.logicalId;
+          break;
+        }
+        case AnnotationType.DIMENSION_THREE_POINT_ANGULAR: {
+          symbolPosition = annotation.threePointAngularDimension.textPosition.coordinate;
+          symbolPosition[0] += 0.5;
+          parentAnnotationLogicalId = annotation.threePointAngularDimension.logicalId;
+          break;
+        }
+        case AnnotationType.GEOMETRIC_TOLERANCE: {
+          symbolPosition = annotation.geometricTolerance.position.coordinate;
+          symbolPosition[0] += 1.0;
+          parentAnnotationLogicalId = annotation.geometricTolerance.logicalId;
+          break;
+        }
+        case AnnotationType.NOTE: {
+          // We do not want to generate inspection symbols on notes in the titleblock and borders
+          // and there is no way to distinguish them now.  So skipping notes for now.
+          symbolPosition = null;
+          parentAnnotationLogicalId = null;
           break;
         }
         default: {

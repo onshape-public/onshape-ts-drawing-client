@@ -183,51 +183,72 @@ export function getRandomViewOnActiveSheetFromExportData(exportData: GetDrawingJ
   return viewToReturn;
 }
 
-export function getAnnotationsOfViewFromExportData(exportData: GetDrawingJsonExportResponse, view: View2): Annotation[] {
-  let annotationsInView: Annotation[] = null;
-  let annotationViewId = '';
+export function getAnnotationsOfViewAndSheetFromExportData(exportData: GetDrawingJsonExportResponse, view: View2, includeSheetAnnotations: boolean): Annotation[] {
+  let annotationsInViewAndSheet: Annotation[] = null;
+  let annotationViewId: string = '';
+  let includeAnnotation: boolean = false;
 
   for (let indexSheet = 0; indexSheet < exportData.sheets.length; indexSheet++) {
     let sheet: Sheet = exportData.sheets[indexSheet];
     if (sheet.name === view.sheet) {
       for (let indexAnnotation = 0; indexAnnotation < sheet.annotations.length; indexAnnotation++) {
         let annotation: Annotation = sheet.annotations[indexAnnotation];
+        includeAnnotation = false;
         switch (annotation.type) {
+          case AnnotationType.CALLOUT: {
+            // Currently there is no way to tell which view is associated with a callout
+            includeAnnotation = includeSheetAnnotations;
+            break;
+          }
           case AnnotationType.DIMENSION_DIAMETER: {
-            annotationViewId = annotation.diametricDimension.chordPoint.viewId;
+            includeAnnotation = (view.viewId === annotation.diametricDimension.chordPoint.viewId);
             break;
           }
           case AnnotationType.DIMENSION_LINE_TO_LINE_ANGULAR: {
-            annotationViewId = annotation.lineToLineAngularDimension.point1.viewId;
+            includeAnnotation = (view.viewId === annotation.lineToLineAngularDimension.point1.viewId);
             break;
           }
           case AnnotationType.DIMENSION_LINE_TO_LINE_LINEAR: {
-            annotationViewId = annotation.lineToLineDimension.edge1.viewId;
+            includeAnnotation = (view.viewId === annotation.lineToLineDimension.edge1.viewId);
             break;
           }
           case AnnotationType.DIMENSION_POINT_TO_LINE_LINEAR: {
-            annotationViewId = annotation.pointToLineDimension.edge.viewId;
+            includeAnnotation = (view.viewId === annotation.pointToLineDimension.edge.viewId);
             break;
           }
           case AnnotationType.DIMENSION_POINT_TO_POINT_LINEAR: {
-            annotationViewId = annotation.pointToPointDimension.point1.viewId;
+            includeAnnotation = (view.viewId === annotation.pointToPointDimension.point1.viewId);
             break;
           }
           case AnnotationType.DIMENSION_RADIAL: {
-            annotationViewId = annotation.radialDimension.centerPoint.viewId;
+            includeAnnotation = (view.viewId === annotation.radialDimension.centerPoint.viewId);
+            break;
+          }
+          case AnnotationType.DIMENSION_THREE_POINT_ANGULAR: {
+            includeAnnotation = (view.viewId === annotation.threePointAngularDimension.point1.viewId);
+            break;
+          }
+          case AnnotationType.GEOMETRIC_TOLERANCE: {
+            // Currently there is no way to tell which view is associated with a geometric tolerance
+            includeAnnotation = includeSheetAnnotations;
+            break;
+          }
+          case AnnotationType.NOTE: {
+            // Currently there is no way to tell which view is associated with a note
+            includeAnnotation = includeSheetAnnotations;
             break;
           }
           default: {
-            annotationViewId = '';
+            includeAnnotation = false;
             break;
           }
         }
 
-        if (annotationViewId === view.viewId) {
-          if (annotationsInView === null) {
-            annotationsInView = [annotation];
+        if (includeAnnotation) {
+          if (annotationsInViewAndSheet === null) {
+            annotationsInViewAndSheet = [annotation];
           } else {
-            annotationsInView.push(annotation);
+            annotationsInViewAndSheet.push(annotation);
           }
         }
       }
@@ -235,7 +256,7 @@ export function getAnnotationsOfViewFromExportData(exportData: GetDrawingJsonExp
     }
   }
 
-  return annotationsInView;
+  return annotationsInViewAndSheet;
 }
 
 export function equalWithinTolerance(value1: number, value2: number, tolerance: number): boolean {
