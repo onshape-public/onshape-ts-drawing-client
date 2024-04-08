@@ -2,7 +2,7 @@ import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
 import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2 } from './utils/onshapetypes.js';
-import { usage, ModifyJob, DrawingScriptArgs, parseDrawingScriptArgs, getRandomLocation } from './utils/drawingutils.js';
+import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, getRandomLocation } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData, convertPointViewToPaper, getMidPoint, areParallelEdges } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -100,27 +100,17 @@ try {
         }]
       }) as BasicNode;
 
-      LOG.info('Initiated creation of line to line linear dimension in drawing', modifyRequest);
-      let jobStatus: ModifyJob = { requestState: 'ACTIVE', id: '' };
-      const end = timeSpan();
-      while (jobStatus.requestState === 'ACTIVE') {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        const elapsedSeconds = end.seconds();
-
-        // If modify takes over 1 minute, then log and continue
-        if (elapsedSeconds > 60) {
-          LOG.error(`Line to line linear dimension creation timed out after ${elapsedSeconds} seconds`);
-          break;
-        }
-
-        LOG.debug(`Waited for modify seconds=${elapsedSeconds}`);
-        jobStatus = await apiClient.get(`api/drawings/modify/status/${modifyRequest.id}`) as ModifyJob;
+      const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
+      if (waitSucceeded) {
+        console.log('Successfully created dimension.');
+        LOG.info(`Successfully created dimension.`);
+      } else {
+        console.log('Create dimension failed waiting for modify to finish.');
+        LOG.info('Create dimension failed waiting for modify to finish.');
       }
-
-      LOG.info(`Created line to line linear dimension`);
     } catch (error) {
       console.error(error);
-      LOG.error('Create line to line linear dimension failed in modify API call', error);
+      LOG.error('Create dimension failed in modify API call', error);
     }
   } else {
     console.log('Insufficient view and edge information to create the dimension.');

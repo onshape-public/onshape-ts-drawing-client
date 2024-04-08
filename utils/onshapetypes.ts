@@ -159,10 +159,14 @@ export interface ReleasePackageItemUpdate {
 // Drawings types
 
 export class AnnotationType {
-  static RADIAL_DIMENSION = 'Onshape::Dimension::Radial';
-  static NOTE = 'Onshape::Note';
   static CENTERLINE_POINT_TO_POINT = 'Onshape::Centerline::PointToPoint';
+  static DIMENSION_DIAMETER = 'Onshape::Dimension::Diametric';
+  static DIMENSION_LINE_TO_LINE_ANGULAR = 'Onshape::Dimension::LineToLineAngular';
+  static DIMENSION_LINE_TO_LINE_LINEAR = 'Onshape::Dimension::LineToLine';
+  static DIMENSION_POINT_TO_LINE_LINEAR = 'Onshape::Dimension::PointToLine';
   static DIMENSION_POINT_TO_POINT_LINEAR = 'Onshape::Dimension::PointToPoint';
+  static DIMENSION_RADIAL = 'Onshape::Dimension::Radial';
+  static NOTE = 'Onshape::Note';
 }
 
 // View object returned from api/appelements/d/did/wv/wvid/e/eid/views/ API
@@ -280,6 +284,12 @@ export interface Edge {
   data: EdgeData;
 }
 
+export interface AssociatedEdge {
+  type: string;
+  uniqueId: string;
+  viewId: string;
+}
+
 export interface GetViewJsonGeometryResponse {
   bodyData: Edge[];
 }
@@ -313,6 +323,13 @@ export interface DimensionUnit {
   unit: string;
 }
 
+export interface GeometricTolerance {
+  boundingBoxPoint: UnassociatedPoint[];
+  frames: string[];
+  logicalId: string;
+  position: UnassociatedPoint;
+}
+
 export interface Note {
   contents: string;
   logicalId: string;
@@ -338,6 +355,58 @@ export interface PointToPointLinearDimension {
   unit: DimensionUnit;
 }
 
+export interface LineToLineAngularDimension {
+  arcPoint: UnassociatedPoint;
+  formatting: DimensionFormatting;
+  isDangling: boolean;
+  logicalId: string;
+  measurement: number;
+  point1: AssociatedPoint;
+  point2: AssociatedPoint;
+  point3: AssociatedPoint;
+  point4: AssociatedPoint;
+  textOverride: string;
+  textPosition: UnassociatedPoint;
+  unit: DimensionUnit;
+}
+
+export interface LineToLineLinearDimension {
+  edge1: AssociatedEdge;
+  edge2: AssociatedEdge;
+  formatting: DimensionFormatting;
+  isDangling: boolean;
+  logicalId: string;
+  measurement: number;
+  textOverride: string;
+  textPosition: UnassociatedPoint;
+  unit: DimensionUnit;
+}
+
+export interface PointToLineLinearDimension {
+  edge: AssociatedEdge;
+  formatting: DimensionFormatting;
+  isDangling: boolean;
+  logicalId: string;
+  measurement: number;
+  point: AssociatedPoint;
+  rotation: number;
+  textOverride: string;
+  textPosition: UnassociatedPoint;
+  unit: DimensionUnit;
+}
+
+export interface DiameterDimension {
+  chordPoint: AssociatedPoint;
+  farChordPoint: AssociatedPoint;
+  formatting: DimensionFormatting;
+  isDangling: boolean;
+  logicalId: string;
+  measurement: number;
+  textOverride: string;
+  textPosition: UnassociatedPoint;
+  unit: DimensionUnit;
+}
+
 export interface RadialDimension {
   centerPoint: AssociatedPoint;
   chordPoint: AssociatedPoint;
@@ -353,6 +422,10 @@ export interface RadialDimension {
 export interface Annotation {
   type: string;
   note?: Note;
+  diametricDimension?: DiameterDimension;
+  lineToLineAngularDimension?: LineToLineAngularDimension;
+  lineToLineDimension?: LineToLineLinearDimension;
+  pointToLineDimension?: PointToLineLinearDimension;
   pointToPointCenterline?: PointToPointCenterline;
   pointToPointDimension?: PointToPointLinearDimension;
   radialDimension?: RadialDimension;

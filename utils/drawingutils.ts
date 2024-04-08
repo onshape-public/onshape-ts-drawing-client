@@ -138,6 +138,31 @@ export async function getDrawingJsonExport(apiClient: ApiClient, documentId: str
   return exportData;
 }
 
+export async function waitForModifyToFinish(apiClient: ApiClient, idModifyRequest: string): Promise<boolean> {
+
+  let succeeded: boolean = true;
+  let elapsedSeconds: number = 0;
+
+  let jobStatus: ModifyJob = { requestState: 'ACTIVE', id: '' };
+  const end = timeSpan();
+  while (jobStatus.requestState === 'ACTIVE') {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    elapsedSeconds = end.seconds();
+
+    // If modify takes over 1 minute, then log and continue
+    if (elapsedSeconds > 60) {
+      succeeded = false;
+      LOG.error(`Callout creation timed out after ${elapsedSeconds} seconds`);
+      break;
+    }
+
+    LOG.debug(`Waited for modify seconds=${elapsedSeconds}`);
+    jobStatus = await apiClient.get(`api/drawings/modify/status/${idModifyRequest}`) as ModifyJob;
+  }
+
+  return succeeded;
+}
+
 export function getRandomViewOnActiveSheetFromExportData(exportData: GetDrawingJsonExportResponse): View2 {
   let viewToReturn: View2 = null;
 
@@ -167,12 +192,35 @@ export function getAnnotationsOfViewFromExportData(exportData: GetDrawingJsonExp
     if (sheet.name === view.sheet) {
       for (let indexAnnotation = 0; indexAnnotation < sheet.annotations.length; indexAnnotation++) {
         let annotation: Annotation = sheet.annotations[indexAnnotation];
-        if (annotation.type === AnnotationType.RADIAL_DIMENSION) {
-          annotationViewId = annotation.radialDimension.centerPoint.viewId;
-        } else if (annotation.type === AnnotationType.DIMENSION_POINT_TO_POINT_LINEAR) {
-          annotationViewId = annotation.pointToPointDimension.point1.viewId;
-        } else {
-          annotationViewId = '';
+        switch (annotation.type) {
+          case AnnotationType.DIMENSION_DIAMETER: {
+            annotationViewId = annotation.diametricDimension.chordPoint.viewId;
+            break;
+          }
+          case AnnotationType.DIMENSION_LINE_TO_LINE_ANGULAR: {
+            annotationViewId = annotation.lineToLineAngularDimension.point1.viewId;
+            break;
+          }
+          case AnnotationType.DIMENSION_LINE_TO_LINE_LINEAR: {
+            annotationViewId = annotation.lineToLineDimension.edge1.viewId;
+            break;
+          }
+          case AnnotationType.DIMENSION_POINT_TO_LINE_LINEAR: {
+            annotationViewId = annotation.pointToLineDimension.edge.viewId;
+            break;
+          }
+          case AnnotationType.DIMENSION_POINT_TO_POINT_LINEAR: {
+            annotationViewId = annotation.pointToPointDimension.point1.viewId;
+            break;
+          }
+          case AnnotationType.DIMENSION_RADIAL: {
+            annotationViewId = annotation.radialDimension.centerPoint.viewId;
+            break;
+          }
+          default: {
+            annotationViewId = '';
+            break;
+          }
         }
 
         if (annotationViewId === view.viewId) {
@@ -188,6 +236,10 @@ export function getAnnotationsOfViewFromExportData(exportData: GetDrawingJsonExp
   }
 
   return annotationsInView;
+}
+
+export function equalWithinTolerance(value1: number, value2: number, tolerance: number): boolean {
+  return ((value1 + tolerance > value2) && (value1 - tolerance < value2));
 }
 
 /**
@@ -280,10 +332,6 @@ export function getMidPoint(pointOne: number[], pointTwo: number[]): number[] {
   }
 
   return midPoint;
-}
-
-export function equalWithinTolerance(value1: number, value2: number, tolerance: number): boolean {
-  return ((value1 + tolerance > value2) && (value1 - tolerance < value2));
 }
 
 export function areParallelEdges(edgeOneStartPoint: number[], edgeOneEndPoint: number[],
