@@ -282,14 +282,31 @@ export function getMidPoint(pointOne: number[], pointTwo: number[]): number[] {
   return midPoint;
 }
 
+export function equalWithinTolerance(value1: number, value2: number, tolerance: number): boolean {
+  return ((value1 + tolerance > value2) && (value1 - tolerance < value2));
+}
+
 export function areParallelEdges(edgeOneStartPoint: number[], edgeOneEndPoint: number[],
   edgeTwoStartPoint: number[], edgeTwoEndPoint: number[]): boolean {
 
+  let slopeTolerance = 0.001;
+  let verticalTolerance = 0.001;
+
   let areParallel: boolean = true;
 
+  // First check for vertical lines
+  let edgeOneVertical: boolean = equalWithinTolerance(edgeOneEndPoint[1] - edgeOneStartPoint[1], 0.0, verticalTolerance);
+  let edgeTwoVertical: boolean = equalWithinTolerance(edgeTwoEndPoint[1] - edgeTwoStartPoint[1], 0.0, verticalTolerance);
 
-
+  if (edgeOneVertical && edgeTwoVertical) {
+    areParallel = true;
+  } else if (edgeOneVertical || edgeTwoVertical) {
+    areParallel = false;
+  } else {
+    let slopeOne: number = (edgeOneEndPoint[1] - edgeOneStartPoint[1]) / (edgeOneEndPoint[0] - edgeOneStartPoint[0]);
+    let slopeTwo: number = (edgeTwoEndPoint[1] - edgeTwoStartPoint[1]) / (edgeTwoEndPoint[0] - edgeTwoStartPoint[0]);
+    areParallel = equalWithinTolerance(slopeOne, slopeTwo, slopeTolerance);
+  }
 
   return areParallel;
 }
-
