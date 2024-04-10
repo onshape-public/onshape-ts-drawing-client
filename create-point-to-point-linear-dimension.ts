@@ -23,13 +23,8 @@ try {
   /**
    * Retrieve a drawing view and some of its edges to get enough information to create the dimension
    */
-  try {
-    let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
-    viewToUse = getRandomViewOnActiveSheetFromExportData(drawingJsonExport);
-  } catch (error) {
-    console.error(error);
-    LOG.error('Create point to point linear dimension failed in retrieve view and line edge.', error);
-  }
+  let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
+  viewToUse = getRandomViewOnActiveSheetFromExportData(drawingJsonExport);
   
   if (viewToUse !== null) {
     LOG.info('Initiated retrieval of view json geometry');
