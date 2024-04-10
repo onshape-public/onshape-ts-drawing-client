@@ -29,7 +29,6 @@ try {
   if (viewToUse !== null) {
     LOG.info('Initiated retrieval of view json geometry');
     retrieveViewJsonGeometryResponse = await apiClient.get(`api/appelements/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/views/${viewToUse.viewId}/jsongeometry`) as GetViewJsonGeometryResponse;
-    LOG.info('Retrieval of view json geometry returned', retrieveViewJsonGeometryResponse);
 
     for (let indexEdge = 0; indexEdge < retrieveViewJsonGeometryResponse.bodyData.length; indexEdge++) {
       let edge: Edge = retrieveViewJsonGeometryResponse.bodyData[indexEdge];
