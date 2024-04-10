@@ -7,7 +7,17 @@
     "build": "npm install && tsc",
     "cleanoutputdirectory": "rimraf ./output && rimraf ./exports && rimraf ./reports && rimraf logs",
     "create-callout": "node .compiledjs/create-callout.js",
-    "create-note": "node .compiledjs/create-note.js"
+    "create-centerline": "node .compiledjs/create-centerline.js",
+    "create-diameter-dimension": "node .compiledjs/create-diameter-dimension.js",
+    "create-geometric-tolerance": "node .compiledjs/create-geometric-tolerance.js",
+    "create-inspection-symbols": "node .compiledjs/create-inspection-symbols.js",
+    "create-line-to-line-angular-dimension": "node .compiledjs/create-line-to-line-angular-dimension.js",
+    "create-line-to-line-linear-dimension": "node .compiledjs/create-line-to-line-linear-dimension.js",
+    "create-note": "node .compiledjs/create-note.js",
+    "create-point-to-line-linear-dimension": "node .compiledjs/create-point-to-line-linear-dimension.js",
+    "create-point-to-point-linear-dimension": "node .compiledjs/create-point-to-point-linear-dimension.js",
+    "create-radial-dimension": "node .compiledjs/create-radial-dimension.js",
+    "create-three-point-angular-dimension": "node .compiledjs/create-three-point-angular-dimension.js"
   },
   "repository": {
     "type": "git",
