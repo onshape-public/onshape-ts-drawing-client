@@ -1,11 +1,11 @@
 #### Description
 Sample Onshape Drawing API client in typescript.
 
-This sample has a long set of possible tasks that can be run, all of the form
+This sample has a long set of possible scripts that can be run, all of the form
 
 	$ npm run xxx
 
-where xxx is a task name, often followed by arguments that can vary task by task.
+where xxx is a script name, often followed by arguments.
 
 Note this repository shares an approach with the Onshape public repository
 
@@ -57,9 +57,9 @@ Note that the tsconfig.json file has a line in it:
 When you do 'npm run build', due to this setting, the Typescript compiler will automatically start watching for file changes and will rebuild every time you change and save a file in the project.
 If you do not want this behavior, then you can change the watch value to false.  But after that you will need to rebuild manually after each code change.
 
-#### Running Sample Tasks
+#### Running Sample Scripts
 
-After building, you can run any of these sample tasks from the terminal command line:
+After building, you can run any of these sample scripts from the terminal command line:
 
 ```
 npm run create-note --drawinguri=<drawing uri> --stack=cad
@@ -110,8 +110,8 @@ Refer to [log4js](https://log4js-node.github.io/log4js-node/) for additional log
 
 #### Visual Studio Code
 
-Using the **Visual Studio Code** IDE is **HIGHLY** recommended to edit this sample code, add additional tasks, debug and run the tasks.  The advantages of Visual Studio Code are:
+Using the **Visual Studio Code** IDE is **HIGHLY** recommended to edit this sample code, add additional scripts, debug and run the scripts.  The advantages of Visual Studio Code are:
 
 1. Style and eslint settings are preconfigured for Visual Studio Code workspace.
-2. Debugging various scripts is already setup in **launch.json**.  You can edit that file - launch.json - to set the drawinguri, stack and companyId values for each task for your situation.
-3. You can pick which task to run in the **Run and Debug** panel on the left side.  There's a dropdown at the top where you can choose the task to run and debug.
+2. Debugging various scripts is already setup in **launch.json**.  You can edit that file - launch.json - to set the drawinguri, stack and companyId values for each script for your situation.
+3. You can pick which script to run in the **Run and Debug** panel on the left side.  There's a dropdown at the top where you can choose the script to run and debug.
