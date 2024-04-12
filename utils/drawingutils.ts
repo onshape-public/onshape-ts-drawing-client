@@ -59,7 +59,7 @@ export function parseDrawingScriptArgs(): DrawingScriptArgs {
     elementId: ''
   };
 
-  LOG.info(`Processing docuri=${drawingUri}`);
+  LOG.info(`Processing drawinguri=${drawingUri}`);
   let url: URL = null;
   try {
     url = new URL(drawingUri);
