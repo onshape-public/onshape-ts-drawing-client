@@ -41,7 +41,7 @@
     "rimraf": "^5.0.5",
     "sanitize-filename": "^1.6.3",
     "time-span": "^5.1.0",
-    "typescript": "^5.4.5",
+    "typescript": "^4.9.5 ",
     "unirest": "^0.6.0"
   },
   "devDependencies": {
@@ -52,7 +52,7 @@
     "@types/localtunnel": "^2.0.1",
     "@types/minimist": "^1.2.2",
     "@types/mkdirp": "^2.0.0",
-    "@types/node": "^20.12.7",
+    "@types/node": "^18.11.19",
     "@types/randomstring": "^1.1.8",
     "@typescript-eslint/eslint-plugin": "^7.6.0",
     "@typescript-eslint/parser": "^7.6.0",
