@@ -30,7 +30,6 @@
   },
   "homepage": "https://github.com/onshape-public/onshape-ts-drawing-client#readme",
   "dependencies": {
-    "csv-stringify": "^6.2.3",
     "death": "^1.1.0",
     "debug": "^4.3.4",
     "express": "^4.18.2",
