@@ -19,7 +19,7 @@ try {
   let endPointEdgeUniqueId: string = null;
 
   /**
-   * Retrieve a drawing view and some of its edges to get enough information to create the centerline
+   * Retrieve a drawing view and some of its edges to get information to create the centerline
    */
   let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
   viewToUse = getRandomViewOnActiveSheetFromExportData(drawingJsonExport);

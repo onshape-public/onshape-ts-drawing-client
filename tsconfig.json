@@ -8,8 +8,14 @@
     "strictNullChecks": false,
     "moduleResolution": "node16",
     "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "watch": true
+    "strict": true
+  },
+  "watchOptions": {
+    "watchFile": "useFsEvents",
+    "watchDirectory": "useFsEvents",
+    "fallbackPolling": "dynamicPriority",
+    "synchronousWatchDirectory": true,
+    "excludeDirectories": ["**/node_modules", "_build"]
   },
   "include": [
     "*.ts",
