@@ -7,6 +7,12 @@ This sample has a long set of possible tasks that can be run, all of the form
 
 where xxx is a task name, often followed by arguments that can vary task by task.
 
+Note this repository shares an approach with the Onshape public repository
+
+https://github.com/onshape-public/onshape-ts-client
+
+You are encouraged to also look at that repository for non-drawings Onshape examples.
+
 #### Installation
 
 1. Install git, nodejs and npm
