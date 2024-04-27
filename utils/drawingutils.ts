@@ -34,6 +34,8 @@ export interface ModifyJob extends BasicNode {
 export class DrawingScriptArgs {
   /** The stack to use for credentials */
   stackToUse: string;
+  /** The base URL */
+  baseURL: string;
   /** The document id */
   documentId: string;
   /** The workspace id */
@@ -54,6 +56,7 @@ export function parseDrawingScriptArgs(): DrawingScriptArgs {
 
   let drawingScriptArgs: DrawingScriptArgs = {
     stackToUse: ArgumentParser.get('stack'),
+    baseURL: '',
     documentId: '',
     workspaceId: '',
     elementId: ''
@@ -66,6 +69,8 @@ export function parseDrawingScriptArgs(): DrawingScriptArgs {
   } catch (error) {
     throw new Error(`Failed to parse ${drawingUri} as valid URL`);
   }
+
+  drawingScriptArgs.baseURL = url.origin.toLowerCase();
 
   const lowerCasePath = url.pathname.toLowerCase();
   const regexMatch = lowerCasePath.match(/^\/documents\/([0-9a-f]{24})\/([wv])\/([0-9a-f]{24})\/e\/([0-9a-f]{24})$/);

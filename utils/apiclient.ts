@@ -69,6 +69,10 @@ export class ApiClient {
     return apiClient;
   }
 
+  public getBaseURL() {
+    return this.baseURL
+  }
+
   public async findCompanyInfo(): Promise<CompanyInfo> {
     const companiesResponse = await this.get('/api/companies') as ListResponse<CompanyInfo>;
     let allCompanies = companiesResponse?.items || [];

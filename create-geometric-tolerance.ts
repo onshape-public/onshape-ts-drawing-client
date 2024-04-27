@@ -8,9 +8,14 @@ const LOG = mainLog();
 
 let drawingScriptArgs: DrawingScriptArgs = null;
 let validArgs: boolean = true;
+let apiClient: ApiClient = null;
 
 try {
   drawingScriptArgs = parseDrawingScriptArgs();
+  apiClient = await ApiClient.createApiClient(drawingScriptArgs.stackToUse);
+  if (apiClient.getBaseURL() !== drawingScriptArgs.baseURL) {
+    console.log(`WARNING: Credentials base URL ${apiClient.getBaseURL()} does not match drawinguri base URL ${drawingScriptArgs.baseURL}.`);
+  }
 } catch (error) {
   validArgs = false;
   usage('create-geometric-tolerance');
@@ -24,7 +29,6 @@ if (validArgs) {
     const geometricToleranceFrame1 = '{\\fDrawing Symbols Sans;◎}%%v{\\fDrawing Symbols Sans;∅}tol1{\\fDrawing Symbols Sans;Ⓜ}%%v%%v%%v%%v%%v\n';
     const geometricToleranceFrame2 = '{\\fDrawing Symbols Sans;⌖}%%vto2{\\fDrawing Symbols Sans;Ⓛ}%%v%%v%%v%%v%%v\n';
     const textHeight = 0.12;
-    const apiClient = await ApiClient.createApiClient(drawingScriptArgs.stackToUse);
   
     /**
      * Modify the drawing to create a callout

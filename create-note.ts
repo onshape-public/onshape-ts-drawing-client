@@ -8,9 +8,14 @@ const LOG = mainLog();
 
 let drawingScriptArgs: DrawingScriptArgs = null;
 let validArgs: boolean = true;
+let apiClient: ApiClient = null;
 
 try {
   drawingScriptArgs = parseDrawingScriptArgs();
+  apiClient = await ApiClient.createApiClient(drawingScriptArgs.stackToUse);
+  if (apiClient.getBaseURL() !== drawingScriptArgs.baseURL) {
+    console.log(`WARNING: Credentials base URL ${apiClient.getBaseURL()} does not match drawinguri base URL ${drawingScriptArgs.baseURL}.`);
+  }
 } catch (error) {
   validArgs = false;
   usage('create-note');
@@ -23,7 +28,6 @@ if (validArgs) {
     const randomLocation: number[] = getRandomLocation([1.0, 1.0], [8.0, 8.0]);
     const textHeight = 0.12;
     const annotationText = `Note at x: ${randomLocation[0]} y: ${randomLocation[1]}`;
-    const apiClient = await ApiClient.createApiClient(drawingScriptArgs.stackToUse);
   
     /**
      * Modify the drawing to create a note

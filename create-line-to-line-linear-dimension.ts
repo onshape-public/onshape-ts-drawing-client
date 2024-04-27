@@ -9,9 +9,14 @@ const LOG = mainLog();
 
 let drawingScriptArgs: DrawingScriptArgs = null;
 let validArgs: boolean = true;
+let apiClient: ApiClient = null;
 
 try {
   drawingScriptArgs = parseDrawingScriptArgs();
+  apiClient = await ApiClient.createApiClient(drawingScriptArgs.stackToUse);
+  if (apiClient.getBaseURL() !== drawingScriptArgs.baseURL) {
+    console.log(`WARNING: Credentials base URL ${apiClient.getBaseURL()} does not match drawinguri base URL ${drawingScriptArgs.baseURL}.`);
+  }
 } catch (error) {
   validArgs = false;
   usage('create-line-to-line-linear-dimension');
@@ -21,7 +26,6 @@ if (validArgs) {
   try {
     LOG.info(`documentId=${drawingScriptArgs.documentId}, workspaceId=${drawingScriptArgs.workspaceId}, elementId=${drawingScriptArgs.elementId}`);
   
-    const apiClient = await ApiClient.createApiClient(drawingScriptArgs.stackToUse);
     let viewToUse: View2 = null;
     let retrieveViewJsonGeometryResponse: GetViewJsonGeometryResponse = null;
     let point1: number[] = null;
