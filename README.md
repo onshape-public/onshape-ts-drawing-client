@@ -59,7 +59,7 @@ If you do not want this behavior, then you can change the watch value to false. 
 
 #### Running Sample Scripts
 
-After building, you can run any of these sample scripts from the terminal command line.  The drawinguri argument should be to a drawing in a document for which you have edit access.  The drawing should have a view that has edges that are lines, arcs and circles, as the sample code will pick a view and some of those edges when creating dimensions.
+After building, you can run any of these sample scripts from the terminal command line.
 
 ```
 npm run create-note --drawinguri=<drawing uri> --stack=cad
@@ -87,7 +87,7 @@ npm run create-diameter-dimension --drawinguri=<drawing uri> --stack=cad
 npm run create-inspection-symbols --drawinguri=<drawing uri> --stack=cad
 ```
 
-where drawing uri is a URL to a drawing in a workspace of an existing document that you have write access to.  For example, this is a possible drawing uri:
+The drawinguri argument should be to a drawing in a document to which you have edit access.  The drawing should be in a workspace and have a view that has edges that are lines, arcs and circles. The sample code will pick a view and some of those edges when creating dimensions. For example, this is a possible drawing uri:
 
 ```
 https://cad.onshape.com/documents/61c4c3f6c490bac4c9db5d58/w/289385821d88d91849a7cd70/e/ae3c0bd456a8cd3f3d40dddc
