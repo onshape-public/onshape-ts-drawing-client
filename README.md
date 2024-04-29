@@ -59,7 +59,7 @@ If you do not want this behavior, then you can change the watch value to false. 
 
 #### Running Sample Scripts
 
-After building, you can run any of these sample scripts from the terminal command line:
+After building, you can run any of these sample scripts from the terminal command line.  The drawinguri argument should be to a drawing in a document for which you have edit access.  The drawing should have a view that has edges that are lines, arcs and circles, as the sample code will pick a view and some of those edges when creating dimensions.
 
 ```
 npm run create-note --drawinguri=<drawing uri> --stack=cad

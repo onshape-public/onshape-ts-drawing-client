@@ -89,6 +89,16 @@ export function parseDrawingScriptArgs(): DrawingScriptArgs {
   return drawingScriptArgs;
 }
 
+/**
+ * The base URL in the credentials.json should match the base URL of the documenturi argument.
+ * Warn if they do not match.  It's possible they are the same and not match (e.g. 127.0.0.1 and localhost).
+ */
+export function validateBaseURLs(credentialsBaseURL: string, argumentsBaseURL: string) {
+  if (credentialsBaseURL !== argumentsBaseURL) {
+    console.log(`WARNING: Credentials base URL ${credentialsBaseURL} does not match drawinguri base URL ${argumentsBaseURL}.`);
+  }
+}
+
 export function getRandomLocation(minLocation: number[], maxLocation: number[]): number[] {
   // Position of note is random between (minLocation[0], minLocation[1]) and (maxLocation[0], maxLocation[1])
   const xPosition: number = minLocation[0] + (Math.random() * (maxLocation[0] - minLocation[0]));

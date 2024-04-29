@@ -2,7 +2,7 @@ import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
 import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2 } from './utils/onshapetypes.js';
-import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, getRandomLocation } from './utils/drawingutils.js';
+import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getRandomLocation } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData, convertPointViewToPaper, getMidPoint, areParallelEdges } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -14,9 +14,7 @@ let apiClient: ApiClient = null;
 try {
   drawingScriptArgs = parseDrawingScriptArgs();
   apiClient = await ApiClient.createApiClient(drawingScriptArgs.stackToUse);
-  if (apiClient.getBaseURL() !== drawingScriptArgs.baseURL) {
-    console.log(`WARNING: Credentials base URL ${apiClient.getBaseURL()} does not match drawinguri base URL ${drawingScriptArgs.baseURL}.`);
-  }
+  validateBaseURLs(apiClient.getBaseURL(), drawingScriptArgs.baseURL);
 } catch (error) {
   validArgs = false;
   usage('create-three-point-angular-dimension');
