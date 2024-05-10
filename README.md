@@ -64,6 +64,8 @@ After building, you can run any of these sample scripts from the terminal comman
 ```
 npm run create-note --drawinguri=<drawing uri> --stack=cad
 
+npm run create-note-with-leader --drawinguri=<drawing uri> --stack=cad
+
 npm run create-callout --drawinguri=<drawing uri> --stack=cad
 
 npm run create-callout-with-leader --drawinguri=<drawing uri> --stack=cad

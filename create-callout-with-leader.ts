@@ -59,6 +59,7 @@ if (validArgs) {
           calloutLocation[0] -= 2.0;
           calloutLocation[1] -= 2.0;
 
+          // Should not need to upper case the id, but it is needed now.  Fixing it soon.
           leaderEdgeId = edge.uniqueId.toUpperCase();
           leaderViewId = viewToUse.viewId;
           break;
