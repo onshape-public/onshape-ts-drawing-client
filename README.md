@@ -66,6 +66,8 @@ npm run create-note --drawinguri=<drawing uri> --stack=cad
 
 npm run create-callout --drawinguri=<drawing uri> --stack=cad
 
+npm run create-callout-with-leader --drawinguri=<drawing uri> --stack=cad
+
 npm run create-geometric-tolerance --drawinguri=<drawing uri> --stack=cad
 
 npm run create-centerline --drawinguri=<drawing uri> --stack=cad
