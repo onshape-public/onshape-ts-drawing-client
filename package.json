@@ -19,6 +19,7 @@
     "create-point-to-line-linear-dimension": "node .compiledjs/create-point-to-line-linear-dimension.js",
     "create-point-to-point-linear-dimension": "node .compiledjs/create-point-to-point-linear-dimension.js",
     "create-radial-dimension": "node .compiledjs/create-radial-dimension.js",
+    "create-table": "node .compiledjs/create-table.js",
     "create-three-point-angular-dimension": "node .compiledjs/create-three-point-angular-dimension.js"
   },
   "repository": {

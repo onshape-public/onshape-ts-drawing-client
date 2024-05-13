@@ -72,6 +72,8 @@ npm run create-callout-with-leader --drawinguri=<drawing uri> --stack=cad
 
 npm run create-geometric-tolerance --drawinguri=<drawing uri> --stack=cad
 
+npm run create-table --drawinguri=<drawing uri> --stack=cad
+
 npm run create-centerline --drawinguri=<drawing uri> --stack=cad
 
 npm run create-point-to-point-linear-dimension --drawinguri=<drawing uri> --stack=cad
