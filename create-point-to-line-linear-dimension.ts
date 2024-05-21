@@ -47,17 +47,17 @@ if (validArgs) {
         if (point === null) {
           if (edge.type === 'line') {
             point = edge.data.start;
-            pointUniqueId = edge.uniqueId;  
+            pointUniqueId = edge.uniqueId.toUpperCase();  
           } else if (edge.type === 'circle') {
             point = edge.data.center;
-            pointUniqueId = edge.uniqueId;
+            pointUniqueId = edge.uniqueId.toUpperCase();
           } else if (edge.type === 'circularArc') {
             point = edge.data.center;
-            pointUniqueId = edge.uniqueId;
+            pointUniqueId = edge.uniqueId.toUpperCase();
           }
         } else if (edgeUniqueId === null && edge.type === 'line') {
           edgeStartPoint = edge.data.start;
-          edgeUniqueId = edge.uniqueId;
+          edgeUniqueId = edge.uniqueId.toUpperCase();
           break;
         }
       }

@@ -54,11 +54,11 @@ if (validArgs) {
         // Want circles with view axis perpendicular to view plane
         if (edge.type === 'circle' && isArcAxisPerpendicularToViewPlane(edge.data.axisDir)) {
           centerPoint = edge.data.center;
-          centerPointEdgeUniqueId = edge.uniqueId;
+          centerPointEdgeUniqueId = edge.uniqueId.toUpperCase();
           chordPoint = pointOnCircle(edge.data.center, edge.data.radius, 45.0);
-          chordPointEdgeUniqueId = edge.uniqueId;
+          chordPointEdgeUniqueId = edge.uniqueId.toUpperCase();
           farChordPoint = pointOnCircle(edge.data.center, edge.data.radius, 225.0);
-          farChordPointEdgeUniqueId = edge.uniqueId;
+          farChordPointEdgeUniqueId = edge.uniqueId.toUpperCase();
   
           // Locate text out from chord point by a bit
           textLocation = [

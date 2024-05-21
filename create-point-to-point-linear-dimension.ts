@@ -47,9 +47,9 @@ if (validArgs) {
         // Want line edge
         if (edge.type === 'line') {
           startPoint = edge.data.start;
-          startPointEdgeUniqueId = edge.uniqueId;
+          startPointEdgeUniqueId = edge.uniqueId.toUpperCase();
           endPoint = edge.data.end;
-          endPointEdgeUniqueId = edge.uniqueId;
+          endPointEdgeUniqueId = edge.uniqueId.toUpperCase();
   
           // Put text location out from mid point by arbitrary amount
           textLocation = getMidPoint(startPoint, endPoint);

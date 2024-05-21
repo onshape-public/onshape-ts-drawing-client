@@ -50,9 +50,9 @@ if (validArgs) {
             if (point1 === null) {
               point1 = edge.data.start;
               point2 = edge.data.end;
-              firstEdgeUniqueId = edge.uniqueId;  
+              firstEdgeUniqueId = edge.uniqueId.toUpperCase();  
             } else if (areParallelEdges(point1, point2, edge.data.start, edge.data.end)) {
-              secondEdgeUniqueId = edge.uniqueId;
+              secondEdgeUniqueId = edge.uniqueId.toUpperCase();
             
               // Put text location on some mid point between two edges
               textLocation = getMidPoint(point1, edge.data.start);

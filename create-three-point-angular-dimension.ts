@@ -53,11 +53,11 @@ if (validArgs) {
             if (point1 === null) {
               point1 = edge.data.start;
               point2 = edge.data.end;
-              point1UniqueId = edge.uniqueId;
-              point2UniqueId = edge.uniqueId; 
+              point1UniqueId = edge.uniqueId.toUpperCase();
+              point2UniqueId = edge.uniqueId.toUpperCase(); 
             } else if (centerPoint === null) {
               centerPoint = getMidPoint(edge.data.start, edge.data.end);
-              centerPointUniqueId = edge.uniqueId;
+              centerPointUniqueId = edge.uniqueId.toUpperCase();
             
               // Put text location on some mid point between point1 and point2
               textLocation = getMidPoint(point1, point2);

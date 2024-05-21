@@ -47,9 +47,9 @@ if (validArgs) {
         // Want circular arcs with view axis perpendicular to view plane
         if (edge.type === 'circularArc' && isArcAxisPerpendicularToViewPlane(edge.data.axisDir)) {
           centerPoint = edge.data.center;
-          centerPointEdgeUniqueId = edge.uniqueId;
+          centerPointEdgeUniqueId = edge.uniqueId.toUpperCase();
           chordPoint = midPointOfArc(edge.data.center, edge.data.radius, edge.data.start, edge.data.end);
-          chordPointEdgeUniqueId = edge.uniqueId;
+          chordPointEdgeUniqueId = edge.uniqueId.toUpperCase();
   
           // Put text out from chord point by the radius of edge in appropriate direction
           textLocation = chordPoint;

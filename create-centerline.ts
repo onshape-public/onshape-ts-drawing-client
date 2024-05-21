@@ -42,13 +42,13 @@ if (validArgs) {
   
       for (let indexEdge = 0; indexEdge < retrieveViewJsonGeometryResponse.bodyData.length; indexEdge++) {
         let edge: Edge = retrieveViewJsonGeometryResponse.bodyData[indexEdge];
-        if (edge.type === 'line') {
+        if (edge.type === 'circle') {
           if (startPoint === null) {
-            startPoint = edge.data.start;
-            startPointEdgeUniqueId = edge.uniqueId;
+            startPoint = edge.data.center;
+            startPointEdgeUniqueId = edge.uniqueId.toUpperCase();
           } else if (endPoint === null) {
-            endPoint = edge.data.start;
-            endPointEdgeUniqueId = edge.uniqueId;
+            endPoint = edge.data.center;
+            endPointEdgeUniqueId = edge.uniqueId.toUpperCase();
             break;
           }
         }

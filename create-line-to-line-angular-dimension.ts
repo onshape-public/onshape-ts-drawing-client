@@ -53,11 +53,11 @@ if (validArgs) {
             if (point1 === null) {
               point1 = edge.data.start;
               point2 = edge.data.end;
-              firstEdgeUniqueId = edge.uniqueId;  
+              firstEdgeUniqueId = edge.uniqueId.toUpperCase();  
             } else {
               point3 = edge.data.start;
               point4 = edge.data.end;
-              secondEdgeUniqueId = edge.uniqueId;
+              secondEdgeUniqueId = edge.uniqueId.toUpperCase();
             
               // Put arc point and text location out from mid point by arbitrary amount
               arcPoint = getMidPoint(point1, point3);

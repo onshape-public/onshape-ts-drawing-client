@@ -316,7 +316,7 @@ if (validArgs) {
     const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
     if (waitSucceeded) {
       console.log('Successfully created table.');
-      LOG.info(`Successfully created tab;e.`);
+      LOG.info(`Successfully created table.`);
     } else {
       console.log('Create table failed waiting for modify to finish.');
       LOG.info('Create table failed waiting for modify to finish.');
