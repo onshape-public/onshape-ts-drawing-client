@@ -139,7 +139,7 @@ if (validArgs) {
       if (annotationsToRequest !== null) {
         // Post request to create inspection symbols on the dimensions
         const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`,  {
-          description: "Add Inspection Symbol",
+          description: 'Add Inspection Symbol',
           jsonRequests: [ {
             messageName: 'onshapeCreateAnnotations',
             formatVersion: '2021-01-01',

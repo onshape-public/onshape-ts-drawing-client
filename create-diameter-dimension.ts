@@ -1,7 +1,7 @@
 import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetDrawingJsonExportResponse, GetViewJsonGeometryResponse, View2 } from './utils/onshapetypes.js';
+import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetDrawingJsonExportResponse, GetViewJsonGeometryResponse, View2, SnapPointType } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getRandomLocation } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData, isArcAxisPerpendicularToViewPlane, convertPointViewToPaper, pointOnCircle } from './utils/drawingutils.js';
 
@@ -37,13 +37,8 @@ if (validArgs) {
     /**
      * Retrieve a drawing view and some of its edges to get enough information to create the diameter dimension
      */
-    try {
-      let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
-      viewToUse = getRandomViewOnActiveSheetFromExportData(drawingJsonExport);
-    } catch (error) {
-      console.error(error);
-      LOG.error('Create diameter dimension failed: ', error);
-    }
+    let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
+    viewToUse = getRandomViewOnActiveSheetFromExportData(drawingJsonExport);
     
     if (viewToUse !== null) {
       LOG.info('Initiated retrieval of view json geometry');
@@ -54,11 +49,11 @@ if (validArgs) {
         // Want circles with view axis perpendicular to view plane
         if (edge.type === 'circle' && isArcAxisPerpendicularToViewPlane(edge.data.axisDir)) {
           centerPoint = edge.data.center;
-          centerPointEdgeUniqueId = edge.uniqueId.toUpperCase();
+          centerPointEdgeUniqueId = edge.uniqueId;
           chordPoint = pointOnCircle(edge.data.center, edge.data.radius, 45.0);
-          chordPointEdgeUniqueId = edge.uniqueId.toUpperCase();
+          chordPointEdgeUniqueId = edge.uniqueId;
           farChordPoint = pointOnCircle(edge.data.center, edge.data.radius, 225.0);
-          farChordPointEdgeUniqueId = edge.uniqueId.toUpperCase();
+          farChordPointEdgeUniqueId = edge.uniqueId;
   
           // Locate text out from chord point by a bit
           textLocation = [
@@ -73,49 +68,53 @@ if (validArgs) {
     }
   
     if (viewToUse != null && centerPoint !== null && chordPoint !== null && centerPointEdgeUniqueId !== null && chordPointEdgeUniqueId !== null) {
-      /**
-       * Modify the drawing to create a radial dimension
-       */
-      const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`,  {
-        description: "Add diameter dim",
-        jsonRequests: [ {
-          messageName: 'onshapeCreateAnnotations',
-          formatVersion: '2021-01-01',
-          annotations: [
-            {
-              type: 'Onshape::Dimension::Diametric',
-              diametricDimension: {
-                chordPoint: {
-                  coordinate: chordPoint,
-                  type: 'Onshape::Reference::Point',
-                  uniqueId: chordPointEdgeUniqueId,
-                  viewId: viewToUse.viewId
-                },
-                farChordPoint: {
-                  coordinate: farChordPoint,
-                  type: 'Onshape::Reference::Point',
-                  uniqueId: farChordPointEdgeUniqueId,
-                  viewId: viewToUse.viewId
-                },
-                formatting: {
-                  dimdec: 2,
-                  dimlim: false,
-                  dimpost: 'R<>',
-                  dimtm: 0,
-                  dimtol: false,
-                  dimtp: 0,
-                  type: 'Onshape::Formatting::Dimension'
-                },
-                textOverride: '',
-                textPosition: {
-                  coordinate: textLocation,
-                  type: 'Onshape::Reference::Point'
+
+      const requestBody = {
+        description: 'Add diameter dim',
+        jsonRequests: [
+          {
+            messageName: 'onshapeCreateAnnotations',
+            formatVersion: '2021-01-01',
+            annotations: [
+              {
+                type: 'Onshape::Dimension::Diametric',
+                diametricDimension: {
+                  chordPoint: {
+                    coordinate: chordPoint,
+                    type: 'Onshape::Reference::Point',
+                    uniqueId: chordPointEdgeUniqueId,
+                    viewId: viewToUse.viewId,
+                    snapPointType: SnapPointType.ModeNear
+                  },
+                  farChordPoint: {
+                    coordinate: farChordPoint,
+                    type: 'Onshape::Reference::Point',
+                    uniqueId: farChordPointEdgeUniqueId,
+                    viewId: viewToUse.viewId,
+                    snapPointType: SnapPointType.ModeNear
+                  },
+                  formatting: {
+                    dimdec: 2,
+                    dimlim: false,
+                    dimpost: 'R<>',
+                    dimtm: 0,
+                    dimtol: false,
+                    dimtp: 0,
+                    type: 'Onshape::Formatting::Dimension'
+                  },
+                  textOverride: '',
+                  textPosition: {
+                    coordinate: textLocation,
+                    type: 'Onshape::Reference::Point'
+                  }
                 }
               }
-            }
-          ]
-        }]
-      }) as BasicNode;
+            ]
+          }
+        ]
+      };
+
+      const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`,  requestBody) as BasicNode;
   
       const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
       if (waitSucceeded) {

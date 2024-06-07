@@ -298,6 +298,11 @@ export function isArcAxisPerpendicularToViewPlane(axisDir: number[]): boolean {
   return perpendicularToViewPlane;
 }
 
+/**
+ * Views have their own coordinate system, as does each drawing sheet.
+ * This function converts from a view's coordinate system to its sheet coordinate system
+ * using the view's view to paper matrix.
+ */
 export function convertPointViewToPaper(pointInView: number[], viewToPaperMatrix: number[]): number[] {
   let pointInPaper: number[] = null;
 
@@ -393,4 +398,18 @@ export function areParallelEdges(edgeOneStartPoint: number[], edgeOneEndPoint: n
   }
 
   return areParallel;
+}
+
+export function areCoincidentPoints(pointOne: number[], pointTwo: number[]): boolean {
+  let distanceTolerance = 0.001;  // Somewhat arbitrary
+  let areCoincident: boolean = false;
+
+  if (pointOne.length === 3 && pointTwo.length === 3) {
+    areCoincident =
+      equalWithinTolerance(pointOne[0], pointTwo[0], distanceTolerance) &&
+      equalWithinTolerance(pointOne[1], pointTwo[1], distanceTolerance) &&
+      equalWithinTolerance(pointOne[2], pointTwo[2], distanceTolerance);
+  }
+
+  return areCoincident;
 }

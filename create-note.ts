@@ -26,30 +26,31 @@ if (validArgs) {
     const randomLocation: number[] = getRandomLocation([1.0, 1.0], [8.0, 8.0]);
     const textHeight = 0.12;
     const annotationText = `Note at x: ${randomLocation[0]} y: ${randomLocation[1]}`;
-  
-    /**
-     * Modify the drawing to create a note
-     */
-    const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`,  {
-      description: "Add note",
-      jsonRequests: [ {
-        messageName: 'onshapeCreateAnnotations',
-        formatVersion: '2021-01-01',
-        annotations: [
-          {
-            type: 'Onshape::Note',
-            note: {
-              position: {
-                type: 'Onshape::Reference::Point',
-                coordinate: randomLocation
-              },
-              contents: annotationText,
-              textHeight: textHeight
+
+    const requestBody = {
+      description: 'Add note',
+      jsonRequests: [
+        {
+          messageName: 'onshapeCreateAnnotations',
+          formatVersion: '2021-01-01',
+          annotations: [
+            {
+              type: 'Onshape::Note',
+              note: {
+                position: {
+                  type: 'Onshape::Reference::Point',
+                  coordinate: randomLocation
+                },
+                contents: annotationText,
+                textHeight: textHeight
+              }
             }
-          }
-        ]
-      }]
-    }) as BasicNode;
+          ]
+        }
+      ]
+    };
+
+    const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`, requestBody) as BasicNode;
   
     const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
     if (waitSucceeded) {

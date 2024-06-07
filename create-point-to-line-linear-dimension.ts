@@ -1,7 +1,7 @@
 import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2 } from './utils/onshapetypes.js';
+import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2, SnapPointType } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getRandomLocation } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData, convertPointViewToPaper, getMidPoint } from './utils/drawingutils.js';
 
@@ -28,9 +28,12 @@ if (validArgs) {
     let retrieveViewJsonGeometryResponse: GetViewJsonGeometryResponse = null;
     let point: number[] = null;
     let pointUniqueId: string = null;
+    let pointSnapPointType: SnapPointType = null;
     let edgeStartPoint: number[] = null;
     let edgeUniqueId: string = null;
+    let edgeSnapPointType: SnapPointType = null;
     let textLocation: number[] = null;
+
   
     /**
      * Retrieve a drawing view and some of its edges to get enough information to create the dimension
@@ -47,17 +50,21 @@ if (validArgs) {
         if (point === null) {
           if (edge.type === 'line') {
             point = edge.data.start;
-            pointUniqueId = edge.uniqueId.toUpperCase();  
+            pointUniqueId = edge.uniqueId;
+            pointSnapPointType = SnapPointType.ModeStart;
           } else if (edge.type === 'circle') {
             point = edge.data.center;
-            pointUniqueId = edge.uniqueId.toUpperCase();
+            pointUniqueId = edge.uniqueId;
+            pointSnapPointType = SnapPointType.ModeCenter;
           } else if (edge.type === 'circularArc') {
             point = edge.data.center;
-            pointUniqueId = edge.uniqueId.toUpperCase();
+            pointUniqueId = edge.uniqueId;
+            pointSnapPointType = SnapPointType.ModeCenter;
           }
         } else if (edgeUniqueId === null && edge.type === 'line') {
           edgeStartPoint = edge.data.start;
-          edgeUniqueId = edge.uniqueId.toUpperCase();
+          edgeUniqueId = edge.uniqueId;
+          edgeSnapPointType = SnapPointType.ModeStart;
           break;
         }
       }
@@ -71,8 +78,9 @@ if (validArgs) {
     }
   
     if (viewToUse != null && point !== null && edgeUniqueId !== null) {
-      const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`,  {
-        description: "Add linear dim",
+
+      const requestBody = {
+        description: 'Add linear dim',
         jsonRequests: [ {
           messageName: 'onshapeCreateAnnotations',
           formatVersion: '2021-01-01',
@@ -84,12 +92,14 @@ if (validArgs) {
                   coordinate: point,
                   type: 'Onshape::Reference::Point',
                   uniqueId: pointUniqueId,
-                  viewId: viewToUse.viewId
+                  viewId: viewToUse.viewId,
+                  snapPointType: pointSnapPointType
                 },
                 edge: {
                   type: 'Onshape::Reference::Edge',
                   uniqueId: edgeUniqueId,
-                  viewId: viewToUse.viewId
+                  viewId: viewToUse.viewId,
+                  snapPointType: edgeSnapPointType
                 },
                 formatting: {
                   dimdec: 2,
@@ -109,7 +119,9 @@ if (validArgs) {
             }
           ]
         }]
-      }) as BasicNode;
+      };
+
+      const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`, requestBody) as BasicNode;
   
       const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
       if (waitSucceeded) {

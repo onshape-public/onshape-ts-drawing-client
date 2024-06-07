@@ -31,6 +31,8 @@ if (validArgs) {
     let textLocation: number[] = null;
     let startPointEdgeUniqueId: string = null;
     let endPointEdgeUniqueId: string = null;
+    let startSnapPointType: string = null;
+    let endSnapPointType: string = null;
   
     /**
      * Retrieve a drawing view and some of its edges to get enough information to create the dimension
@@ -47,9 +49,11 @@ if (validArgs) {
         // Want line edge
         if (edge.type === 'line') {
           startPoint = edge.data.start;
-          startPointEdgeUniqueId = edge.uniqueId.toUpperCase();
+          startPointEdgeUniqueId = edge.uniqueId;
+          startSnapPointType = "ModeStart";
           endPoint = edge.data.end;
-          endPointEdgeUniqueId = edge.uniqueId.toUpperCase();
+          endPointEdgeUniqueId = edge.uniqueId;
+          endSnapPointType = "ModeEnd";
   
           // Put text location out from mid point by arbitrary amount
           textLocation = getMidPoint(startPoint, endPoint);
@@ -62,11 +66,9 @@ if (validArgs) {
     }
   
     if (viewToUse != null && startPoint !== null && endPoint !== null && startPointEdgeUniqueId !== null && endPointEdgeUniqueId !== null) {
-      /**
-       * Modify the drawing to create a dimension
-       */
-      const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`,  {
-        description: "Add linear dim",
+
+      const requestBody = {
+        description: 'Add linear dim',
         jsonRequests: [ {
           messageName: 'onshapeCreateAnnotations',
           formatVersion: '2021-01-01',
@@ -78,13 +80,15 @@ if (validArgs) {
                   coordinate: startPoint,
                   type: 'Onshape::Reference::Point',
                   uniqueId: startPointEdgeUniqueId,
-                  viewId: viewToUse.viewId
+                  viewId: viewToUse.viewId,
+                  snapPointType: startSnapPointType
                 },
                 point2: {
                   coordinate: endPoint,
                   type: 'Onshape::Reference::Point',
                   uniqueId: endPointEdgeUniqueId,
-                  viewId: viewToUse.viewId
+                  viewId: viewToUse.viewId,
+                  snapPointType: endSnapPointType
                 },
                 formatting: {
                   dimdec: 2,
@@ -104,7 +108,12 @@ if (validArgs) {
             }
           ]
         }]
-      }) as BasicNode;
+      };
+
+      /**
+       * Modify the drawing to create a dimension
+       */
+      const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`, requestBody) as BasicNode;
   
       const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
       if (waitSucceeded) {

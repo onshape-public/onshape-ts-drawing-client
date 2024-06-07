@@ -1,7 +1,7 @@
 import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2 } from './utils/onshapetypes.js';
+import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2, SnapPointType } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getRandomLocation, getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -29,6 +29,8 @@ if (validArgs) {
     let endPoint: number[] = null;
     let startPointEdgeUniqueId: string = null;
     let endPointEdgeUniqueId: string = null;
+    let startSnapPointType: SnapPointType = null;
+    let endSnapPointType: SnapPointType = null;
   
     /**
      * Retrieve a drawing view and some of its edges to get information to create the centerline
@@ -45,10 +47,12 @@ if (validArgs) {
         if (edge.type === 'circle') {
           if (startPoint === null) {
             startPoint = edge.data.center;
-            startPointEdgeUniqueId = edge.uniqueId.toUpperCase();
+            startPointEdgeUniqueId = edge.uniqueId;
+            startSnapPointType = SnapPointType.ModeCenter;
           } else if (endPoint === null) {
             endPoint = edge.data.center;
-            endPointEdgeUniqueId = edge.uniqueId.toUpperCase();
+            endPointEdgeUniqueId = edge.uniqueId;
+            endSnapPointType = SnapPointType.ModeCenter;
             break;
           }
         }
@@ -56,32 +60,39 @@ if (validArgs) {
     }
   
     if (viewToUse.viewId != null && startPoint !== null && endPoint !== null && startPointEdgeUniqueId !== null && endPointEdgeUniqueId !== null) {
-      const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`,  {
-        description: "Add centerline",
-        jsonRequests: [ {
-          messageName: 'onshapeCreateAnnotations',
-          formatVersion: '2021-01-01',
-          annotations: [
-            {
-              type: 'Onshape::Centerline::PointToPoint',
-              pointToPointCenterline: {
-                point1: {
-                  coordinate: startPoint,
-                  type: 'Onshape::Reference::Point',
-                  uniqueId: startPointEdgeUniqueId,
-                  viewId: viewToUse.viewId
-                },
-                point2: {
-                  coordinate: endPoint,
-                  type: 'Onshape::Reference::Point',
-                  uniqueId: endPointEdgeUniqueId,
-                  viewId: viewToUse.viewId
+
+      const requestBody = {
+        description: 'Add centerline',
+        jsonRequests: [ 
+          {
+            messageName: 'onshapeCreateAnnotations',
+            formatVersion: '2021-01-01',
+            annotations: [
+              {
+                type: 'Onshape::Centerline::PointToPoint',
+                pointToPointCenterline: {
+                  point1: {
+                    coordinate: startPoint,
+                    type: 'Onshape::Reference::Point',
+                    uniqueId: startPointEdgeUniqueId,
+                    viewId: viewToUse.viewId,
+                    snapPointType: startSnapPointType
+                  },
+                  point2: {
+                    coordinate: endPoint,
+                    type: 'Onshape::Reference::Point',
+                    uniqueId: endPointEdgeUniqueId,
+                    viewId: viewToUse.viewId,
+                    snapPointType: endSnapPointType
+                  }
                 }
               }
-            }
-          ]
-        }]
-      }) as BasicNode;
+            ]
+          } 
+        ]
+      };
+
+      const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`, requestBody) as BasicNode;
   
       const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
       if (waitSucceeded) {

@@ -1,7 +1,7 @@
 import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetDrawingJsonExportResponse, GetViewJsonGeometryResponse, View2 } from './utils/onshapetypes.js';
+import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetDrawingJsonExportResponse, GetViewJsonGeometryResponse, View2, SnapPointType } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, convertPointViewToPaper } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData } from './utils/drawingutils.js';
 
@@ -29,6 +29,7 @@ if (validArgs) {
     let viewToUse: View2 = null;
     let retrieveViewJsonGeometryResponse: GetViewJsonGeometryResponse = null;
     var leaderLocation: number[] = null;
+    var leaderSnapPointType: SnapPointType = null;
     var leaderEdgeId: string = null;
     var leaderViewId: string = null;
     var calloutLocation: number[] = null;
@@ -46,11 +47,13 @@ if (validArgs) {
       for (let indexEdge = 0; indexEdge < retrieveViewJsonGeometryResponse.bodyData.length; indexEdge++) {
         let edge: Edge = retrieveViewJsonGeometryResponse.bodyData[indexEdge];
         if (edge.type === 'line') {
+          // Locate leader at midpoint of edge
           leaderLocation = [
             (edge.data.start[0] + edge.data.end[0]) / 2.0,
             (edge.data.start[1] + edge.data.end[1]) / 2.0,
             (edge.data.start[2] + edge.data.end[2]) / 2.0
           ];
+          leaderSnapPointType = SnapPointType.ModeMid;
 
           var calloutLocationInViewSpace = leaderLocation;
           calloutLocation = convertPointViewToPaper(calloutLocationInViewSpace, viewToUse.viewToPaperMatrix.items);
@@ -59,8 +62,7 @@ if (validArgs) {
           calloutLocation[0] -= 2.0;
           calloutLocation[1] -= 2.0;
 
-          // Should not need to upper case the id, but it is needed now.  Fixing it soon.
-          leaderEdgeId = edge.uniqueId.toUpperCase();
+          leaderEdgeId = edge.uniqueId;
           leaderViewId = viewToUse.viewId;
           break;
         }
@@ -68,41 +70,47 @@ if (validArgs) {
     }
       
     if (viewToUse != null && leaderLocation !== null && leaderEdgeId !== null && leaderViewId !== null) {
+
+      const requestBody = {
+        description: 'Add callout',
+        jsonRequests: [
+          {
+            messageName: 'onshapeCreateAnnotations',
+            formatVersion: '2021-01-01',
+            annotations: [
+              {
+                type: 'Onshape::Callout',
+                callout: {
+                  borderShape: 'Circle',
+                  borderSize: 0,
+                  contents: annotationText,
+                  contentsBottom: 'bottom',
+                  contentsLeft: 'left',
+                  contentsRight: 'right',
+                  contentsTop: 'top',
+                  leaderPosition: {
+                    type: 'Onshape::Reference::Point',
+                    coordinate: leaderLocation,
+                    uniqueId: leaderEdgeId,
+                    viewId: leaderViewId,
+                    snapPointType: leaderSnapPointType
+                  },
+                  position: {
+                    type: 'Onshape::Reference::Point',
+                    coordinate: calloutLocation
+                  },
+                  textHeight: textHeight
+                }
+              }
+            ]
+          }
+        ]
+      };
+
       /**
        * Modify the drawing to create a callout with leader
        */
-      const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`,  {
-        description: "Add callout",
-        jsonRequests: [ {
-          messageName: 'onshapeCreateAnnotations',
-          formatVersion: '2021-01-01',
-          annotations: [
-            {
-              type: 'Onshape::Callout',
-              callout: {
-                borderShape: 'Circle',
-                borderSize: 0,
-                contents: annotationText,
-                contentsBottom: 'bottom',
-                contentsLeft: 'left',
-                contentsRight: 'right',
-                contentsTop: 'top',
-                leaderPosition: {
-                  type: 'Onshape::Reference::Point',
-                  coordinate: leaderLocation,
-                  uniqueId: leaderEdgeId,
-                  viewId: leaderViewId
-                },
-                position: {
-                  type: 'Onshape::Reference::Point',
-                  coordinate: calloutLocation
-                },
-                textHeight: textHeight
-              }
-            }
-          ]
-        }]
-      }) as BasicNode;
+      const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`, requestBody) as BasicNode;
 
       const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
       if (waitSucceeded) {
@@ -116,7 +124,6 @@ if (validArgs) {
       console.log('Insufficient view and edge information to create the callout with leader.');
       LOG.error('Create callout with leader failed due to insufficient view and edge information.');
     }
-  
   } catch (error) {
     console.error(error);
     LOG.error('Create callout with leader failed.', error);

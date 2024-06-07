@@ -170,6 +170,23 @@ export class AnnotationType {
   static GEOMETRIC_TOLERANCE = 'Onshape::GeometricTolerance';
   static NOTE = 'Onshape::Note';
   static DIMENSION_THREE_POINT_ANGULAR = 'Onshape::Dimension::ThreePointAngular';
+  static TABLE = 'Onshape::Table::GeneralTable';
+}
+
+export class SnapPointType {
+  static ModeApint = 'ModeApint';       // Apparent intersection
+  static ModeCenter = 'ModeCenter';     // Center point
+  static ModeEnd = 'ModeEnd';           // End point
+  static ModeIns = 'ModeIns';           // Insertion point
+  static ModeIntersec = 'ModeIntersec'; // Intersection
+  static ModeMid = 'ModeMid';           // Midpoint
+  static ModeNear = 'ModeNear';         // Nearest point
+  static ModeNode = 'ModeNode';         // Node
+  static ModePar = 'ModePar';           // Parallel
+  static ModePerp = 'ModePerp';         // Perpendicular
+  static ModeQuad = 'ModeQuad';         // Quadrant
+  static ModeStart = 'ModeStart';       // Start point
+  static ModeTan = 'ModeTan';           // Tangent point
 }
 
 // View object returned from api/appelements/d/did/wv/wvid/e/eid/views/ API
@@ -312,6 +329,7 @@ export interface AssociatedPoint {
   type: string;
   uniqueId: string;
   viewId: string;
+  snapPointType: SnapPointType;
 }
 
 export interface UnassociatedPoint {

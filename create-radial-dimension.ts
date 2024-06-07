@@ -1,7 +1,7 @@
 import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetDrawingJsonExportResponse, GetViewJsonGeometryResponse, View2 } from './utils/onshapetypes.js';
+import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetDrawingJsonExportResponse, GetViewJsonGeometryResponse, View2, SnapPointType } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getRandomLocation } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData, isArcAxisPerpendicularToViewPlane, convertPointViewToPaper, midPointOfArc } from './utils/drawingutils.js';
 
@@ -47,9 +47,9 @@ if (validArgs) {
         // Want circular arcs with view axis perpendicular to view plane
         if (edge.type === 'circularArc' && isArcAxisPerpendicularToViewPlane(edge.data.axisDir)) {
           centerPoint = edge.data.center;
-          centerPointEdgeUniqueId = edge.uniqueId.toUpperCase();
+          centerPointEdgeUniqueId = edge.uniqueId;
           chordPoint = midPointOfArc(edge.data.center, edge.data.radius, edge.data.start, edge.data.end);
-          chordPointEdgeUniqueId = edge.uniqueId.toUpperCase();
+          chordPointEdgeUniqueId = edge.uniqueId;
   
           // Put text out from chord point by the radius of edge in appropriate direction
           textLocation = chordPoint;
@@ -62,11 +62,9 @@ if (validArgs) {
     }
   
     if (viewToUse != null && centerPoint !== null && chordPoint !== null && centerPointEdgeUniqueId !== null && chordPointEdgeUniqueId !== null) {
-      /**
-       * Modify the drawing to create a radial dimension
-       */
-      const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`,  {
-        description: "Add radial dim",
+
+      const requestBody = {
+        description: 'Add radial dim',
         jsonRequests: [ {
           messageName: 'onshapeCreateAnnotations',
           formatVersion: '2021-01-01',
@@ -78,13 +76,15 @@ if (validArgs) {
                   coordinate: centerPoint,
                   type: 'Onshape::Reference::Point',
                   uniqueId: centerPointEdgeUniqueId,
-                  viewId: viewToUse.viewId
+                  viewId: viewToUse.viewId,
+                  snapPointType: SnapPointType.ModeCenter
                 },
                 chordPoint: {
                   coordinate: chordPoint,
                   type: 'Onshape::Reference::Point',
                   uniqueId: chordPointEdgeUniqueId,
-                  viewId: viewToUse.viewId
+                  viewId: viewToUse.viewId,
+                  snapPointType: SnapPointType.ModeNear
                 },
                 formatting: {
                   dimdec: 2,
@@ -104,7 +104,12 @@ if (validArgs) {
             }
           ]
         }]
-      }) as BasicNode;
+      };
+
+      /**
+       * Modify the drawing to create a radial dimension
+       */
+      const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`, requestBody) as BasicNode;
   
       const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
       if (waitSucceeded) {

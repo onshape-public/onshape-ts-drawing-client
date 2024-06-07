@@ -27,32 +27,33 @@ if (validArgs) {
     const geometricToleranceFrame1 = '{\\fDrawing Symbols Sans;◎}%%v{\\fDrawing Symbols Sans;∅}tol1{\\fDrawing Symbols Sans;Ⓜ}%%v%%v%%v%%v%%v\n';
     const geometricToleranceFrame2 = '{\\fDrawing Symbols Sans;⌖}%%vto2{\\fDrawing Symbols Sans;Ⓛ}%%v%%v%%v%%v%%v\n';
     const textHeight = 0.12;
-  
-    /**
-     * Modify the drawing to create a callout
-     */
-    const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`,  {
-      description: "Add GTol",
-      jsonRequests: [ {
-        messageName: 'onshapeCreateAnnotations',
-        formatVersion: '2021-01-01',
-        annotations: [
-          {
-            type: 'Onshape::GeometricTolerance',
-            geometricTolerance: {
-              frames: [
-                geometricToleranceFrame1,
-                geometricToleranceFrame2
-              ],
-              position: {
-                type: 'Onshape::Reference::Point',
-                coordinate: randomLocation
+
+    const requestBody = {
+      description: 'Add GTol',
+      jsonRequests: [ 
+        {
+          messageName: 'onshapeCreateAnnotations',
+          formatVersion: '2021-01-01',
+          annotations: [
+            {
+              type: 'Onshape::GeometricTolerance',
+              geometricTolerance: {
+                frames: [
+                  geometricToleranceFrame1,
+                  geometricToleranceFrame2
+                ],
+                position: {
+                  type: 'Onshape::Reference::Point',
+                  coordinate: randomLocation
+                }
               }
             }
-          }
-        ]
-      }]
-    }) as BasicNode;
+          ]
+        }
+      ]
+    };
+
+    const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`,  requestBody) as BasicNode;
   
     const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
     if (waitSucceeded) {
