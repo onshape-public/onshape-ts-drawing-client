@@ -17,7 +17,7 @@ try {
   validateBaseURLs(apiClient.getBaseURL(), drawingScriptArgs.baseURL);
 } catch (error) {
   validArgs = false;
-  usage('create-point-to-line-linear-dimension');
+  usage('create-aligned-linear-dimension');
 }
 
 if (validArgs) {
@@ -33,6 +33,7 @@ if (validArgs) {
     let edgeUniqueId: string = null;
     let edgeSnapPointType: SnapPointType = null;
     let textLocation: number[] = null;
+    let rotation: number = null;
 
     /**
      * Retrieve a drawing view and some of its edges to get enough information to create the dimension
@@ -73,6 +74,9 @@ if (validArgs) {
         textLocation = getMidPoint(point, edgeStartPoint);
         textLocation[0] += 0.03;
         textLocation = convertPointViewToPaper(textLocation, viewToUse.viewToPaperMatrix.items);
+
+        // Set the alignment of the dimension to vertical
+        rotation = 90.0;
       }
     }
   
@@ -109,6 +113,7 @@ if (validArgs) {
                   dimtp: 0,
                   type: 'Onshape::Formatting::Dimension'
                 },
+                rotation: rotation,
                 textOverride: '',
                 textPosition: {
                   coordinate: textLocation,
@@ -137,6 +142,6 @@ if (validArgs) {
   
   } catch (error) {
     console.error(error);
-    LOG.error('Create point to line linear dimension failed: ', error);
+    LOG.error('Create aligned linear dimension failed: ', error);
   }
 }

@@ -143,3 +143,6 @@ package-lock.json
 
 # Credentials - important to not submit
 credentials.json
+
+# Checklist before submit - list of things to check before pushing to repo
+checklist.txt

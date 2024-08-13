@@ -189,6 +189,19 @@ export class SnapPointType {
   static ModeTan = 'ModeTan';           // Tangent point
 }
 
+export class ErrorStateValue {
+  static OK = 0;        // Healthy
+  static INFO = 1;      // Information
+  static WARNING = 2;   // Warning
+  static ERROR = 3;     // Error - currently either isDangling annotation or view with view generation error
+  static UNKNOWN = 4;   // Unknown
+}
+
+export interface ErrorState {
+  value: ErrorStateValue;
+  description: string;
+}
+
 // View object returned from api/appelements/d/did/wv/wvid/e/eid/views/ API
 export interface View1 {
   associativityChangeId: string;
@@ -247,6 +260,7 @@ export interface GetDrawingViewsResponse {
 // View object returned from api/drawings/d/did/wv/wvid/e/eid/translations API with DRAWING_JSON format
 export interface View2 {
   bomReference: string;
+  errorState?: ErrorState;
   label: string;
   name: string;
   orientation: string;
@@ -255,7 +269,7 @@ export interface View2 {
     y: number;
   };
   renderMode: string;
-  rotation: number;
+  rotation?: number;
   scale: {
     denumerator: number;
     numerator: number;
@@ -483,7 +497,7 @@ export interface Annotation {
 }
 
 export interface Sheet {
-  active: boolean;
+  active?: boolean;
   annotations: Annotation[];
   format: string;
   index: number;

@@ -6,6 +6,7 @@
   "scripts": {
     "build": "npm install && tsc",
     "cleanoutputdirectory": "rimraf ./output && rimraf ./exports && rimraf ./reports && rimraf logs",
+    "create-aligned-linear-dimension": "node .compilejs/create-aligned-linear-dimension.js",
     "create-callout": "node .compiledjs/create-callout.js",
     "create-callout-with-leader": "node .compiledjs/create-callout-with-leader.js",
     "create-centerline": "node .compiledjs/create-centerline.js",
@@ -20,7 +21,8 @@
     "create-point-to-point-linear-dimension": "node .compiledjs/create-point-to-point-linear-dimension.js",
     "create-radial-dimension": "node .compiledjs/create-radial-dimension.js",
     "create-table": "node .compiledjs/create-table.js",
-    "create-three-point-angular-dimension": "node .compiledjs/create-three-point-angular-dimension.js"
+    "create-three-point-angular-dimension": "node .compiledjs/create-three-point-angular-dimension.js",
+    "find-errors-in-drawing": "node .compiledjs/find-errors-in-drawing.js"
   },
   "repository": {
     "type": "git",

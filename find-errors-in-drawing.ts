@@ -1,6 +1,9 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { GetDrawingJsonExportResponse, Sheet } from './utils/onshapetypes.js';
+import { GetDrawingJsonExportResponse, Sheet, View2, AnnotationType, Annotation, ErrorStateValue, ErrorState } from './utils/onshapetypes.js';
+import { Callout, DiameterDimension, GeometricTolerance, LineToLineAngularDimension, LineToLineLinearDimension } from './utils/onshapetypes.js';
+import { Note, PointToLineLinearDimension, PointToPointCenterline, PointToPointLinearDimension } from './utils/onshapetypes.js';
+import { RadialDimension, ThreePointAngularDimension } from './utils/onshapetypes.js';
 import { usage, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs } from './utils/drawingutils.js';
 import { getDrawingJsonExport } from './utils/drawingutils.js';
 
@@ -9,6 +12,9 @@ const LOG = mainLog();
 let drawingScriptArgs: DrawingScriptArgs = null;
 let validArgs: boolean = true;
 let apiClient: ApiClient = null;
+let errorValue: string = null;
+let viewErrorsFound: boolean = false;
+let annotationErrorsFound: boolean = false;
 
 try {
   drawingScriptArgs = parseDrawingScriptArgs();
@@ -28,23 +34,122 @@ if (validArgs) {
      */
     let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
     
-    
     for (let indexSheet = 0; indexSheet < drawingJsonExport.sheets.length; indexSheet++) {
+
+      viewErrorsFound = false;
+      annotationErrorsFound = false;
+
       let sheet: Sheet = drawingJsonExport.sheets[indexSheet];
+
+      console.log(`Sheet ${sheet.name}:`)
 
       // Check for views on the sheet that have a bad error state
       for (let indexView = 0; indexView < sheet.views.length; indexView++) {
-        // Uncommment when we can see the errorState field on views in json exports
-        // aView = sheet.views[indexView];
-        // if (aView.errorState != 0) {
-        //   console.log("some error message");
-        // }
+        let aView: View2 = sheet.views[indexView];
+        errorValue = null;
+        if (aView.hasOwnProperty('errorState')) {
+          switch (aView.errorState.value) {
+            case ErrorStateValue.OK:
+              errorValue = null;
+              break;
+            case ErrorStateValue.INFO:
+              errorValue = "INFO";
+              break;
+            case ErrorStateValue.WARNING:
+              errorValue = "WARNING";
+              break;
+            case ErrorStateValue.ERROR:
+              errorValue = "ERROR";
+              break;
+            case ErrorStateValue.UNKNOWN:
+              errorValue = "UNKNOWN";
+              break;
+            default: {
+              errorValue = null;
+              break;
+            }
+          }
+        }
+
+        if (errorValue) {
+          viewErrorsFound = true;
+          console.log(`  View name: ${aView.name} id: ${aView.viewId} label: ${aView.label} has ${errorValue}: ${aView.errorState.description}.`);
+        }
+      }
+
+      if (!viewErrorsFound) {
+        console.log('  All views are healthy.');
       }
 
       // Check for annotations on the sheet that are dangling
-      // TBD
+      for (let indexAnnotation = 0; indexAnnotation < sheet.annotations.length; indexAnnotation++) {
+        let anAnnotation: Annotation = sheet.annotations[indexAnnotation];
+        let isDangling: boolean = false;
+        let logicalId: string = '';
+        let friendlyType: string = '';
+        switch (anAnnotation.type) {
+          case AnnotationType.DIMENSION_DIAMETER: {
+            isDangling = anAnnotation.diametricDimension.isDangling;
+            logicalId = anAnnotation.diametricDimension.logicalId;
+            friendlyType = 'Diameter dimension';
+            break;
+          }
+          case AnnotationType.DIMENSION_LINE_TO_LINE_ANGULAR: {
+            isDangling = anAnnotation.lineToLineAngularDimension.isDangling;
+            logicalId = anAnnotation.lineToLineAngularDimension.logicalId;
+            friendlyType = 'Line to line angular dimension';
+            break;
+          }
+          case AnnotationType.DIMENSION_LINE_TO_LINE_LINEAR: {
+            isDangling = anAnnotation.lineToLineDimension.isDangling;
+            logicalId = anAnnotation.lineToLineDimension.logicalId;
+            friendlyType = 'Line to line linear dimension';
+            break;
+          }
+          case AnnotationType.DIMENSION_POINT_TO_LINE_LINEAR: {
+            isDangling = anAnnotation.pointToLineDimension.isDangling;
+            logicalId = anAnnotation.pointToLineDimension.logicalId;
+            friendlyType = 'Point to line linear dimension';
+            break;
+          }
+          case AnnotationType.DIMENSION_POINT_TO_POINT_LINEAR: {
+            isDangling = anAnnotation.pointToPointDimension.isDangling;
+            logicalId = anAnnotation.pointToPointDimension.logicalId;
+            friendlyType = 'Point to point linear dimension';
+            break;
+          }
+          case AnnotationType.DIMENSION_RADIAL: {
+            isDangling = anAnnotation.radialDimension.isDangling;
+            logicalId = anAnnotation.radialDimension.logicalId;
+            friendlyType = 'Radial dimension';
+            break;
+          }
+          case AnnotationType.DIMENSION_THREE_POINT_ANGULAR: {
+            isDangling = anAnnotation.threePointAngularDimension.isDangling;
+            logicalId = anAnnotation.threePointAngularDimension.logicalId;
+            friendlyType = 'Three point angular dimension';
+            break;
+          }
+          case AnnotationType.CALLOUT:
+          case AnnotationType.CENTERLINE_POINT_TO_POINT: 
+          case AnnotationType.GEOMETRIC_TOLERANCE:
+          case AnnotationType.NOTE:
+          case AnnotationType.TABLE:
+          default:
+            // No isDangling field yet on these types of annotations
+            break;
+        }
+
+        if (isDangling) {
+          annotationErrorsFound = true;
+          console.log(`  ${friendlyType} logicalId: ${logicalId} is dangling.`)
+        }
+      }
+
+      if (!annotationErrorsFound) {
+        console.log('  All annotations are healthy.');
+      }
     }
-  
   } catch (error) {
     console.error(error);
     LOG.error('Find errors in drawing failed: ', error);

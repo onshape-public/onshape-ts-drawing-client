@@ -147,6 +147,20 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Create Aligned Linear Dimension",
+            "console": "integratedTerminal",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/.compiledjs/create-aligned-linear-dimension.js",
+            "args": [
+                "--drawinguri=https://cad.onshape.com/documents/3f7e7b5e2e6140fb84195b10/w/b2b41f2cbf04d2530cc8f205/e/749f074ef7c22c76b7e7f0f0",
+                "--stack=cad"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Create Line to Line Angular Dimension",
             "console": "integratedTerminal",
             "skipFiles": [
@@ -211,6 +225,20 @@
             "program": "${workspaceFolder}/.compiledjs/create-inspection-symbols.js",
             "args": [
                 "--drawinguri=https://cad.onshape.com/documents/3f7e7b5e2e6140fb84195b10/w/b2b41f2cbf04d2530cc8f205/e/749f074ef7c22c76b7e7f0f0",
+                "--stack=cad"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Find Errors in Drawing",
+            "console": "integratedTerminal",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/.compiledjs/find-errors-in-drawing.js",
+            "args": [
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
                 "--stack=cad"
             ]
         }
