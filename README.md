@@ -91,6 +91,10 @@ npm run create-radial-dimension --drawinguri=<drawing uri> --stack=cad
 npm run create-diameter-dimension --drawinguri=<drawing uri> --stack=cad
 
 npm run create-inspection-symbols --drawinguri=<drawing uri> --stack=cad
+
+npm run create-aligned-linear-dimension --drawinguri=<drawing uri> --stack=cad
+
+npm run find-errors-in-drawing --drawinguri=<drawing uri> --stack=cad
 ```
 
 The drawinguri argument should be to a drawing in a document to which you have edit access.  The drawing should be in a workspace and have a view that has edges that are lines, arcs and circles. The sample code will pick a view and some of those edges when creating dimensions. For example, this is a possible drawing uri:
