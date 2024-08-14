@@ -26,13 +26,13 @@ if (validArgs) {
   
     let viewToUse: View2 = null;
     let retrieveViewJsonGeometryResponse: GetViewJsonGeometryResponse = null;
-    let point: number[] = null;
-    let pointUniqueId: string = null;
-    let pointSnapPointType: SnapPointType = null;
-    let edgeStartPoint: number[] = null;
-    let edgeUniqueId: string = null;
-    let edgeSnapPointType: SnapPointType = null;
+    let startPoint: number[] = null;
+    let endPoint: number[] = null;
     let textLocation: number[] = null;
+    let startPointEdgeUniqueId: string = null;
+    let endPointEdgeUniqueId: string = null;
+    let startSnapPointType: string = null;
+    let endSnapPointType: string = null;
     let rotation: number = null;
 
     /**
@@ -47,40 +47,29 @@ if (validArgs) {
   
       for (let indexEdge = 0; indexEdge < retrieveViewJsonGeometryResponse.bodyData.length; indexEdge++) {
         let edge: Edge = retrieveViewJsonGeometryResponse.bodyData[indexEdge];
-        if (point === null) {
-          if (edge.type === 'line') {
-            point = edge.data.start;
-            pointUniqueId = edge.uniqueId;
-            pointSnapPointType = SnapPointType.ModeStart;
-          } else if (edge.type === 'circle') {
-            point = edge.data.center;
-            pointUniqueId = edge.uniqueId;
-            pointSnapPointType = SnapPointType.ModeCenter;
-          } else if (edge.type === 'circularArc') {
-            point = edge.data.center;
-            pointUniqueId = edge.uniqueId;
-            pointSnapPointType = SnapPointType.ModeCenter;
-          }
-        } else if (edgeUniqueId === null && edge.type === 'line') {
-          edgeStartPoint = edge.data.start;
-          edgeUniqueId = edge.uniqueId;
-          edgeSnapPointType = SnapPointType.ModeStart;
+        // Want line edge
+        if (edge.type === 'line') {
+          startPoint = edge.data.start;
+          startPointEdgeUniqueId = edge.uniqueId;
+          startSnapPointType = "ModeStart";
+          endPoint = edge.data.end;
+          endPointEdgeUniqueId = edge.uniqueId;
+          endSnapPointType = "ModeEnd";
+  
+          // Put text location out from mid point by arbitrary amount
+          textLocation = getMidPoint(startPoint, endPoint);
+          textLocation[0] += 0.003;
+          textLocation[1] += 0.003;
+          textLocation = convertPointViewToPaper(textLocation, viewToUse.viewToPaperMatrix.items);
+
+          // Set the alignment of the dimension to vertical
+          rotation = 90.0;
           break;
         }
       }
-  
-      if (point !== null && edgeUniqueId !== null) {
-        // Put text location out from mid point by arbitrary amount
-        textLocation = getMidPoint(point, edgeStartPoint);
-        textLocation[0] += 0.03;
-        textLocation = convertPointViewToPaper(textLocation, viewToUse.viewToPaperMatrix.items);
-
-        // Set the alignment of the dimension to vertical
-        rotation = 90.0;
-      }
     }
   
-    if (viewToUse != null && point !== null && edgeUniqueId !== null) {
+    if (viewToUse != null && startPoint !== null && endPoint !== null && startPointEdgeUniqueId !== null && endPointEdgeUniqueId !== null) {
 
       const requestBody = {
         description: 'Add linear dim',
@@ -89,20 +78,21 @@ if (validArgs) {
           formatVersion: '2021-01-01',
           annotations: [
             {
-              type: 'Onshape::Dimension::PointToLine',
-              pointToLineDimension: {
-                point: {
-                  coordinate: point,
+              type: 'Onshape::Dimension::PointToPoint',
+              pointToPointDimension: {
+                point1: {
+                  coordinate: startPoint,
                   type: 'Onshape::Reference::Point',
-                  uniqueId: pointUniqueId,
+                  uniqueId: startPointEdgeUniqueId,
                   viewId: viewToUse.viewId,
-                  snapPointType: pointSnapPointType
+                  snapPointType: startSnapPointType
                 },
-                edge: {
-                  type: 'Onshape::Reference::Edge',
-                  uniqueId: edgeUniqueId,
+                point2: {
+                  coordinate: endPoint,
+                  type: 'Onshape::Reference::Point',
+                  uniqueId: endPointEdgeUniqueId,
                   viewId: viewToUse.viewId,
-                  snapPointType: edgeSnapPointType
+                  snapPointType: endSnapPointType
                 },
                 formatting: {
                   dimdec: 2,
