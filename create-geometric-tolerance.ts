@@ -1,7 +1,6 @@
-import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode } from './utils/onshapetypes.js';
+import { BasicNode, DrawingObjectType } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getRandomLocation } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -36,7 +35,7 @@ if (validArgs) {
           formatVersion: '2021-01-01',
           annotations: [
             {
-              type: 'Onshape::GeometricTolerance',
+              type: DrawingObjectType.GEOMETRIC_TOLERANCE,
               geometricTolerance: {
                 frames: [
                   geometricToleranceFrame1,

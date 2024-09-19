@@ -1,8 +1,7 @@
-import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetDrawingJsonExportResponse, GetViewJsonGeometryResponse, View2, SnapPointType } from './utils/onshapetypes.js';
-import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getRandomLocation } from './utils/drawingutils.js';
+import { BasicNode, Edge, GetDrawingJsonExportResponse, GetViewJsonGeometryResponse, View2, SnapPointType, DrawingObjectType } from './utils/onshapetypes.js';
+import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData, isArcAxisPerpendicularToViewPlane, convertPointViewToPaper, pointOnCircle } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -77,7 +76,7 @@ if (validArgs) {
             formatVersion: '2021-01-01',
             annotations: [
               {
-                type: 'Onshape::Dimension::Diametric',
+                type: DrawingObjectType.DIMENSION_DIAMETER,
                 diametricDimension: {
                   chordPoint: {
                     coordinate: chordPoint,

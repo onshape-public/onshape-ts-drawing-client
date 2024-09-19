@@ -1,10 +1,7 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { GetDrawingJsonExportResponse, Sheet, View2, AnnotationType, Annotation, ErrorStateValue, ErrorState } from './utils/onshapetypes.js';
-import { Callout, DiameterDimension, GeometricTolerance, LineToLineAngularDimension, LineToLineLinearDimension } from './utils/onshapetypes.js';
-import { Note, PointToLineLinearDimension, PointToPointCenterline, PointToPointLinearDimension } from './utils/onshapetypes.js';
-import { RadialDimension, ThreePointAngularDimension } from './utils/onshapetypes.js';
-import { usage, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs } from './utils/drawingutils.js';
+import { GetDrawingJsonExportResponse, Sheet, View2, DrawingObjectType, Annotation, ErrorStateValue, ErrorState } from './utils/onshapetypes.js';
+import { usage, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, removeNewLinesFromString } from './utils/drawingutils.js';
 import { getDrawingJsonExport } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -46,6 +43,8 @@ if (validArgs) {
       // Check for views on the sheet that have a bad error state
       for (let indexView = 0; indexView < sheet.views.length; indexView++) {
         let aView: View2 = sheet.views[indexView];
+        let viewName = removeNewLinesFromString(aView.name);
+        let viewLabel = removeNewLinesFromString(aView.label);
         errorValue = null;
         if (aView.hasOwnProperty('errorState')) {
           switch (aView.errorState.value) {
@@ -73,7 +72,7 @@ if (validArgs) {
 
         if (errorValue) {
           viewErrorsFound = true;
-          console.log(`  View name: ${aView.name} id: ${aView.viewId} label: ${aView.label} has ${errorValue}: ${aView.errorState.description}.`);
+          console.log(`  View name: ${viewName} id: ${aView.viewId} label:  ${viewLabel} has ${errorValue}: ${aView.errorState.description}.`);
         }
       }
 
@@ -88,53 +87,73 @@ if (validArgs) {
         let logicalId: string = '';
         let friendlyType: string = '';
         switch (anAnnotation.type) {
-          case AnnotationType.DIMENSION_DIAMETER: {
+          case DrawingObjectType.DIMENSION_DIAMETER: {
             isDangling = anAnnotation.diametricDimension.isDangling;
             logicalId = anAnnotation.diametricDimension.logicalId;
             friendlyType = 'Diameter dimension';
             break;
           }
-          case AnnotationType.DIMENSION_LINE_TO_LINE_ANGULAR: {
+          case DrawingObjectType.DIMENSION_LINE_TO_LINE_ANGULAR: {
             isDangling = anAnnotation.lineToLineAngularDimension.isDangling;
             logicalId = anAnnotation.lineToLineAngularDimension.logicalId;
             friendlyType = 'Line to line angular dimension';
             break;
           }
-          case AnnotationType.DIMENSION_LINE_TO_LINE_LINEAR: {
+          case DrawingObjectType.DIMENSION_LINE_TO_LINE_LINEAR: {
             isDangling = anAnnotation.lineToLineDimension.isDangling;
             logicalId = anAnnotation.lineToLineDimension.logicalId;
             friendlyType = 'Line to line linear dimension';
             break;
           }
-          case AnnotationType.DIMENSION_POINT_TO_LINE_LINEAR: {
+          case DrawingObjectType.DIMENSION_POINT_TO_LINE_LINEAR: {
             isDangling = anAnnotation.pointToLineDimension.isDangling;
             logicalId = anAnnotation.pointToLineDimension.logicalId;
             friendlyType = 'Point to line linear dimension';
             break;
           }
-          case AnnotationType.DIMENSION_POINT_TO_POINT_LINEAR: {
+          case DrawingObjectType.DIMENSION_POINT_TO_POINT_LINEAR: {
             isDangling = anAnnotation.pointToPointDimension.isDangling;
             logicalId = anAnnotation.pointToPointDimension.logicalId;
             friendlyType = 'Point to point linear dimension';
             break;
           }
-          case AnnotationType.DIMENSION_RADIAL: {
+          case DrawingObjectType.DIMENSION_RADIAL: {
             isDangling = anAnnotation.radialDimension.isDangling;
             logicalId = anAnnotation.radialDimension.logicalId;
             friendlyType = 'Radial dimension';
             break;
           }
-          case AnnotationType.DIMENSION_THREE_POINT_ANGULAR: {
+          case DrawingObjectType.DIMENSION_THREE_POINT_ANGULAR: {
             isDangling = anAnnotation.threePointAngularDimension.isDangling;
             logicalId = anAnnotation.threePointAngularDimension.logicalId;
             friendlyType = 'Three point angular dimension';
             break;
           }
-          case AnnotationType.CALLOUT:
-          case AnnotationType.CENTERLINE_POINT_TO_POINT: 
-          case AnnotationType.GEOMETRIC_TOLERANCE:
-          case AnnotationType.NOTE:
-          case AnnotationType.TABLE:
+          case DrawingObjectType.CALLOUT: {
+            isDangling = anAnnotation.callout.isDangling ?? false;
+            logicalId = anAnnotation.callout.logicalId ?? '';
+            friendlyType = 'Callout';
+            break;
+          }
+          case DrawingObjectType.CENTERLINE_POINT_TO_POINT: {
+            isDangling = anAnnotation.pointToPointCenterline.isDangling ?? false;
+            logicalId = anAnnotation.pointToPointCenterline.logicalId ?? '';
+            friendlyType = 'Point to point centerline';
+            break;
+          }
+          case DrawingObjectType.GEOMETRIC_TOLERANCE: {
+            isDangling = anAnnotation.geometricTolerance.isDangling ?? false;
+            logicalId = anAnnotation.geometricTolerance.logicalId ?? '';
+            friendlyType = "Geometric tolerance";
+            break;
+          }
+          case DrawingObjectType.NOTE: {
+            isDangling = anAnnotation.note.isDangling ?? false;
+            logicalId = anAnnotation.note.logicalId ?? '';
+            friendlyType = "Note";
+            break;
+          }
+          case DrawingObjectType.TABLE:
           default:
             // No isDangling field yet on these types of annotations
             break;

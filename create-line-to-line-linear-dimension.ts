@@ -1,7 +1,6 @@
-import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2 } from './utils/onshapetypes.js';
+import { BasicNode, Edge, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2, DrawingObjectType } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getRandomLocation } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData, convertPointViewToPaper, getMidPoint, areParallelEdges } from './utils/drawingutils.js';
 
@@ -71,7 +70,7 @@ if (validArgs) {
           formatVersion: '2021-01-01',
           annotations: [
             {
-              type: 'Onshape::Dimension::LineToLine',
+              type: DrawingObjectType.DIMENSION_LINE_TO_LINE_LINEAR,
               lineToLineDimension: {
                 edge1: {
                   type: 'Onshape::Reference::Edge',

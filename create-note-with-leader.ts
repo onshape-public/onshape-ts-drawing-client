@@ -1,7 +1,6 @@
-import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetDrawingJsonExportResponse, GetViewJsonGeometryResponse, View2, SnapPointType } from './utils/onshapetypes.js';
+import { BasicNode, Edge, GetDrawingJsonExportResponse, GetViewJsonGeometryResponse, View2, SnapPointType, DrawingObjectType } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, convertPointViewToPaper } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData } from './utils/drawingutils.js';
 
@@ -80,7 +79,7 @@ if (validArgs) {
             formatVersion: '2021-01-01',
             annotations: [
               {
-                type: 'Onshape::Note',
+                type: DrawingObjectType.NOTE,
                 note: {
                   position: {
                     type: 'Onshape::Reference::Point',

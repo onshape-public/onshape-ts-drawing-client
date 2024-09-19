@@ -1,8 +1,7 @@
-import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2, SnapPointType } from './utils/onshapetypes.js';
-import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getRandomLocation } from './utils/drawingutils.js';
+import { BasicNode, Edge, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2, SnapPointType, DrawingObjectType } from './utils/onshapetypes.js';
+import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData, convertPointViewToPaper, getMidPoint, areParallelEdges } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -80,7 +79,7 @@ if (validArgs) {
             formatVersion: '2021-01-01',
             annotations: [
               {
-                type: 'Onshape::Dimension::LineToLineAngular',
+                type: DrawingObjectType.DIMENSION_LINE_TO_LINE_ANGULAR,
                 lineToLineAngularDimension: {
                   arcPoint: {
                     coordinate: arcPoint,

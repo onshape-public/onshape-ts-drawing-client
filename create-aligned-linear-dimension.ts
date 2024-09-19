@@ -1,8 +1,7 @@
-import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2, SnapPointType } from './utils/onshapetypes.js';
-import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getRandomLocation } from './utils/drawingutils.js';
+import { BasicNode, Edge, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2, DrawingObjectType, SnapPointType } from './utils/onshapetypes.js';
+import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData, convertPointViewToPaper, getMidPoint } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -31,8 +30,8 @@ if (validArgs) {
     let textLocation: number[] = null;
     let startPointEdgeUniqueId: string = null;
     let endPointEdgeUniqueId: string = null;
-    let startSnapPointType: string = null;
-    let endSnapPointType: string = null;
+    let startSnapPointType: SnapPointType = null;
+    let endSnapPointType: SnapPointType = null;
     let rotation: number = null;
 
     /**
@@ -51,10 +50,10 @@ if (validArgs) {
         if (edge.type === 'line') {
           startPoint = edge.data.start;
           startPointEdgeUniqueId = edge.uniqueId;
-          startSnapPointType = "ModeStart";
+          startSnapPointType = SnapPointType.ModeStart;
           endPoint = edge.data.end;
           endPointEdgeUniqueId = edge.uniqueId;
-          endSnapPointType = "ModeEnd";
+          endSnapPointType = SnapPointType.ModeEnd;
   
           // Put text location out from mid point by arbitrary amount
           textLocation = getMidPoint(startPoint, endPoint);
@@ -78,7 +77,7 @@ if (validArgs) {
           formatVersion: '2021-01-01',
           annotations: [
             {
-              type: 'Onshape::Dimension::PointToPoint',
+              type: DrawingObjectType.DIMENSION_POINT_TO_POINT_LINEAR,
               pointToPointDimension: {
                 point1: {
                   coordinate: startPoint,

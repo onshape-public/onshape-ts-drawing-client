@@ -4,7 +4,7 @@ import { ArgumentParser } from './argumentparser.js';
 import { ApiClient } from './apiclient.js';
 import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse } from './onshapetypes.js';
 import { GetDrawingJsonExportResponse, Sheet, TranslationStatusResponse, Annotation, View2 } from './onshapetypes.js';
-import { AnnotationType } from './onshapetypes.js';
+import { DrawingObjectType } from './onshapetypes.js';
 
 const LOG = mainLog();
 
@@ -97,6 +97,14 @@ export function validateBaseURLs(credentialsBaseURL: string, argumentsBaseURL: s
   if (credentialsBaseURL !== argumentsBaseURL) {
     console.log(`WARNING: Credentials base URL ${credentialsBaseURL} does not match drawinguri base URL ${argumentsBaseURL}.`);
   }
+}
+
+export function removeNewLinesFromString(baseString: string): string {
+  let returnString = '';
+  if (baseString) {
+    returnString = baseString.replace('\n', '');
+  } 
+  return returnString;
 }
 
 export function getRandomLocation(minLocation: number[], maxLocation: number[]): number[] {
@@ -210,45 +218,45 @@ export function getAnnotationsOfViewAndSheetFromExportData(exportData: GetDrawin
         let annotation: Annotation = sheet.annotations[indexAnnotation];
         includeAnnotation = false;
         switch (annotation.type) {
-          case AnnotationType.CALLOUT: {
+          case DrawingObjectType.CALLOUT: {
             // Currently there is no way to tell which view is associated with a callout
             includeAnnotation = includeSheetAnnotations;
             break;
           }
-          case AnnotationType.DIMENSION_DIAMETER: {
+          case DrawingObjectType.DIMENSION_DIAMETER: {
             includeAnnotation = (view.viewId === annotation.diametricDimension.chordPoint.viewId);
             break;
           }
-          case AnnotationType.DIMENSION_LINE_TO_LINE_ANGULAR: {
+          case DrawingObjectType.DIMENSION_LINE_TO_LINE_ANGULAR: {
             includeAnnotation = (view.viewId === annotation.lineToLineAngularDimension.point1.viewId);
             break;
           }
-          case AnnotationType.DIMENSION_LINE_TO_LINE_LINEAR: {
+          case DrawingObjectType.DIMENSION_LINE_TO_LINE_LINEAR: {
             includeAnnotation = (view.viewId === annotation.lineToLineDimension.edge1.viewId);
             break;
           }
-          case AnnotationType.DIMENSION_POINT_TO_LINE_LINEAR: {
+          case DrawingObjectType.DIMENSION_POINT_TO_LINE_LINEAR: {
             includeAnnotation = (view.viewId === annotation.pointToLineDimension.edge.viewId);
             break;
           }
-          case AnnotationType.DIMENSION_POINT_TO_POINT_LINEAR: {
+          case DrawingObjectType.DIMENSION_POINT_TO_POINT_LINEAR: {
             includeAnnotation = (view.viewId === annotation.pointToPointDimension.point1.viewId);
             break;
           }
-          case AnnotationType.DIMENSION_RADIAL: {
+          case DrawingObjectType.DIMENSION_RADIAL: {
             includeAnnotation = (view.viewId === annotation.radialDimension.centerPoint.viewId);
             break;
           }
-          case AnnotationType.DIMENSION_THREE_POINT_ANGULAR: {
+          case DrawingObjectType.DIMENSION_THREE_POINT_ANGULAR: {
             includeAnnotation = (view.viewId === annotation.threePointAngularDimension.point1.viewId);
             break;
           }
-          case AnnotationType.GEOMETRIC_TOLERANCE: {
+          case DrawingObjectType.GEOMETRIC_TOLERANCE: {
             // Currently there is no way to tell which view is associated with a geometric tolerance
             includeAnnotation = includeSheetAnnotations;
             break;
           }
-          case AnnotationType.NOTE: {
+          case DrawingObjectType.NOTE: {
             // Currently there is no way to tell which view is associated with a note
             includeAnnotation = includeSheetAnnotations;
             break;

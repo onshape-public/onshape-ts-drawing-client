@@ -1,8 +1,7 @@
-import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetDrawingJsonExportResponse, GetViewJsonGeometryResponse, View2, SnapPointType } from './utils/onshapetypes.js';
-import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getRandomLocation } from './utils/drawingutils.js';
+import { BasicNode, DrawingObjectType, Edge, GetDrawingJsonExportResponse, GetViewJsonGeometryResponse, SnapPointType, View2 } from './utils/onshapetypes.js';
+import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData, isArcAxisPerpendicularToViewPlane, convertPointViewToPaper, midPointOfArc } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -70,7 +69,7 @@ if (validArgs) {
           formatVersion: '2021-01-01',
           annotations: [
             {
-              type: 'Onshape::Dimension::Radial',
+              type: DrawingObjectType.DIMENSION_RADIAL,
               radialDimension: {
                 centerPoint: {
                   coordinate: centerPoint,

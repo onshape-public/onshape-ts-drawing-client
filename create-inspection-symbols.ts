@@ -1,9 +1,8 @@
-import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2, Annotation, AnnotationType, UnassociatedPoint } from './utils/onshapetypes.js';
-import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getRandomLocation } from './utils/drawingutils.js';
-import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData, getAnnotationsOfViewAndSheetFromExportData, convertPointViewToPaper, getMidPoint } from './utils/drawingutils.js';
+import { BasicNode, GetDrawingJsonExportResponse, View2, Annotation, DrawingObjectType } from './utils/onshapetypes.js';
+import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs } from './utils/drawingutils.js';
+import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData, getAnnotationsOfViewAndSheetFromExportData } from './utils/drawingutils.js';
 
 const LOG = mainLog();
 
@@ -45,61 +44,61 @@ if (validArgs) {
       for (let indexAnnotation = 0; indexAnnotation < annotationsInViewAndSheet.length; indexAnnotation++) {
         let annotation: Annotation = annotationsInViewAndSheet[indexAnnotation];
         switch (annotation.type) {
-          case AnnotationType.CALLOUT: {
+          case DrawingObjectType.CALLOUT: {
             symbolPosition = annotation.callout.position.coordinate;
             symbolPosition[0] += 1.0;
             parentAnnotationLogicalId = annotation.callout.logicalId;
             break;
           }
-          case AnnotationType.DIMENSION_DIAMETER: {
+          case DrawingObjectType.DIMENSION_DIAMETER: {
             symbolPosition = annotation.diametricDimension.textPosition.coordinate;
             symbolPosition[0] += 0.5;
             parentAnnotationLogicalId = annotation.diametricDimension.logicalId;
             break;
           }
-          case AnnotationType.DIMENSION_LINE_TO_LINE_ANGULAR: {
+          case DrawingObjectType.DIMENSION_LINE_TO_LINE_ANGULAR: {
             symbolPosition = annotation.lineToLineAngularDimension.textPosition.coordinate;
             symbolPosition[0] += 0.5;
             parentAnnotationLogicalId = annotation.lineToLineAngularDimension.logicalId;
             break;
           }
-          case AnnotationType.DIMENSION_LINE_TO_LINE_LINEAR: {
+          case DrawingObjectType.DIMENSION_LINE_TO_LINE_LINEAR: {
             symbolPosition = annotation.lineToLineDimension.textPosition.coordinate;
             symbolPosition[0] += 0.5;
             parentAnnotationLogicalId = annotation.lineToLineDimension.logicalId;
             break;
           }
-          case AnnotationType.DIMENSION_POINT_TO_LINE_LINEAR: {
+          case DrawingObjectType.DIMENSION_POINT_TO_LINE_LINEAR: {
             symbolPosition = annotation.pointToLineDimension.textPosition.coordinate;
             symbolPosition[0] += 0.5;
             parentAnnotationLogicalId = annotation.pointToLineDimension.logicalId;
             break;
           }
-          case AnnotationType.DIMENSION_POINT_TO_POINT_LINEAR: {
+          case DrawingObjectType.DIMENSION_POINT_TO_POINT_LINEAR: {
             symbolPosition = annotation.pointToPointDimension.textPosition.coordinate;
             symbolPosition[0] += 0.5;
             parentAnnotationLogicalId = annotation.pointToPointDimension.logicalId;
             break;
           }
-          case AnnotationType.DIMENSION_RADIAL: {
+          case DrawingObjectType.DIMENSION_RADIAL: {
             symbolPosition = annotation.radialDimension.textPosition.coordinate;
             symbolPosition[0] += 0.5;
             parentAnnotationLogicalId = annotation.radialDimension.logicalId;
             break;
           }
-          case AnnotationType.DIMENSION_THREE_POINT_ANGULAR: {
+          case DrawingObjectType.DIMENSION_THREE_POINT_ANGULAR: {
             symbolPosition = annotation.threePointAngularDimension.textPosition.coordinate;
             symbolPosition[0] += 0.5;
             parentAnnotationLogicalId = annotation.threePointAngularDimension.logicalId;
             break;
           }
-          case AnnotationType.GEOMETRIC_TOLERANCE: {
+          case DrawingObjectType.GEOMETRIC_TOLERANCE: {
             symbolPosition = annotation.geometricTolerance.position.coordinate;
             symbolPosition[0] += 1.0;
             parentAnnotationLogicalId = annotation.geometricTolerance.logicalId;
             break;
           }
-          case AnnotationType.NOTE: {
+          case DrawingObjectType.NOTE: {
             // We do not want to generate inspection symbols on notes in the titleblock and borders
             // and there is no way to distinguish them now.  So skipping notes for now.
             symbolPosition = null;
@@ -115,7 +114,7 @@ if (validArgs) {
   
         if (symbolPosition !== null && parentAnnotationLogicalId !== null) {
           let annotationRequest = {
-            type: 'Onshape::InspectionSymbol',
+            type: DrawingObjectType.INSPECTION_SYMBOL,
             inspectionSymbol: {
               borderShape: 'Circle',
               borderSize: 2,

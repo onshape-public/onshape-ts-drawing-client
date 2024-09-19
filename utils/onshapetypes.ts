@@ -158,7 +158,7 @@ export interface ReleasePackageItemUpdate {
 
 // Drawings types
 
-export class AnnotationType {
+export class DrawingObjectType {
   static CALLOUT = 'Onshape::Callout';
   static CENTERLINE_POINT_TO_POINT = 'Onshape::Centerline::PointToPoint';
   static DIMENSION_DIAMETER = 'Onshape::Dimension::Diametric';
@@ -167,9 +167,10 @@ export class AnnotationType {
   static DIMENSION_POINT_TO_LINE_LINEAR = 'Onshape::Dimension::PointToLine';
   static DIMENSION_POINT_TO_POINT_LINEAR = 'Onshape::Dimension::PointToPoint';
   static DIMENSION_RADIAL = 'Onshape::Dimension::Radial';
-  static GEOMETRIC_TOLERANCE = 'Onshape::GeometricTolerance';
-  static NOTE = 'Onshape::Note';
   static DIMENSION_THREE_POINT_ANGULAR = 'Onshape::Dimension::ThreePointAngular';
+  static GEOMETRIC_TOLERANCE = 'Onshape::GeometricTolerance';
+  static INSPECTION_SYMBOL = 'Onshape::InspectionSymbol';
+  static NOTE = 'Onshape::Note';
   static TABLE = 'Onshape::Table::GeneralTable';
 }
 
@@ -366,6 +367,7 @@ export interface Callout {
   contentsLeft: string;
   contentsRight: string;
   contentsTop: string;
+  isDangling: boolean;
   logicalId: string;
   position: UnassociatedPoint;
   textHeight: number;
@@ -374,18 +376,21 @@ export interface Callout {
 export interface GeometricTolerance {
   boundingBoxPoint: UnassociatedPoint[];
   frames: string[];
+  isDangling: boolean;
   logicalId: string;
   position: UnassociatedPoint;
 }
 
 export interface Note {
   contents: string;
+  isDangling: boolean;
   logicalId: string;
   position: UnassociatedPoint;
   textHeight: number;
 }
 
 export interface PointToPointCenterline {
+  isDangling: boolean;
   logicalId: string;
   point1: AssociatedPoint;
   point2: AssociatedPoint;
@@ -513,4 +518,29 @@ export interface Sheet {
 
 export interface GetDrawingJsonExportResponse {
   sheets: Sheet[];
+}
+
+export class SingleRequestResponseStatus {
+  static RequestSucceeded = 'OK';       // Succeeded
+  static RequestFailed = 'Failed';      // Failed
+}
+
+export class SingleRequestType {
+  static RequestTypeCreate = "Create";
+  static RequestTypeEdit = "Edit";
+  static RequestTypeDelete = "Delete";
+}
+ 
+// The response to a single JSON request (create, edit, delete) of (annotation, view, sheet, etc.)
+export interface SingleRequestResponse {
+  status: SingleRequestResponseStatus;
+  requestType: SingleRequestType;
+  logicalId: string;
+  objectType: DrawingObjectType
+}
+
+export interface ModifyStatusResponse {
+  overallStatus: boolean;
+  changeId: string;
+  requests: SingleRequestResponse[];
 }

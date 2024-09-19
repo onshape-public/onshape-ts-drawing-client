@@ -1,7 +1,6 @@
-import timeSpan from 'time-span';
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode } from './utils/onshapetypes.js';
+import { BasicNode, DrawingObjectType } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getRandomLocation } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -34,259 +33,259 @@ if (validArgs) {
         {
           messageName: 'onshapeCreateAnnotations',
           formatVersion: '2021-01-01',
-          'annotations': [
+          annotations: [
             {
-              'table': {
-                'cells': [
+              type: DrawingObjectType.TABLE,
+              table: {
+                cells: [
                   {
-                    'alignment': {
-                      'alignment': 'kMiddleCenter'
+                    alignment: {
+                      alignment: 'kMiddleCenter'
                     },
-                    'column': 0,
-                    'content': 'Title',
-                    'contentColor': {
-                      'blue': 255,
-                      'colorType': '',
-                      'green': 255,
-                      'red': 255
+                    column: 0,
+                    content: 'Title',
+                    contentColor: {
+                      blue: 255,
+                      colorType: '',
+                      green: 255,
+                      red: 255
                     },
-                    'isMerged': true,
-                    'maxCol': 1,
-                    'maxRow': 0,
-                    'minCol': 0,
-                    'minRow': 0,
-                    'row': 0,
-                    'textHeight': titleTextHeight
+                    isMerged: true,
+                    maxCol: 1,
+                    maxRow: 0,
+                    minCol: 0,
+                    minRow: 0,
+                    row: 0,
+                    textHeight: titleTextHeight
                   },
                   {
-                    'alignment': {
-                      'alignment': 'kMiddleCenter'
+                    alignment: {
+                      alignment: 'kMiddleCenter'
                     },
-                    'column': 0,
-                    'content': 'H1',
-                    'contentColor': {
-                      'blue': 255,
-                      'colorType': '',
-                      'green': 255,
-                      'red': 255
+                    column: 0,
+                    content: 'H1',
+                    contentColor: {
+                      blue: 255,
+                      colorType: '',
+                      green: 255,
+                      red: 255
                     },
-                    'isMerged': false,
-                    'maxCol': null,
-                    'maxRow': null,
-                    'minCol': null,
-                    'minRow': null,
-                    'row': 1,
-                    'textHeight': headerTextHeight
+                    isMerged: false,
+                    maxCol: null,
+                    maxRow: null,
+                    minCol: null,
+                    minRow: null,
+                    row: 1,
+                    textHeight: headerTextHeight
                   },
                   {
-                    'alignment': {
-                      'alignment': 'kMiddleLeft'
+                    alignment: {
+                      alignment: 'kMiddleLeft'
                     },
-                    'column': 0,
-                    'content': 'C1,1',
-                    'contentColor': {
-                      'blue': 255,
-                      'colorType': '',
-                      'green': 255,
-                      'red': 255
+                    column: 0,
+                    content: 'C1,1',
+                    contentColor: {
+                      blue: 255,
+                      colorType: '',
+                      green: 255,
+                      red: 255
                     },
-                    'isMerged': false,
-                    'maxCol': null,
-                    'maxRow': null,
-                    'minCol': null,
-                    'minRow': null,
-                    'row': 2,
-                    'textHeight': textHeight
+                    isMerged: false,
+                    maxCol: null,
+                    maxRow: null,
+                    minCol: null,
+                    minRow: null,
+                    row: 2,
+                    textHeight: textHeight
                   },
                   {
-                    'alignment': {
-                      'alignment': 'kMiddleLeft'
+                    alignment: {
+                      alignment: 'kMiddleLeft'
                     },
-                    'column': 0,
-                    'content': 'C2,1',
-                    'contentColor': {
-                      'blue': 255,
-                      'colorType': '',
-                      'green': 255,
-                      'red': 255
+                    column: 0,
+                    content: 'C2,1',
+                    contentColor: {
+                      blue: 255,
+                      colorType: '',
+                      green: 255,
+                      red: 255
                     },
-                    'isMerged': false,
-                    'maxCol': null,
-                    'maxRow': null,
-                    'minCol': null,
-                    'minRow': null,
-                    'row': 3,
-                    'textHeight': textHeight
+                    isMerged: false,
+                    maxCol: null,
+                    maxRow: null,
+                    minCol: null,
+                    minRow: null,
+                    row: 3,
+                    textHeight: textHeight
                   },
                   {
-                    'alignment': {
-                      'alignment': 'kMiddleCenter'
+                    alignment: {
+                      alignment: 'kMiddleCenter'
                     },
-                    'column': 1,
-                    'content': '',
-                    'contentColor': {
-                      'blue': 255,
-                      'colorType': '',
-                      'green': 255,
-                      'red': 255
+                    column: 1,
+                    content: '',
+                    contentColor: {
+                      blue: 255,
+                      colorType: '',
+                      green: 255,
+                      red: 255
                     },
-                    'isMerged': true,
-                    'maxCol': 1,
-                    'maxRow': 0,
-                    'minCol': 0,
-                    'minRow': 0,
-                    'row': 0,
-                    'textHeight': titleTextHeight
+                    isMerged: true,
+                    maxCol: 1,
+                    maxRow: 0,
+                    minCol: 0,
+                    minRow: 0,
+                    row: 0,
+                    textHeight: titleTextHeight
                   },
                   {
-                    'alignment': {
-                      'alignment': 'kMiddleCenter'
+                    alignment: {
+                      alignment: 'kMiddleCenter'
                     },
-                    'column': 1,
-                    'content': 'H2',
-                    'contentColor': {
-                      'blue': 255,
-                      'colorType': '',
-                      'green': 255,
-                      'red': 255
+                    column: 1,
+                    content: 'H2',
+                    contentColor: {
+                      blue: 255,
+                      colorType: '',
+                      green: 255,
+                      red: 255
                     },
-                    'isMerged': false,
-                    'maxCol': null,
-                    'maxRow': null,
-                    'minCol': null,
-                    'minRow': null,
-                    'row': 1,
-                    'textHeight': headerTextHeight
+                    isMerged: false,
+                    maxCol: null,
+                    maxRow: null,
+                    minCol: null,
+                    minRow: null,
+                    row: 1,
+                    textHeight: headerTextHeight
                   },
                   {
-                    'alignment': {
-                      'alignment': 'kMiddleLeft'
+                    alignment: {
+                      alignment: 'kMiddleLeft'
                     },
-                    'column': 1,
-                    'content': 'C1,2',
-                    'contentColor': {
-                      'blue': 255,
-                      'colorType': '',
-                      'green': 255,
-                      'red': 255
+                    column: 1,
+                    content: 'C1,2',
+                    contentColor: {
+                      blue: 255,
+                      colorType: '',
+                      green: 255,
+                      red: 255
                     },
-                    'isMerged': false,
-                    'maxCol': null,
-                    'maxRow': null,
-                    'minCol': null,
-                    'minRow': null,
-                    'row': 2,
-                    'textHeight': textHeight
+                    isMerged: false,
+                    maxCol: null,
+                    maxRow: null,
+                    minCol: null,
+                    minRow: null,
+                    row: 2,
+                    textHeight: textHeight
                   },
                   {
-                    'alignment': {
-                      'alignment': 'kMiddleLeft'
+                    alignment: {
+                      alignment: 'kMiddleLeft'
                     },
-                    'column': 1,
-                    'content': 'C2,2',
-                    'contentColor': {
-                      'blue': 255,
-                      'colorType': '',
-                      'green': 255,
-                      'red': 255
+                    column: 1,
+                    content: 'C2,2',
+                    contentColor: {
+                      blue: 255,
+                      colorType: '',
+                      green: 255,
+                      red: 255
                     },
-                    'isMerged': false,
-                    'maxCol': null,
-                    'maxRow': null,
-                    'minCol': null,
-                    'minRow': null,
-                    'row': 3,
-                    'textHeight': textHeight
+                    isMerged: false,
+                    maxCol: null,
+                    maxRow: null,
+                    minCol: null,
+                    minRow: null,
+                    row: 3,
+                    textHeight: textHeight
                   }
                 ],
-                'columns': 2,
-                'formatting': {
-                  'fixedCorners': 'FixedCornerTopRight',
-                  'flowDirection': 'TtoB',
-                  'styleByRowType': [
+                columns: 2,
+                formatting: {
+                  fixedCorners: 'FixedCornerTopRight',
+                  flowDirection: 'TtoB',
+                  styleByRowType: [
                     {
-                      'rowType': {
-                        'alignmentType': 'kTitleRow'
+                      rowType: {
+                        alignmentType: 'kTitleRow'
                       }
                     },
                     {
-                      'rowType': {
-                        'alignmentType': 'kHeaderRow'
+                      rowType: {
+                        alignmentType: 'kHeaderRow'
                       }
                     },
                     {
-                      'rowType': {
-                        'alignmentType': 'kDataRow'
+                      rowType: {
+                        alignmentType: 'kDataRow'
                       }
                     },
                     {
-                      'rowType': {
-                        'alignmentType': 'kDataRow'
+                      rowType: {
+                        alignmentType: 'kDataRow'
                       }
                     },
                     {
-                      'rowType': {
-                        'alignmentType': 'kTitleRow'
+                      rowType: {
+                        alignmentType: 'kTitleRow'
                       }
                     },
                     {
-                      'rowType': {
-                        'alignmentType': 'kHeaderRow'
+                      rowType: {
+                        alignmentType: 'kHeaderRow'
                       }
                     },
                     {
-                      'rowType': {
-                        'alignmentType': 'kDataRow'
+                      rowType: {
+                        alignmentType: 'kDataRow'
                       }
                     },
                     {
-                      'rowType': {
-                        'alignmentType': 'kDataRow'
+                      rowType: {
+                        alignmentType: 'kDataRow'
                       }
                     }
                   ],
-                  'tableColumnWidth': [
+                  tableColumnWidth: [
                     {
-                      'columnIndex': 0,
-                      'columnWidth': 0.78740157480315
+                      columnIndex: 0,
+                      columnWidth: 0.78740157480315
                     },
                     {
-                      'columnIndex': 1,
-                      'columnWidth': 0.78740157480315
+                      columnIndex: 1,
+                      columnWidth: 0.78740157480315
                     }
                   ],
-                  'tableHeight': 1.208,
-                  'tableRowHeight': [
+                  tableHeight: 1.208,
+                  tableRowHeight: [
                     {
-                      'rowHeight': 0.328,
-                      'rowIndex': 0
+                      rowHeight: 0.328,
+                      rowIndex: 0
                     },
                     {
-                      'rowHeight': 0.32,
-                      'rowIndex': 1
+                      rowHeight: 0.32,
+                      rowIndex: 1
                     },
                     {
-                      'rowHeight': 0.28,
-                      'rowIndex': 2
+                      rowHeight: 0.28,
+                      rowIndex: 2
                     },
                     {
-                      'rowHeight': 0.28,
-                      'rowIndex': 3
+                      rowHeight: 0.28,
+                      rowIndex: 3
                     }
                   ],
-                  'tableWidth': 1.5748031496063
+                  tableWidth: 1.5748031496063
                 },
-                'horizontalCellMargin': 0,
-                'position': {
-                  'coordinate': randomLocation,
-                  'type': 'Onshape::Reference::Point'
+                horizontalCellMargin: 0,
+                position: {
+                  coordinate: randomLocation,
+                  type: 'Onshape::Reference::Point'
                 },
-                'rows': 4,
-                'suppressHeaderRow': false,
-                'suppressTitleRow': false,
-                'verticalCellMargin': 0
-              },
-              'type': 'Onshape::Table::GeneralTable'
+                rows: 4,
+                suppressHeaderRow: false,
+                suppressTitleRow: false,
+                verticalCellMargin: 0
+              }
             }
           ]
         }
