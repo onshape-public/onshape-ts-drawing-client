@@ -26,6 +26,8 @@ export interface ModifyJob extends BasicNode {
   drawingElementId?: string;
   /** Reason why the modification failed if not DONE */
   failureReason?: string;
+  /** Output from job */
+  output?: string;
 }
 
 /**
@@ -99,14 +101,6 @@ export function validateBaseURLs(credentialsBaseURL: string, argumentsBaseURL: s
   }
 }
 
-export function removeNewLinesFromString(baseString: string): string {
-  let returnString = '';
-  if (baseString) {
-    returnString = baseString.replace('\n', '');
-  } 
-  return returnString;
-}
-
 export function getRandomLocation(minLocation: number[], maxLocation: number[]): number[] {
   // Position of note is random between (minLocation[0], minLocation[1]) and (maxLocation[0], maxLocation[1])
   const xPosition: number = minLocation[0] + (Math.random() * (maxLocation[0] - minLocation[0]));
@@ -166,7 +160,7 @@ export async function waitForModifyToFinish(apiClient: ApiClient, idModifyReques
   let succeeded: boolean = true;
   let elapsedSeconds: number = 0;
 
-  let jobStatus: ModifyJob = { requestState: 'ACTIVE', id: '' };
+  let jobStatus: ModifyJob = { requestState: 'ACTIVE', id: '', output: '' };
   const end = timeSpan();
   while (jobStatus.requestState === 'ACTIVE') {
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -181,6 +175,15 @@ export async function waitForModifyToFinish(apiClient: ApiClient, idModifyReques
 
     LOG.debug(`Waited for modify seconds=${elapsedSeconds}`);
     jobStatus = await apiClient.get(`api/drawings/modify/status/${idModifyRequest}`) as ModifyJob;
+  }
+
+  if (jobStatus.requestState !== 'ACTIVE') {
+    let jobOutput = '';
+    if (jobStatus.output) {
+      jobOutput = jobStatus.output;
+    }
+    // The output field will soon report details about drawing modifications
+    console.log(`modify/status returned output: ${jobOutput}`)
   }
 
   return succeeded;

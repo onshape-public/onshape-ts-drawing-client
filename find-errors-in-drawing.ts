@@ -1,7 +1,7 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
 import { GetDrawingJsonExportResponse, Sheet, View2, DrawingObjectType, Annotation, ErrorStateValue, ErrorState } from './utils/onshapetypes.js';
-import { usage, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, removeNewLinesFromString } from './utils/drawingutils.js';
+import { usage, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs } from './utils/drawingutils.js';
 import { getDrawingJsonExport } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -43,8 +43,7 @@ if (validArgs) {
       // Check for views on the sheet that have a bad error state
       for (let indexView = 0; indexView < sheet.views.length; indexView++) {
         let aView: View2 = sheet.views[indexView];
-        let viewName = removeNewLinesFromString(aView.name);
-        let viewLabel = removeNewLinesFromString(aView.label);
+
         errorValue = null;
         if (aView.hasOwnProperty('errorState')) {
           switch (aView.errorState.value) {
@@ -72,6 +71,8 @@ if (validArgs) {
 
         if (errorValue) {
           viewErrorsFound = true;
+          const viewName = aView.name.replaceAll('\n', ' ');
+          const viewLabel = aView.label.replaceAll('\n', ' ');
           console.log(`  View name: ${viewName} id: ${aView.viewId} label:  ${viewLabel} has ${errorValue}: ${aView.errorState.description}.`);
         }
       }
