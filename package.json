@@ -22,6 +22,7 @@
     "create-radial-dimension": "node .compiledjs/create-radial-dimension.js",
     "create-table": "node .compiledjs/create-table.js",
     "create-three-point-angular-dimension": "node .compiledjs/create-three-point-angular-dimension.js",
+    "edit-notes": "node .compiledjs/edit-notes.js",
     "find-errors-in-drawing": "node .compiledjs/find-errors-in-drawing.js"
   },
   "repository": {

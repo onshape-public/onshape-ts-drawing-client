@@ -116,8 +116,8 @@ if (validArgs) {
         LOG.info('Create dimension failed waiting for modify to finish.');
       }
     } else {
-      console.log('Insufficient view and edge information to create the dimension.');
-      LOG.error('Create dimension failed due to insufficient view and edge information.');
+      console.log('Insufficient view and edge information to create the dimension. Maybe it did not find 2 parallel edges?');
+      LOG.error('Create dimension failed due to insufficient view and edge information. Maybe it did not find 2 parallel edges?');
     }
   
   } catch (error) {

@@ -125,8 +125,8 @@ if (validArgs) {
       }
   
     } else {
-      console.log('Insufficient view and edge information to create the dimension.');
-      LOG.error('Create dimension failed due to insufficient view and edge information.');
+      console.log('Insufficient view and edge information to create the dimension. Maybe no circular edges were found?');
+      LOG.error('Create dimension failed due to insufficient view and edge information. Maybe no circular edges were found?');
     }
   
   } catch (error) {

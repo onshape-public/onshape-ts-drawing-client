@@ -119,8 +119,8 @@ if (validArgs) {
         LOG.info('Create dimension failed waiting for modify to finish.');
       }
     } else {
-      console.log('Insufficient view and edge information to create the dimension.');
-      LOG.error('Create dimension failed due to insufficient view and edge information.');
+      console.log('Insufficient view and edge information to create the dimension. Maybe no circular arcs were found?');
+      LOG.error('Create dimension failed due to insufficient view and edge information. Maybe no circular arcs were found?');
     }
   } catch (error) {
     console.error(error);

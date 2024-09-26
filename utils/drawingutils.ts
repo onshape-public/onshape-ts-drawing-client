@@ -182,8 +182,9 @@ export async function waitForModifyToFinish(apiClient: ApiClient, idModifyReques
     if (jobStatus.output) {
       jobOutput = jobStatus.output;
     }
+
     // The output field will soon report details about drawing modifications
-    console.log(`modify/status returned output: ${jobOutput}`)
+    console.log(`modify/status returned output, but the format of this field will be changing soon: ${jobOutput}`)
   }
 
   return succeeded;
@@ -211,7 +212,6 @@ export function getRandomViewOnActiveSheetFromExportData(exportData: GetDrawingJ
 
 export function getAnnotationsOfViewAndSheetFromExportData(exportData: GetDrawingJsonExportResponse, view: View2, includeSheetAnnotations: boolean): Annotation[] {
   let annotationsInViewAndSheet: Annotation[] = null;
-  let annotationViewId: string = '';
   let includeAnnotation: boolean = false;
 
   for (let indexSheet = 0; indexSheet < exportData.sheets.length; indexSheet++) {
@@ -222,8 +222,12 @@ export function getAnnotationsOfViewAndSheetFromExportData(exportData: GetDrawin
         includeAnnotation = false;
         switch (annotation.type) {
           case DrawingObjectType.CALLOUT: {
-            // Currently there is no way to tell which view is associated with a callout
-            includeAnnotation = includeSheetAnnotations;
+            // Look at leader to determine if callout is in a view
+            if (annotation.callout.leaderPosition) {
+              includeAnnotation = (view.viewId === annotation.callout.leaderPosition.viewId);
+            } else {
+              includeAnnotation = includeSheetAnnotations;
+            }
             break;
           }
           case DrawingObjectType.DIMENSION_DIAMETER: {
@@ -255,13 +259,21 @@ export function getAnnotationsOfViewAndSheetFromExportData(exportData: GetDrawin
             break;
           }
           case DrawingObjectType.GEOMETRIC_TOLERANCE: {
-            // Currently there is no way to tell which view is associated with a geometric tolerance
-            includeAnnotation = includeSheetAnnotations;
+            // Look at leader to determine if geometric tolerance is in a view
+            if (annotation.geometricTolerance.leaderPosition) {
+              includeAnnotation = (view.viewId === annotation.geometricTolerance.leaderPosition.viewId);
+            } else {
+              includeAnnotation = includeSheetAnnotations;
+            }
             break;
           }
           case DrawingObjectType.NOTE: {
-            // Currently there is no way to tell which view is associated with a note
-            includeAnnotation = includeSheetAnnotations;
+            // Look at leader to determine if note is in a view
+            if (annotation.note.leaderPosition) {
+              includeAnnotation = (view.viewId === annotation.note.leaderPosition.viewId);
+            } else {
+              includeAnnotation = includeSheetAnnotations;
+            }
             break;
           }
           default: {
@@ -283,6 +295,78 @@ export function getAnnotationsOfViewAndSheetFromExportData(exportData: GetDrawin
   }
 
   return annotationsInViewAndSheet;
+}
+
+export function getAllDrawingAnnotationsInViewsFromExportData(exportData: GetDrawingJsonExportResponse): Annotation[] {
+  let annotationsInViews: Annotation[] = null;
+  let includeAnnotation: boolean = false;
+
+  for (let indexSheet = 0; indexSheet < exportData.sheets.length; indexSheet++) {
+    let sheet: Sheet = exportData.sheets[indexSheet];
+    for (let indexAnnotation = 0; indexAnnotation < sheet.annotations.length; indexAnnotation++) {
+      let annotation: Annotation = sheet.annotations[indexAnnotation];
+      includeAnnotation = false;
+      switch (annotation.type) {
+        case DrawingObjectType.CALLOUT: {
+          // Only way to know if a callout is in a view is if it has a leader to an edge of the view
+          includeAnnotation = (annotation.callout.leaderPosition && annotation.callout.leaderPosition.viewId) ? true : false;
+          break;
+        }
+        case DrawingObjectType.DIMENSION_DIAMETER: {
+          includeAnnotation = annotation.diametricDimension.chordPoint.viewId ? true : false;
+          break;
+        }
+        case DrawingObjectType.DIMENSION_LINE_TO_LINE_ANGULAR: {
+          includeAnnotation = annotation.lineToLineAngularDimension.point1.viewId ? true : false;
+          break;
+        }
+        case DrawingObjectType.DIMENSION_LINE_TO_LINE_LINEAR: {
+          includeAnnotation = annotation.lineToLineDimension.edge1.viewId ? true : false;
+          break;
+        }
+        case DrawingObjectType.DIMENSION_POINT_TO_LINE_LINEAR: {
+          includeAnnotation = annotation.pointToLineDimension.edge.viewId ? true : false;
+          break;
+        }
+        case DrawingObjectType.DIMENSION_POINT_TO_POINT_LINEAR: {
+          includeAnnotation = annotation.pointToPointDimension.point1.viewId ? true : false;
+          break;
+        }
+        case DrawingObjectType.DIMENSION_RADIAL: {
+          includeAnnotation = annotation.radialDimension.centerPoint.viewId ? true : false;
+          break;
+        }
+        case DrawingObjectType.DIMENSION_THREE_POINT_ANGULAR: {
+          includeAnnotation = annotation.threePointAngularDimension.point1.viewId ? true : false;
+          break;
+        }
+        case DrawingObjectType.GEOMETRIC_TOLERANCE: {
+          // Only way to know if a geometric tolerance is in a view is if it has a leader to an edge of the view
+          includeAnnotation = (annotation.geometricTolerance.leaderPosition && annotation.geometricTolerance.leaderPosition.viewId) ? true : false;
+          break;
+        }
+        case DrawingObjectType.NOTE: {
+          // Only way to know if a note is in a view is if it has a leader to an edge of the view
+          includeAnnotation = (annotation.note.leaderPosition && annotation.note.leaderPosition.viewId) ? true : false;
+          break;
+        }
+        default: {
+          includeAnnotation = false;
+          break;
+        }
+      }
+
+      if (includeAnnotation) {
+        if (annotationsInViews === null) {
+          annotationsInViews = [annotation];
+        } else {
+          annotationsInViews.push(annotation);
+        }
+      }
+    }
+  }
+
+  return annotationsInViews;
 }
 
 export function equalWithinTolerance(value1: number, value2: number, tolerance: number): boolean {

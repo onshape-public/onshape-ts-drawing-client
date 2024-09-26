@@ -231,6 +231,20 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Edit Notes",
+            "console": "integratedTerminal",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/.compiledjs/edit-notes.js",
+            "args": [
+                "--drawinguri=https://cad.onshape.com/documents/3f7e7b5e2e6140fb84195b10/w/b2b41f2cbf04d2530cc8f205/e/749f074ef7c22c76b7e7f0f0",
+                "--stack=cad"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Find Errors in Drawing",
             "console": "integratedTerminal",
             "skipFiles": [

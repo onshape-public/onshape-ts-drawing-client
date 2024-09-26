@@ -330,21 +330,21 @@ export interface GetViewJsonGeometryResponse {
 }
 
 export interface DimensionFormatting {
-  dimdec: number;
-  dimlim: boolean;
-  dimpost: string;
-  dimtm: number;
-  dimtol: boolean;
-  dimtp: number;
-  type: string;
+  dimdec?: number;
+  dimlim?: boolean;
+  dimpost?: string;
+  dimtm?: number;
+  dimtol?: boolean;
+  dimtp?: number;
+  type?: string;
 }
 
 export interface AssociatedPoint {
-  coordinate: number[];
-  type: string;
-  uniqueId: string;
-  viewId: string;
-  snapPointType: SnapPointType;
+  coordinate?: number[];
+  type?: string;
+  uniqueId?: string;
+  viewId?: string;
+  snapPointType?: SnapPointType;
 }
 
 export interface UnassociatedPoint {
@@ -359,6 +359,14 @@ export interface DimensionUnit {
   unit: string;
 }
 
+export interface LeaderPosition {
+  coordinate: number[];
+  type: DrawingObjectType;
+  uniqueId: string;
+  viewId: string;
+  snapPointType: SnapPointType;
+}
+
 export interface Callout {
   borderShape: string;
   borderSize: number;
@@ -368,6 +376,7 @@ export interface Callout {
   contentsRight: string;
   contentsTop: string;
   isDangling: boolean;
+  leaderPosition?: LeaderPosition;
   logicalId: string;
   position: UnassociatedPoint;
   textHeight: number;
@@ -377,16 +386,18 @@ export interface GeometricTolerance {
   boundingBoxPoint: UnassociatedPoint[];
   frames: string[];
   isDangling: boolean;
+  leaderPosition?: LeaderPosition;
   logicalId: string;
   position: UnassociatedPoint;
 }
 
 export interface Note {
-  contents: string;
-  isDangling: boolean;
-  logicalId: string;
-  position: UnassociatedPoint;
-  textHeight: number;
+  contents?: string;
+  isDangling?: boolean;
+  leaderPosition?: LeaderPosition;
+  logicalId?: string;
+  position?: UnassociatedPoint;
+  textHeight?: number;
 }
 
 export interface PointToPointCenterline {
@@ -397,15 +408,15 @@ export interface PointToPointCenterline {
 }
 
 export interface PointToPointLinearDimension {
-  formatting: DimensionFormatting;
-  isDangling: boolean;
-  logicalId: string;
-  measurement: number;
-  point1: AssociatedPoint;
-  point2: AssociatedPoint;
-  textOverride: string;
-  textPosition: UnassociatedPoint;
-  unit: DimensionUnit;
+  formatting?: DimensionFormatting;
+  isDangling?: boolean;
+  logicalId?: string;
+  measurement?: number;
+  point1?: AssociatedPoint;
+  point2?: AssociatedPoint;
+  textOverride?: string;
+  textPosition?: UnassociatedPoint;
+  unit?: DimensionUnit;
 }
 
 export interface LineToLineAngularDimension {
