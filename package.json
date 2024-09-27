@@ -23,6 +23,8 @@
     "create-table": "node .compiledjs/create-table.js",
     "create-three-point-angular-dimension": "node .compiledjs/create-three-point-angular-dimension.js",
     "edit-notes": "node .compiledjs/edit-notes.js",
+    "edit-dimension-attachments": "node .compiledjs/edit-dimension-attachments.js",
+    "edit-dimension-text-positions": "node .compiledjs/edit-dimension-text-positions.js",
     "find-errors-in-drawing": "node .compiledjs/find-errors-in-drawing.js"
   },
   "repository": {

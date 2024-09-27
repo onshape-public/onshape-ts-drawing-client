@@ -94,6 +94,12 @@ npm run create-inspection-symbols --drawinguri=<drawing uri> --stack=cad
 
 npm run create-aligned-linear-dimension --drawinguri=<drawing uri> --stack=cad
 
+npm run edit-notes --drawinguri=<drawing uri> --stack=cad
+
+npm run edit-dimension-attachments.ts --drawinguri=<drawing uri> --stack=cad
+
+npm run edit-dimension-text-positions.ts --drawinguri=<drawing uri> --stack=cad
+
 npm run find-errors-in-drawing --drawinguri=<drawing uri> --stack=cad
 ```
 

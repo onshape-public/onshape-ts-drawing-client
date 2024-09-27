@@ -245,6 +245,34 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Edit Dimension Attachments",
+            "console": "integratedTerminal",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/.compiledjs/edit-dimension-attachments.js",
+            "args": [
+                "--drawinguri=https://cad.onshape.com/documents/66e3efbad7d5bab375522684/w/d481b96308ad2a5b7f261f0c/e/f0804a6511341d568ad63223",
+                "--stack=cad"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Edit Dimension Text Positions",
+            "console": "integratedTerminal",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/.compiledjs/edit-dimension-text-positions.js",
+            "args": [
+                "--drawinguri=https://cad.onshape.com/documents/66e3efbad7d5bab375522684/w/d481b96308ad2a5b7f261f0c/e/f0804a6511341d568ad63223",
+                "--stack=cad"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Find Errors in Drawing",
             "console": "integratedTerminal",
             "skipFiles": [

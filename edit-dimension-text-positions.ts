@@ -1,6 +1,6 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, DrawingObjectType, Note, GetDrawingJsonExportResponse, Annotation } from './utils/onshapetypes.js';
+import { BasicNode, DrawingObjectType, GetDrawingJsonExportResponse, Annotation } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getAllDrawingAnnotationsInViewsFromExportData } from './utils/drawingutils.js';
 
@@ -16,22 +16,23 @@ try {
   validateBaseURLs(apiClient.getBaseURL(), drawingScriptArgs.baseURL);
 } catch (error) {
   validArgs = false;
-  usage('edit-notes');
+  usage('edit-dimension-text-positions');
 }
 
 if (validArgs) {
   try {
     LOG.info(`documentId=${drawingScriptArgs.documentId}, workspaceId=${drawingScriptArgs.workspaceId}, elementId=${drawingScriptArgs.elementId}`);
   
+    let viewAnnotations: Annotation[] = null;
+  
     /**
-     * Retrieve annotations in the drawing that are associated with views (to avoid annotations in borders, titleblock, etc.).
-     * NOTE - THIS MEANS NOTES THAT ARE NOT ASSOCIATED WITH A VIEW (e.g. do not have a leader attached to a view edge) WILL NOT BE EDITED.
+     * Retrieve annotations in the drawing
      */
     let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
-    let viewAnnotations: Annotation[] = getAllDrawingAnnotationsInViewsFromExportData(drawingJsonExport);
+    viewAnnotations = getAllDrawingAnnotationsInViewsFromExportData(drawingJsonExport);
 
     /**
-     * Loop through annotations and create edit requests to move each note 1 unit to the right and add ' +' to the last line of note text.
+     * Loop through annotations and create edit requests to move the dimension text 1 unit to the right
      */
     let editAnnotations: Annotation[] = null;
     for (let indexAnnotation = 0; indexAnnotation < viewAnnotations.length; indexAnnotation++) {
@@ -39,28 +40,21 @@ if (validArgs) {
       let editAnnotation: Annotation = null;
 
       switch (annotation.type) {
-        case DrawingObjectType.NOTE: {
-          // Add a ' +' at the end of the note text.
-          // It's best to preserve the {\\pxql; <note text> } structure of note text by putting new text inside of the {}'s.
-          // pxql or pql is left justified, pxqc or pqc is center justified, pxqr or pqr is right justified, pxqj or pqj is justified.
-          let lastBraceRegEx = /}$/g;  // Regular expression to find the brace at end of the contents string
-          let newContents = annotation.note.contents.replace(lastBraceRegEx, ' +}')
-
+        case DrawingObjectType.DIMENSION_POINT_TO_POINT_LINEAR: {
           editAnnotation = {
-            note: {
-              logicalId: annotation.note.logicalId,
-              position: {
+            pointToPointDimension: {
+              logicalId: annotation.pointToPointDimension.logicalId,
+              textPosition: {
                 coordinate: [
-                  annotation.note.position.coordinate[0] + 1.0,
-                  annotation.note.position.coordinate[1],
-                  annotation.note.position.coordinate[2]
+                  annotation.pointToPointDimension.textPosition.coordinate[0] + 1.0,
+                  annotation.pointToPointDimension.textPosition.coordinate[1],
+                  annotation.pointToPointDimension.textPosition.coordinate[2]
                 ],
                 type: 'Onshape::Reference::Point'
-              },
-              contents: newContents
+              }
             },
-            type: DrawingObjectType.NOTE
-          };
+            type: DrawingObjectType.DIMENSION_POINT_TO_POINT_LINEAR
+          }
           break;
         }
         default: {
@@ -80,13 +74,13 @@ if (validArgs) {
   
     if (editAnnotations && editAnnotations.length > 0) {
       const requestBody = {
-        description: 'Edit notes',
+        description: 'Edit linear dims',
         jsonRequests: [ {
           messageName: 'onshapeEditAnnotations',
           formatVersion: '2021-01-01',
           annotations: editAnnotations
         } ]
-      };
+      }
 
       /**
        * Modify the drawing to edit the dimensions
@@ -95,18 +89,18 @@ if (validArgs) {
   
       const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
       if (waitSucceeded) {
-        console.log('Successfully edited notes.');
-        LOG.info(`Successfully edited notes.`);
+        console.log('Successfully edited dimensions.');
+        LOG.info(`Successfully edited dimensions.`);
       } else {
-        console.log('Edit notes failed waiting for modify to finish.');
-        LOG.info('Edit notes failed waiting for modify to finish.');
+        console.log('Edit dimensions failed waiting for modify to finish.');
+        LOG.info('Edit dimensions failed waiting for modify to finish.');
       }
     } else {
-      console.log('No notes found to be edited.');
-      LOG.error('No notes found to be edited.');
+      console.log('No dimensions need to be edited.');
+      LOG.error('No dimensions need to be edited.');
     }
   } catch (error) {
     console.error(error);
-    LOG.error('Edit notes failed', error);
+    LOG.error('Edit point to point linear dimensions failed:', error);
   }
 }
