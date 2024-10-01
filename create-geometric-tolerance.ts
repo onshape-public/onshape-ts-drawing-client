@@ -1,6 +1,6 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, DrawingObjectType } from './utils/onshapetypes.js';
+import { BasicNode, DrawingObjectType, ModifyStatusResponseOutput } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getRandomLocation } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -54,8 +54,8 @@ if (validArgs) {
 
     const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`,  requestBody) as BasicNode;
   
-    const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
-    if (waitSucceeded) {
+    const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
+    if (responseOutput) {
       console.log('Successfully created geometric tolerance.');
       LOG.info(`Successfully created geometric tolerance.`);
     } else {

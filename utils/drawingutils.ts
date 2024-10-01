@@ -2,7 +2,7 @@ import timeSpan from 'time-span';
 import { mainLog } from './logger.js';
 import { ArgumentParser } from './argumentparser.js';
 import { ApiClient } from './apiclient.js';
-import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse } from './onshapetypes.js';
+import { BasicNode, ExportDrawingResponse, ModifyStatusResponseOutput } from './onshapetypes.js';
 import { GetDrawingJsonExportResponse, Sheet, TranslationStatusResponse, Annotation, View2 } from './onshapetypes.js';
 import { DrawingObjectType } from './onshapetypes.js';
 
@@ -155,10 +155,11 @@ export async function getDrawingJsonExport(apiClient: ApiClient, documentId: str
   return exportData;
 }
 
-export async function waitForModifyToFinish(apiClient: ApiClient, idModifyRequest: string): Promise<boolean> {
+export async function waitForModifyToFinish(apiClient: ApiClient, idModifyRequest: string): Promise<ModifyStatusResponseOutput> {
 
   let succeeded: boolean = true;
   let elapsedSeconds: number = 0;
+  let jobOutput: ModifyStatusResponseOutput = null;
 
   let jobStatus: ModifyJob = { requestState: 'ACTIVE', id: '', output: '' };
   const end = timeSpan();
@@ -177,17 +178,14 @@ export async function waitForModifyToFinish(apiClient: ApiClient, idModifyReques
     jobStatus = await apiClient.get(`api/drawings/modify/status/${idModifyRequest}`) as ModifyJob;
   }
 
-  if (jobStatus.requestState !== 'ACTIVE') {
-    let jobOutput = '';
+  if (succeeded && jobStatus.requestState !== 'ACTIVE') {
     if (jobStatus.output) {
-      jobOutput = jobStatus.output;
+      jobOutput = JSON.parse(jobStatus.output);
+      console.log(`modify status response output is: ${jobStatus.output}`);
     }
-
-    // The output field will soon report details about drawing modifications
-    console.log(`modify/status returned output, but the format of this field will be changing soon: ${jobOutput}`)
   }
 
-  return succeeded;
+  return jobOutput;  // Will return null if failed
 }
 
 export function getRandomViewOnActiveSheetFromExportData(exportData: GetDrawingJsonExportResponse): View2 {

@@ -1,6 +1,6 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, Edge, GetDrawingJsonExportResponse, GetViewJsonGeometryResponse, View2, SnapPointType, DrawingObjectType } from './utils/onshapetypes.js';
+import { BasicNode, Edge, GetDrawingJsonExportResponse, GetViewJsonGeometryResponse, View2, SnapPointType, DrawingObjectType, ModifyStatusResponseOutput } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, convertPointViewToPaper } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData } from './utils/drawingutils.js';
 
@@ -103,8 +103,8 @@ if (validArgs) {
 
       const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`, requestBody) as BasicNode;
     
-      const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
-      if (waitSucceeded) {
+      const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
+      if (responseOutput) {
         console.log('Successfully created note with leader.');
         LOG.info(`Successfully created note with leader.`);
       } else {

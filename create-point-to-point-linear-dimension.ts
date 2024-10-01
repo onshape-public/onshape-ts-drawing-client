@@ -1,6 +1,6 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, DrawingObjectType, Edge, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2, SnapPointType } from './utils/onshapetypes.js';
+import { BasicNode, DrawingObjectType, Edge, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2, SnapPointType, ModifyStatusResponseOutput } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData, convertPointViewToPaper, getMidPoint } from './utils/drawingutils.js';
 
@@ -114,8 +114,8 @@ if (validArgs) {
        */
       const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`, requestBody) as BasicNode;
   
-      const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
-      if (waitSucceeded) {
+      const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
+      if (responseOutput) {
         console.log('Successfully created dimension.');
         LOG.info(`Successfully created dimension.`);
       } else {

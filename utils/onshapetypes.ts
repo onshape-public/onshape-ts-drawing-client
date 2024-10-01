@@ -531,7 +531,7 @@ export interface GetDrawingJsonExportResponse {
   sheets: Sheet[];
 }
 
-export class SingleRequestResponseStatus {
+export class SingleRequestResultStatus {
   static RequestSucceeded = 'OK';       // Succeeded
   static RequestFailed = 'Failed';      // Failed
 }
@@ -544,14 +544,14 @@ export class SingleRequestType {
  
 // The response to a single JSON request (create, edit, delete) of (annotation, view, sheet, etc.)
 export interface SingleRequestResponse {
-  status: SingleRequestResponseStatus;
-  requestType: SingleRequestType;
+  status: SingleRequestResultStatus;
   logicalId: string;
-  objectType: DrawingObjectType
 }
 
-export interface ModifyStatusResponse {
-  overallStatus: boolean;
+export interface ModifyStatusResponseOutput {
+  status: SingleRequestResultStatus;
+  statusCode: number;
   changeId: string;
-  requests: SingleRequestResponse[];
+  results: SingleRequestResponse[];
 }
+

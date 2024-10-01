@@ -1,6 +1,6 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, GetDrawingJsonExportResponse, View2, Annotation, DrawingObjectType } from './utils/onshapetypes.js';
+import { BasicNode, GetDrawingJsonExportResponse, View2, Annotation, DrawingObjectType, ModifyStatusResponseOutput } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData, getAnnotationsOfViewAndSheetFromExportData } from './utils/drawingutils.js';
 
@@ -146,8 +146,8 @@ if (validArgs) {
           }]
         }) as BasicNode;
   
-        const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
-        if (waitSucceeded) {
+        const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
+        if (responseOutput) {
           console.log('Successfully created inspection symbols.');
           LOG.info(`Successfully created inspection symbols.`);
         } else {
