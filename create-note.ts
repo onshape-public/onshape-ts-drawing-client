@@ -1,6 +1,6 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, DrawingObjectType, ModifyStatusResponseOutput } from './utils/onshapetypes.js';
+import { BasicNode, DrawingObjectType, ModifyStatusResponseOutput, SingleRequestResultStatus } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getRandomLocation } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -53,8 +53,15 @@ if (validArgs) {
   
     const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
     if (responseOutput) {
-      console.log('Successfully created note.');
-      LOG.info(`Successfully created note.`);
+      // Only 1 request was made - verify it succeeded
+      if (responseOutput.results.length == 1 &&
+          responseOutput.results[0].status === SingleRequestResultStatus.RequestSucceeded) {
+          // Success - logicalId of new note is available
+          const newNoteLogicalId = responseOutput.results[0].logicalId;
+          console.log(`Create note succeeded and new note has a logicalId: ${newNoteLogicalId}`);
+      } else {
+        console.log(`Create note failed. Response status code: ${responseOutput.statusCode}.`)
+      }
     } else {
       console.log('Create note failed waiting for modify to finish.');
       LOG.info('Create note failed waiting for modify to finish.');

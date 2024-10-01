@@ -1,6 +1,6 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, DrawingObjectType, ModifyStatusResponseOutput } from './utils/onshapetypes.js';
+import { BasicNode, DrawingObjectType, ModifyStatusResponseOutput, SingleRequestResultStatus } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getRandomLocation } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -299,8 +299,15 @@ if (validArgs) {
   
     const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
     if (responseOutput) {
-      console.log('Successfully created table.');
-      LOG.info(`Successfully created table.`);
+      // Only 1 request was made - verify it succeeded
+      if (responseOutput.results.length == 1 &&
+          responseOutput.results[0].status === SingleRequestResultStatus.RequestSucceeded) {
+          // Success - logicalId of new table is available
+          const newTableLogicalId = responseOutput.results[0].logicalId;
+          console.log(`Create table succeeded and new table has a logicalId: ${newTableLogicalId}`);
+      } else {
+        console.log(`Create table failed. Response status code: ${responseOutput.statusCode}.`)
+      }
     } else {
       console.log('Create table failed waiting for modify to finish.');
       LOG.info('Create table failed waiting for modify to finish.');

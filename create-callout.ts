@@ -1,6 +1,6 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, DrawingObjectType, ModifyStatusResponseOutput } from './utils/onshapetypes.js';
+import { BasicNode, DrawingObjectType, ModifyStatusResponseOutput, SingleRequestResultStatus } from './utils/onshapetypes.js';
 import { usage, DrawingScriptArgs, validateBaseURLs, waitForModifyToFinish, parseDrawingScriptArgs, getRandomLocation } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -59,8 +59,15 @@ if (validArgs) {
   
     const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
     if (responseOutput) {
-      console.log('Successfully created callout.');
-      LOG.info(`Successfully created callout.`);
+      // Only 1 request was made - verify it succeeded
+      if (responseOutput.results.length == 1 &&
+          responseOutput.results[0].status === SingleRequestResultStatus.RequestSucceeded) {
+          // Success - logicalId of new callout is available
+          const newDimLogicalId = responseOutput.results[0].logicalId;
+          console.log(`Create callout succeeded and new callout has a logicalId: ${newDimLogicalId}`);
+      } else {
+        console.log(`Create callout failed. Response status code: ${responseOutput.statusCode}.`)
+      }
     } else {
       console.log('Create callout failed waiting for modify to finish.');
       LOG.info('Create callout failed waiting for modify to finish.');

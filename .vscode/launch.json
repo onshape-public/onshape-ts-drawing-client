@@ -28,8 +28,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-note-with-leader.js",
             "args": [
-                "--drawinguri=https://cad.onshape.com/documents/3f7e7b5e2e6140fb84195b10/w/b2b41f2cbf04d2530cc8f205/e/749f074ef7c22c76b7e7f0f0",
-                "--stack=cad"
+                "--drawinguri=https://staging.dev.onshape.com/documents/b3cfb2d109cb7a2451d71da1/w/2560553b206382b541ceb481/e/ab58c1e00a7923a5b29e5a37",
+                "--stack=staging"
             ]
         },
         {
@@ -56,8 +56,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-callout-with-leader.js",
             "args": [
-                "--drawinguri=https://cad.onshape.com/documents/3f7e7b5e2e6140fb84195b10/w/b2b41f2cbf04d2530cc8f205/e/749f074ef7c22c76b7e7f0f0",
-                "--stack=cad"
+                "--drawinguri=https://staging.dev.onshape.com/documents/ee63b9ee2302ab2088cf8fc0/w/0e48c187ddc923ea5a6dc36b/e/f2c479023e0c273f05f82d2d",
+                "--stack=staging"
             ]
         },
         {
@@ -98,8 +98,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-centerline.js",
             "args": [
-                "--drawinguri=https://cad.onshape.com/documents/3f7e7b5e2e6140fb84195b10/w/b2b41f2cbf04d2530cc8f205/e/749f074ef7c22c76b7e7f0f0",
-                "--stack=cad"
+                "--drawinguri=https://staging.dev.onshape.com/documents/b3cfb2d109cb7a2451d71da1/w/2560553b206382b541ceb481/e/ab58c1e00a7923a5b29e5a37",
+                "--stack=staging"
             ]
         },
         {

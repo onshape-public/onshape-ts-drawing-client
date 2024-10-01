@@ -82,6 +82,9 @@ if (validArgs) {
         } ]
       }
 
+      const requestBodyAsString: string = JSON.stringify(requestBody);
+      console.log(requestBodyAsString);
+
       /**
        * Modify the drawing to edit the dimensions
        */
@@ -100,8 +103,12 @@ if (validArgs) {
           }
         }
         console.log(`Successfully edited ${countSucceeded} of ${editAnnotations.length} dimensions.`);
+        if (countFailed > 0) {
+          console.log(`Failed to edit ${countFailed} dimension text positions.`);
+        }
         if (editAnnotations.length !== (countSucceeded + countFailed)) {
-          console.log('Mismatch in number of dimension edits requested and response');
+          let countTotal = countSucceeded + countFailed;
+          console.log(`Mismatch in number of dimension edits requested (${editAnnotations.length}) and response (${countTotal}).`);
         }
       } else {
         console.log('Edit dimensions failed waiting for modify to finish.');

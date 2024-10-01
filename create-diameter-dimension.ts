@@ -1,6 +1,6 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, Edge, GetDrawingJsonExportResponse, GetViewJsonGeometryResponse, View2, SnapPointType, DrawingObjectType, ModifyStatusResponseOutput } from './utils/onshapetypes.js';
+import { BasicNode, Edge, GetDrawingJsonExportResponse, GetViewJsonGeometryResponse, View2, SnapPointType, DrawingObjectType, ModifyStatusResponseOutput, SingleRequestResultStatus } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData, isArcAxisPerpendicularToViewPlane, convertPointViewToPaper, pointOnCircle } from './utils/drawingutils.js';
 
@@ -117,13 +117,19 @@ if (validArgs) {
   
       const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
       if (responseOutput) {
-        console.log('Successfully created dimension.');
-        LOG.info(`Successfully created dimension.`);
+        // Only 1 request was made - verify it succeeded
+        if (responseOutput.results.length == 1 &&
+            responseOutput.results[0].status === SingleRequestResultStatus.RequestSucceeded) {
+            // Success - logicalId of new dimension is available
+            const newDimLogicalId = responseOutput.results[0].logicalId;
+            console.log(`Create dimension succeeded and new dimension has a logicalId: ${newDimLogicalId}`);
+        } else {
+          console.log(`Create dimension failed. Response status code: ${responseOutput.statusCode}.`)
+        }
       } else {
         console.log('Create dimension failed waiting for modify to finish.');
         LOG.info('Create dimension failed waiting for modify to finish.');
       }
-  
     } else {
       console.log('Insufficient view and edge information to create the dimension. Maybe no circular edges were found?');
       LOG.error('Create dimension failed due to insufficient view and edge information. Maybe no circular edges were found?');

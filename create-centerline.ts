@@ -1,6 +1,6 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, Edge, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2, SnapPointType, DrawingObjectType, ModifyStatusResponseOutput } from './utils/onshapetypes.js';
+import { BasicNode, Edge, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2, SnapPointType, DrawingObjectType, ModifyStatusResponseOutput, SingleRequestResultStatus } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -95,8 +95,15 @@ if (validArgs) {
   
       const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
       if (responseOutput) {
-        console.log('Successfully created centerline.');
-        LOG.info(`Successfully created centerline.`);
+        // Only 1 request was made - verify it succeeded
+        if (responseOutput.results.length == 1 &&
+            responseOutput.results[0].status === SingleRequestResultStatus.RequestSucceeded) {
+            // Success - logicalId of new centerline is available
+            const newDimLogicalId = responseOutput.results[0].logicalId;
+            console.log(`Create centerline succeeded and new centerline has a logicalId: ${newDimLogicalId}`);
+        } else {
+          console.log(`Create centerline failed. Response status code: ${responseOutput.statusCode}.`)
+        }
       } else {
         console.log('Create centerline failed waiting for modify to finish.');
         LOG.info('Create centerline failed waiting for modify to finish.');

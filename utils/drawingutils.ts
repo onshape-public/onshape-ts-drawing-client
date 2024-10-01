@@ -180,8 +180,8 @@ export async function waitForModifyToFinish(apiClient: ApiClient, idModifyReques
 
   if (succeeded && jobStatus.requestState !== 'ACTIVE') {
     if (jobStatus.output) {
-      jobOutput = JSON.parse(jobStatus.output);
       console.log(`modify status response output is: ${jobStatus.output}`);
+      jobOutput = JSON.parse(jobStatus.output);
     }
   }
 
