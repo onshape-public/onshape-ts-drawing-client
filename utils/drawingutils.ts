@@ -3,7 +3,7 @@ import { mainLog } from './logger.js';
 import { ArgumentParser } from './argumentparser.js';
 import { ApiClient } from './apiclient.js';
 import { BasicNode, ExportDrawingResponse, ModifyStatusResponseOutput } from './onshapetypes.js';
-import { GetDrawingJsonExportResponse, Sheet, TranslationStatusResponse, Annotation, View2 } from './onshapetypes.js';
+import { GetDrawingJsonExportResponse, Sheet, TranslationStatusResponse, Annotation, View2, DrawingReference, ResolveReferencesResponse } from './onshapetypes.js';
 import { DrawingObjectType } from './onshapetypes.js';
 
 const LOG = mainLog();
@@ -114,15 +114,41 @@ export function getRandomInt(min: number, max: number) {
   return randomInt;
 }
 
+export async function getDrawingNeedUpdate(apiClient: ApiClient, documentId: string, workspaceId: string, elementId: string): Promise<boolean> {
+  let drawingNeedsUpdate = false;
+
+  try {
+    LOG.info('Initiated retrieval of drawing references');
+    let resolveReferenceResponse: any = await apiClient.get(`api/v9/appelements/d/${documentId}/w/${workspaceId}/resolvereferences?includeInternal=false&drawingsOnly=true`) as any;
+
+    if (resolveReferenceResponse.hasOwnProperty(elementId)) {
+      let innerResponse: ResolveReferencesResponse = resolveReferenceResponse[elementId];
+      for (let indexReference = 0; indexReference < innerResponse.resolvedReferences.length; indexReference++) {
+        let resolvedReference: DrawingReference = innerResponse.resolvedReferences[indexReference];
+        if (resolvedReference.latestElementMicroversionId !== resolvedReference.targetElementMicroversionId) {
+          drawingNeedsUpdate = true;
+          break;
+        }
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    LOG.error('Error getting drawing references.', error);
+  }
+
+  return drawingNeedsUpdate;
+}
+
 export async function getDrawingJsonExport(apiClient: ApiClient, documentId: string, workspaceId: string, elementId: string): Promise<GetDrawingJsonExportResponse> {
   let exportData: GetDrawingJsonExportResponse = null;
+  const storeInDocument: boolean = false;  // In this sample app, we always export the drawing json externally, not to a new element in the document
 
   try {
     LOG.info('Initiated export of drawing as json');
     let exportResponse: ExportDrawingResponse = await apiClient.post(`api/drawings/d/${documentId}/w/${workspaceId}/e/${elementId}/translations`, {
       formatName: 'DRAWING_JSON',
-      level: 'full',
-      storeInDocument: false
+      storeInDocument: storeInDocument,
+      level: 'full'
     }) as ExportDrawingResponse;
 
     let translationStatus: TranslationStatusResponse = { requestState: 'ACTIVE', id: exportResponse.id, failureReason: '', resultExternalDataIds: [] };
@@ -141,11 +167,20 @@ export async function getDrawingJsonExport(apiClient: ApiClient, documentId: str
       translationStatus = await apiClient.get(`api/translations/${exportResponse.id}`) as TranslationStatusResponse;
     }
 
-    let translationId: string = translationStatus.resultExternalDataIds[0];
-    console.log(`translation id=`, translationId);
-    
-    let responseAsString: string = await apiClient.get(`api/documents/d/${documentId}/externaldata/${translationStatus.resultExternalDataIds[0]}`) as string;
-    exportData = JSON.parse(responseAsString);
+    // resultElementIds will be non-null if storeInDocument parameter is true
+    // resultExternalDataIds will be non-null if storeInDocument parameter is false
+    if (storeInDocument) {
+      // Data stored as a new element in the document.  Return null, although we could retrieve if from the element if needed
+      // using the /blobelements/d/{did}/w/{wid}/e/{eid} API, which downloads the contents of a blob element.
+      exportData = null;
+    } else {
+      // Data stored externally - retrieve it
+      let translationId: string = translationStatus.resultExternalDataIds[0];
+      console.log(`translation id=`, translationId);
+
+      let responseAsString: string = await apiClient.get(`api/documents/d/${documentId}/externaldata/${translationStatus.resultExternalDataIds[0]}`) as string;
+      exportData = JSON.parse(responseAsString);
+    }
 
   } catch (error) {
     console.error(error);

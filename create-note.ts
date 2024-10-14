@@ -55,7 +55,7 @@ if (validArgs) {
     if (responseOutput) {
       // Only 1 request was made - verify it succeeded
       if (responseOutput.results.length == 1 &&
-          responseOutput.results[0].status === SingleRequestResultStatus.RequestSucceeded) {
+          responseOutput.results[0].status === SingleRequestResultStatus.RequestSuccess) {
           // Success - logicalId of new note is available
           const newNoteLogicalId = responseOutput.results[0].logicalId;
           console.log(`Create note succeeded and new note has a logicalId: ${newNoteLogicalId}`);

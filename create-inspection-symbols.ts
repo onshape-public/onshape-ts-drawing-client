@@ -153,7 +153,7 @@ if (validArgs) {
           for (let iResultCount: number = 0; iResultCount < responseOutput.results.length; iResultCount++) {
             let currentResult = responseOutput.results[iResultCount];
             // currentResult.logicalId has the logicalId of each created inspection symbol
-            if (currentResult.status === SingleRequestResultStatus.RequestSucceeded) {
+            if (currentResult.status === SingleRequestResultStatus.RequestSuccess) {
               countSucceeded++;
             } else {
               countFailed++;

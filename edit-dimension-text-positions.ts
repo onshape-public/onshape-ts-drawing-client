@@ -96,7 +96,7 @@ if (validArgs) {
         let countFailed = 0;
         for (let iResultCount: number = 0; iResultCount < responseOutput.results.length; iResultCount++) {
           let currentResult = responseOutput.results[iResultCount];
-          if (currentResult.status === SingleRequestResultStatus.RequestSucceeded) {
+          if (currentResult.status === SingleRequestResultStatus.RequestSuccess) {
             countSucceeded++;
           } else {
             countFailed++;

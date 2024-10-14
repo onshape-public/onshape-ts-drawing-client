@@ -114,7 +114,7 @@ if (validArgs) {
       if (responseOutput) {
         // Only 1 request was made - verify it succeeded
         if (responseOutput.results.length == 1 &&
-            responseOutput.results[0].status === SingleRequestResultStatus.RequestSucceeded) {
+            responseOutput.results[0].status === SingleRequestResultStatus.RequestSuccess) {
             // Success - logicalId of edited dimension is available
             const editedDimLogicalId = responseOutput.results[0].logicalId;
             console.log(`Edit dimension succeeded and edited dimension has a logicalId: ${editedDimLogicalId}`);

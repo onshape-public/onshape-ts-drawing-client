@@ -115,7 +115,7 @@ if (validArgs) {
       if (responseOutput) {
         // Only 1 request was made - verify it succeeded
         if (responseOutput.results.length == 1 &&
-            responseOutput.results[0].status === SingleRequestResultStatus.RequestSucceeded) {
+            responseOutput.results[0].status === SingleRequestResultStatus.RequestSuccess) {
             // Success - logicalId of new callout is available
             const newDimLogicalId = responseOutput.results[0].logicalId;
             console.log(`Create callout with leader succeeded and new callout has a logicalId: ${newDimLogicalId}`);
