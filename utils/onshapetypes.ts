@@ -583,6 +583,7 @@ export interface DrawingReference {
 }
 
 export interface ResolveReferencesResponse {
+  unresolvedReferences: DrawingReference[];
   resolvedReferences: DrawingReference[];
 }
 

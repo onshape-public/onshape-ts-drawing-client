@@ -1,6 +1,6 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { usage, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getDrawingNeedUpdate } from './utils/drawingutils.js';
+import { usage, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getIfDrawingNeedsUpdate } from './utils/drawingutils.js';
 
 const LOG = mainLog();
 
@@ -14,14 +14,14 @@ try {
   validateBaseURLs(apiClient.getBaseURL(), drawingScriptArgs.baseURL);
 } catch (error) {
   validArgs = false;
-  usage('detect-update-needed');
+  usage('detect-if-single-drawing-needs-update');
 }
 
 if (validArgs) {
   try {
     LOG.info(`documentId=${drawingScriptArgs.documentId}, workspaceId=${drawingScriptArgs.workspaceId}, elementId=${drawingScriptArgs.elementId}`);
   
-    const drawingNeedsUpdate: boolean = await getDrawingNeedUpdate(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId)
+    const drawingNeedsUpdate: boolean = await getIfDrawingNeedsUpdate(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId)
 
     if (drawingNeedsUpdate) {
       console.log('Drawing needs an update!');
@@ -30,6 +30,6 @@ if (validArgs) {
     }
   } catch (error) {
     console.error(error);
-    LOG.error('Detecting if drawing needs an updated failed', error);
+    LOG.error('Detecting if a drawing needs an update failed', error);
   }
 }

@@ -101,8 +101,13 @@ export function validateBaseURLs(credentialsBaseURL: string, argumentsBaseURL: s
   }
 }
 
+/**
+ * Return a random location between (minLocation[0], minLocation[1]) and (maxLocation[0], maxLocation[1])
+ * @param minLocation 
+ * @param maxLocation 
+ * @returns random location
+ */
 export function getRandomLocation(minLocation: number[], maxLocation: number[]): number[] {
-  // Position of note is random between (minLocation[0], minLocation[1]) and (maxLocation[0], maxLocation[1])
   const xPosition: number = minLocation[0] + (Math.random() * (maxLocation[0] - minLocation[0]));
   const yPosition: number = minLocation[1] + (Math.random() * (maxLocation[1] - minLocation[1]));
   return [xPosition, yPosition, 0.0];
@@ -114,19 +119,68 @@ export function getRandomInt(min: number, max: number) {
   return randomInt;
 }
 
-export async function getDrawingNeedUpdate(apiClient: ApiClient, documentId: string, workspaceId: string, elementId: string): Promise<boolean> {
+/**
+ * Return if a single drawing needs an update (e.g. the yellow update button would be highlighted)
+ * @param apiClient 
+ * @param documentId 
+ * @param workspaceId 
+ * @param elementId 
+ * @returns boolean
+ */
+export async function getIfDrawingNeedsUpdate(apiClient: ApiClient, documentId: string, workspaceId: string, elementId: string): Promise<boolean> {
   let drawingNeedsUpdate = false;
 
   try {
     LOG.info('Initiated retrieval of drawing references');
+    // drawingsOnly=true query parameter is required
+    let resolveReferenceResponse: ResolveReferencesResponse = await apiClient.get(`api/v9/appelements/d/${documentId}/w/${workspaceId}/e/${elementId}/resolvereferences?includeInternal=false`) as any;
+
+    // Loop through drawing resolved references, looking for out-of-date references
+    for (let indexReference = 0; indexReference < resolveReferenceResponse.resolvedReferences.length; indexReference++) {
+      let resolvedReference: DrawingReference = resolveReferenceResponse.resolvedReferences[indexReference];
+      // If the latest element microversion is not the same as the target element microversion, it means
+      // the target element has changed since the last time the drawing was updated.
+      if (resolvedReference.latestElementMicroversionId !== resolvedReference.targetElementMicroversionId) {
+        drawingNeedsUpdate = true;
+        break;
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    LOG.error('Error getting drawing references.', error);
+  }
+
+  return drawingNeedsUpdate;
+}
+
+/**
+ * Return the drawings in a document workspace that need an update (e.g. the yellow update button would be highlighted).
+ * Returns an array of drawing element ids.
+ */
+export async function getWorkspaceDrawingsThatNeedUpdate(apiClient: ApiClient, documentId: string, workspaceId: string): Promise<string[]> {
+  let drawingsThatNeedUpdate: string[] = null;
+
+  try {
+    LOG.info('Initiated retrieval of workspace drawing references');
+    // drawingsOnly=true query parameter is required
     let resolveReferenceResponse: any = await apiClient.get(`api/v9/appelements/d/${documentId}/w/${workspaceId}/resolvereferences?includeInternal=false&drawingsOnly=true`) as any;
 
-    if (resolveReferenceResponse.hasOwnProperty(elementId)) {
-      let innerResponse: ResolveReferencesResponse = resolveReferenceResponse[elementId];
-      for (let indexReference = 0; indexReference < innerResponse.resolvedReferences.length; indexReference++) {
-        let resolvedReference: DrawingReference = innerResponse.resolvedReferences[indexReference];
+    for (const key in resolveReferenceResponse) {
+      let drawingElementId = key;
+      let drawingReferenceResponse: ResolveReferencesResponse = resolveReferenceResponse[drawingElementId];
+
+      // Loop through drawing references, looking for out-of-date references
+      for (let indexReference = 0; indexReference < drawingReferenceResponse.resolvedReferences.length; indexReference++) {
+        let resolvedReference: DrawingReference = drawingReferenceResponse.resolvedReferences[indexReference];
+        // If the latest element microversion is not the same as the target element microversion, it means
+        // the target element has changed since the last time the drawing was updated.
         if (resolvedReference.latestElementMicroversionId !== resolvedReference.targetElementMicroversionId) {
-          drawingNeedsUpdate = true;
+          if (drawingsThatNeedUpdate === null) {
+            drawingsThatNeedUpdate = [drawingElementId];
+          } else {
+            drawingsThatNeedUpdate.push(drawingElementId);
+          }
+          // Only want each drawingElementId in the array once
           break;
         }
       }
@@ -136,7 +190,7 @@ export async function getDrawingNeedUpdate(apiClient: ApiClient, documentId: str
     LOG.error('Error getting drawing references.', error);
   }
 
-  return drawingNeedsUpdate;
+  return drawingsThatNeedUpdate;
 }
 
 export async function getDrawingJsonExport(apiClient: ApiClient, documentId: string, workspaceId: string, elementId: string): Promise<GetDrawingJsonExportResponse> {
@@ -214,6 +268,7 @@ export async function waitForModifyToFinish(apiClient: ApiClient, idModifyReques
   }
 
   if (succeeded && jobStatus.requestState !== 'ACTIVE') {
+
     if (jobStatus.output) {
       console.log(`modify status response output is: ${jobStatus.output}`);
       jobOutput = JSON.parse(jobStatus.output);

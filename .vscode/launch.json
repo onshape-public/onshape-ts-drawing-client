@@ -231,12 +231,26 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Detect if Update Needed",
+            "name": "Detect If Single Drawing Needs Update",
             "console": "integratedTerminal",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/.compiledjs/detect-update-needed.js",
+            "program": "${workspaceFolder}/.compiledjs/detect-if-single-drawing-needs-update.js",
+            "args": [
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/616523b0e7c1e69c8ab40aac",
+                "--stack=democ"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Detect If Workspace Contains Drawings Needing Update",
+            "console": "integratedTerminal",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/.compiledjs/detect-if-workspace-contains-drawings-needing-update.js",
             "args": [
                 "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/616523b0e7c1e69c8ab40aac",
                 "--stack=democ"
