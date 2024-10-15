@@ -14,8 +14,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-note.js",
             "args": [
-                "--drawinguri=https://cad.onshape.com/documents/854e914aa52304e246a9eec9/w/abfdc05bfa1f41beddef6799/e/0bb00c2b35c0dad605592265",
-                "--stack=cad"
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
+                "--stack=democ"
             ]
         },
         {
@@ -28,8 +28,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-note-with-leader.js",
             "args": [
-                "--drawinguri=https://cad.onshape.com/documents/854e914aa52304e246a9eec9/w/abfdc05bfa1f41beddef6799/e/0bb00c2b35c0dad605592265",
-                "--stack=cad"
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
+                "--stack=democ"
             ]
         },
         {
@@ -42,8 +42,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-callout.js",
             "args": [
-                "--drawinguri=https://staging.dev.onshape.com/documents/b3cfb2d109cb7a2451d71da1/w/2560553b206382b541ceb481/e/ab58c1e00a7923a5b29e5a37",
-                "--stack=staging"
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
+                "--stack=democ"
             ]
         },
         {
@@ -56,8 +56,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-callout-with-leader.js",
             "args": [
-                "--drawinguri=https://staging.dev.onshape.com/documents/b3cfb2d109cb7a2451d71da1/w/2560553b206382b541ceb481/e/ab58c1e00a7923a5b29e5a37",
-                "--stack=staging"
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
+                "--stack=democ"
             ]
         },
         {
@@ -70,8 +70,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-geometric-tolerance.js",
             "args": [
-                "--drawinguri=https://staging.dev.onshape.com/documents/b3cfb2d109cb7a2451d71da1/w/2560553b206382b541ceb481/e/ab58c1e00a7923a5b29e5a37",
-                "--stack=staging"
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
+                "--stack=democ"
             ]
         },
         {
@@ -84,8 +84,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-table.js",
             "args": [
-                "--drawinguri=https://staging.dev.onshape.com/documents/b3cfb2d109cb7a2451d71da1/w/2560553b206382b541ceb481/e/ab58c1e00a7923a5b29e5a37",
-                "--stack=staging"
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
+                "--stack=democ"
             ]
         },
         {
@@ -98,8 +98,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-centerline.js",
             "args": [
-                "--drawinguri=https://staging.dev.onshape.com/documents/b3cfb2d109cb7a2451d71da1/w/2560553b206382b541ceb481/e/ab58c1e00a7923a5b29e5a37",
-                "--stack=staging"
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
+                "--stack=democ"
             ]
         },
         {
@@ -112,8 +112,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-point-to-point-linear-dimension.js",
             "args": [
-                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
-                "--stack=cad"
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
+                "--stack=democ"
             ]
         },
         {
@@ -126,8 +126,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-point-to-line-linear-dimension.js",
             "args": [
-                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
-                "--stack=cad"
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
+                "--stack=democ"
             ]
         },
         {
@@ -140,8 +140,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-line-to-line-linear-dimension.js",
             "args": [
-                "--drawinguri=https://staging.dev.onshape.com/documents/b3cfb2d109cb7a2451d71da1/w/2560553b206382b541ceb481/e/ab58c1e00a7923a5b29e5a37",
-                "--stack=staging"
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
+                "--stack=democ"
             ]
         },
         {
@@ -154,8 +154,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-aligned-linear-dimension.js",
             "args": [
-                "--drawinguri=https://staging.dev.onshape.com/documents/b3cfb2d109cb7a2451d71da1/w/2560553b206382b541ceb481/e/ab58c1e00a7923a5b29e5a37",
-                "--stack=staging"
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
+                "--stack=democ"
             ]
         },
         {
@@ -168,8 +168,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-line-to-line-angular-dimension.js",
             "args": [
-                "--drawinguri=https://staging.dev.onshape.com/documents/b3cfb2d109cb7a2451d71da1/w/2560553b206382b541ceb481/e/ab58c1e00a7923a5b29e5a37",
-                "--stack=staging"
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
+                "--stack=democ"
             ]
         },
         {
@@ -182,8 +182,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-three-point-angular-dimension.js",
             "args": [
-                "--drawinguri=https://staging.dev.onshape.com/documents/b3cfb2d109cb7a2451d71da1/w/2560553b206382b541ceb481/e/ab58c1e00a7923a5b29e5a37",
-                "--stack=staging"
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
+                "--stack=democ"
             ]
         },
         {
@@ -196,8 +196,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-radial-dimension.js",
             "args": [
-                "--drawinguri=https://staging.dev.onshape.com/documents/b3cfb2d109cb7a2451d71da1/w/2560553b206382b541ceb481/e/ab58c1e00a7923a5b29e5a37",
-                "--stack=staging"
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
+                "--stack=democ"
             ]
         },
         {
@@ -210,8 +210,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-diameter-dimension.js",
             "args": [
-                "--drawinguri=https://staging.dev.onshape.com/documents/b3cfb2d109cb7a2451d71da1/w/2560553b206382b541ceb481/e/ab58c1e00a7923a5b29e5a37",
-                "--stack=staging"
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
+                "--stack=democ"
             ]
         },
         {
@@ -224,8 +224,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-inspection-symbols.js",
             "args": [
-                "--drawinguri=https://staging.dev.onshape.com/documents/817e23922c032cf9009338eb/w/01142a1728d1bcb84bff6cfc/e/b3ccb5a55b65c63826c1c0e8",
-                "--stack=staging"
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
+                "--stack=democ"
             ]
         },
         {
@@ -266,8 +266,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/edit-notes.js",
             "args": [
-                "--drawinguri=https://staging.dev.onshape.com/documents/b3cfb2d109cb7a2451d71da1/w/2560553b206382b541ceb481/e/ab58c1e00a7923a5b29e5a37",
-                "--stack=staging"
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
+                "--stack=democ"
             ]
         },
         {
@@ -280,8 +280,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/edit-dimension-attachments.js",
             "args": [
-                "--drawinguri=https://staging.dev.onshape.com/documents/b3cfb2d109cb7a2451d71da1/w/2560553b206382b541ceb481/e/ab58c1e00a7923a5b29e5a37",
-                "--stack=staging"
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
+                "--stack=democ"
             ]
         },
         {
@@ -294,8 +294,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/edit-dimension-text-positions.js",
             "args": [
-                "--drawinguri=https://staging.dev.onshape.com/documents/b3cfb2d109cb7a2451d71da1/w/2560553b206382b541ceb481/e/ab58c1e00a7923a5b29e5a37",
-                "--stack=staging"
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
+                "--stack=democ"
             ]
         },
         {
@@ -308,8 +308,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/find-errors-in-drawing.js",
             "args": [
-                "--drawinguri=https://staging.dev.onshape.com/documents/b3cfb2d109cb7a2451d71da1/w/2560553b206382b541ceb481/e/ab58c1e00a7923a5b29e5a37",
-                "--stack=staging"
+                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
+                "--stack=democ"
             ]
         }
     ]

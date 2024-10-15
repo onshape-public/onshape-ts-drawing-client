@@ -268,9 +268,9 @@ export async function waitForModifyToFinish(apiClient: ApiClient, idModifyReques
   }
 
   if (succeeded && jobStatus.requestState !== 'ACTIVE') {
-
     if (jobStatus.output) {
       console.log(`modify status response output is: ${jobStatus.output}`);
+      // Parses the output string into an object containing the modify results
       jobOutput = JSON.parse(jobStatus.output);
     }
   }

@@ -497,11 +497,25 @@ export interface RadialDimension {
   unit: DimensionUnit;
 }
 
+export interface InspectionSymbol {
+  borderShape: string;
+  borderSize: number;
+  isDangling?: boolean;
+  itemParsing: string;
+  logicalId: string;
+  number: number;
+  parentAnnotation: string;
+  parentLineIndex: number;
+  position: UnassociatedPoint;
+  textHeight: number;
+}
+
 export interface Annotation {
   type: string;
   callout?: Callout;
   diametricDimension?: DiameterDimension;
   geometricTolerance?: GeometricTolerance;
+  inspectionSymbol?: InspectionSymbol;
   lineToLineAngularDimension?: LineToLineAngularDimension;
   lineToLineDimension?: LineToLineLinearDimension;
   note?: Note;
@@ -551,7 +565,7 @@ export class SingleRequestType {
 // The response to a single JSON request (create, edit, delete) of (annotation, view, sheet, etc.)
 export interface SingleRequestResponse {
   status: SingleRequestResultStatus;
-  logicalId: string;
+  logicalId?: string;         // Field exists and has a value if status is "OK"
   errorDescription?: string;  // Field exists and has a value if status is "Failed"
 }
 
