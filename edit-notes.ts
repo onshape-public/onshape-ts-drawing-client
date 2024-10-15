@@ -1,6 +1,6 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, DrawingObjectType, Note, GetDrawingJsonExportResponse, Annotation } from './utils/onshapetypes.js';
+import { BasicNode, DrawingObjectType, Note, GetDrawingJsonExportResponse, Annotation, ModifyStatusResponseOutput, SingleRequestResultStatus } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getAllDrawingAnnotationsInViewsFromExportData } from './utils/drawingutils.js';
 
@@ -93,10 +93,26 @@ if (validArgs) {
        */
       const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`, requestBody) as BasicNode;
   
-      const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
-      if (waitSucceeded) {
-        console.log('Successfully edited notes.');
-        LOG.info(`Successfully edited notes.`);
+      const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
+      if (responseOutput) {
+        let countSucceeded = 0;
+        let countFailed = 0;
+        for (let iResultCount: number = 0; iResultCount < responseOutput.results.length; iResultCount++) {
+          let currentResult = responseOutput.results[iResultCount];
+          if (currentResult.status === SingleRequestResultStatus.RequestSuccess) {
+            countSucceeded++;
+          } else {
+            countFailed++;
+          }
+        }
+        console.log(`Successfully edited ${countSucceeded} of ${editAnnotations.length} notes.`);
+        if (countFailed > 0) {
+          console.log(`Failed to edit ${countFailed} notes.`);
+        }
+        if (editAnnotations.length !== (countSucceeded + countFailed)) {
+          let countTotal = countSucceeded + countFailed;
+          console.log(`Mismatch in number of note edits requested (${editAnnotations.length}) and response (${countTotal}).`);
+        }
       } else {
         console.log('Edit notes failed waiting for modify to finish.');
         LOG.info('Edit notes failed waiting for modify to finish.');

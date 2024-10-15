@@ -1,6 +1,6 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, DrawingObjectType, Edge, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, SnapPointType, Annotation } from './utils/onshapetypes.js';
+import { BasicNode, DrawingObjectType, Edge, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, SnapPointType, Annotation, ModifyStatusResponseOutput, SingleRequestResultStatus } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getAllDrawingAnnotationsInViewsFromExportData } from './utils/drawingutils.js';
 
@@ -110,13 +110,23 @@ if (validArgs) {
        */
       const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`, requestBody) as BasicNode;
     
-      const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
-      if (waitSucceeded) {
-        console.log('Successfully edited dimensions.');
-        LOG.info('Successfully edited dimensions.');
+      const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
+      if (responseOutput) {
+        // Only 1 request was made - verify it succeeded
+        if (responseOutput.results.length == 1 &&
+            responseOutput.results[0].status === SingleRequestResultStatus.RequestSuccess) {
+            // Success - logicalId of edited dimension is available
+            const editedDimLogicalId = responseOutput.results[0].logicalId;
+            console.log(`Edit dimension succeeded and edited dimension has a logicalId: ${editedDimLogicalId}`);
+            if (editedDimLogicalId !== dimensionToEdit.pointToPointDimension.logicalId) {
+              console.log(`ERROR - requested dimension logicalId is ${dimensionToEdit.pointToPointDimension.logicalId} but result logicalId is ${editedDimLogicalId}.`);
+            }
+        } else {
+          console.log(`Edit dimension failed. Response status code: ${responseOutput.statusCode}.`)
+        }
       } else {
-        console.log('Edit dimensions failed waiting for modify to finish.');
-        LOG.info('Edit dimensions failed waiting for modify to finish.');
+        console.log('Edit dimension failed waiting for modify to finish.');
+        LOG.info('Edit dimension failed waiting for modify to finish.');
       }
     }
   } catch (error) {

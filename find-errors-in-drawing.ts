@@ -154,6 +154,12 @@ if (validArgs) {
             friendlyType = "Note";
             break;
           }
+          case DrawingObjectType.INSPECTION_SYMBOL: {
+            isDangling = anAnnotation.inspectionSymbol.isDangling ?? false;
+            logicalId = anAnnotation.inspectionSymbol.logicalId ?? '';
+            friendlyType = "Inspection symbol";
+            break;
+          }
           case DrawingObjectType.TABLE:
           default:
             // No isDangling field yet on these types of annotations

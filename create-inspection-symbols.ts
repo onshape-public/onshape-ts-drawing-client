@@ -1,6 +1,6 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, GetDrawingJsonExportResponse, View2, Annotation, DrawingObjectType } from './utils/onshapetypes.js';
+import { BasicNode, GetDrawingJsonExportResponse, View2, Annotation, DrawingObjectType, ModifyStatusResponseOutput, SingleRequestResultStatus } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData, getAnnotationsOfViewAndSheetFromExportData } from './utils/drawingutils.js';
 
@@ -146,10 +146,27 @@ if (validArgs) {
           }]
         }) as BasicNode;
   
-        const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
-        if (waitSucceeded) {
-          console.log('Successfully created inspection symbols.');
-          LOG.info(`Successfully created inspection symbols.`);
+        const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
+        if (responseOutput) {
+          let countSucceeded = 0;
+          let countFailed = 0;
+          for (let iResultCount: number = 0; iResultCount < responseOutput.results.length; iResultCount++) {
+            let currentResult = responseOutput.results[iResultCount];
+            // currentResult.logicalId has the logicalId of each created inspection symbol
+            if (currentResult.status === SingleRequestResultStatus.RequestSuccess) {
+              countSucceeded++;
+            } else {
+              countFailed++;
+            }
+          }
+          console.log(`Successfully created ${countSucceeded} of ${annotationsToRequest.length} inspection symbols.`);
+          if (countFailed > 0) {
+            console.log(`Failed to create ${countFailed} inspection symbols.`);
+          }
+          if (annotationsToRequest.length !== (countSucceeded + countFailed)) {
+            let countTotal = countSucceeded + countFailed;
+            console.log(`Mismatch in number of inspection symbols requested (${annotationsToRequest.length}) and response (${countTotal}).`);
+          }
         } else {
           console.log('Create inspection symbols failed waiting for modify to finish.');
           LOG.info('Create inspection symbols failed waiting for modify to finish.');

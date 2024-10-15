@@ -1,6 +1,6 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, Edge, GetDrawingJsonExportResponse, GetViewJsonGeometryResponse, View2, SnapPointType, DrawingObjectType } from './utils/onshapetypes.js';
+import { BasicNode, Edge, GetDrawingJsonExportResponse, GetViewJsonGeometryResponse, View2, SnapPointType, DrawingObjectType, ModifyStatusResponseOutput, SingleRequestResultStatus } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, convertPointViewToPaper } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData } from './utils/drawingutils.js';
 
@@ -111,10 +111,17 @@ if (validArgs) {
        */
       const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`, requestBody) as BasicNode;
 
-      const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
-      if (waitSucceeded) {
-        console.log('Successfully created callout with leader.');
-        LOG.info(`Successfully created callout with leader.`);
+      const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
+      if (responseOutput) {
+        // Only 1 request was made - verify it succeeded
+        if (responseOutput.results.length == 1 &&
+            responseOutput.results[0].status === SingleRequestResultStatus.RequestSuccess) {
+            // Success - logicalId of new callout is available
+            const newDimLogicalId = responseOutput.results[0].logicalId;
+            console.log(`Create callout with leader succeeded and new callout has a logicalId: ${newDimLogicalId}`);
+        } else {
+          console.log(`Create callout with leader failed. Response status code: ${responseOutput.statusCode}.`)
+        }
       } else {
         console.log('Create callout with leader failed waiting for modify to finish.');
         LOG.info('Create callout with leader failed waiting for modify to finish.');

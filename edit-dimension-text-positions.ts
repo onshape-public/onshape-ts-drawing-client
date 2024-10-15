@@ -1,6 +1,6 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, DrawingObjectType, GetDrawingJsonExportResponse, Annotation } from './utils/onshapetypes.js';
+import { BasicNode, DrawingObjectType, GetDrawingJsonExportResponse, Annotation, ModifyStatusResponseOutput, SingleRequestResultStatus } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getAllDrawingAnnotationsInViewsFromExportData } from './utils/drawingutils.js';
 
@@ -82,15 +82,34 @@ if (validArgs) {
         } ]
       }
 
+      const requestBodyAsString: string = JSON.stringify(requestBody);
+      console.log(requestBodyAsString);
+
       /**
        * Modify the drawing to edit the dimensions
        */
       const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`, requestBody) as BasicNode;
   
-      const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
-      if (waitSucceeded) {
-        console.log('Successfully edited dimensions.');
-        LOG.info(`Successfully edited dimensions.`);
+      const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
+      if (responseOutput) {
+        let countSucceeded = 0;
+        let countFailed = 0;
+        for (let iResultCount: number = 0; iResultCount < responseOutput.results.length; iResultCount++) {
+          let currentResult = responseOutput.results[iResultCount];
+          if (currentResult.status === SingleRequestResultStatus.RequestSuccess) {
+            countSucceeded++;
+          } else {
+            countFailed++;
+          }
+        }
+        console.log(`Successfully edited ${countSucceeded} of ${editAnnotations.length} dimensions.`);
+        if (countFailed > 0) {
+          console.log(`Failed to edit ${countFailed} dimension text positions.`);
+        }
+        if (editAnnotations.length !== (countSucceeded + countFailed)) {
+          let countTotal = countSucceeded + countFailed;
+          console.log(`Mismatch in number of dimension edits requested (${editAnnotations.length}) and response (${countTotal}).`);
+        }
       } else {
         console.log('Edit dimensions failed waiting for modify to finish.');
         LOG.info('Edit dimensions failed waiting for modify to finish.');

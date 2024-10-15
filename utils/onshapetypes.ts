@@ -497,11 +497,25 @@ export interface RadialDimension {
   unit: DimensionUnit;
 }
 
+export interface InspectionSymbol {
+  borderShape: string;
+  borderSize: number;
+  isDangling?: boolean;
+  itemParsing: string;
+  logicalId: string;
+  number: number;
+  parentAnnotation: string;
+  parentLineIndex: number;
+  position: UnassociatedPoint;
+  textHeight: number;
+}
+
 export interface Annotation {
   type: string;
   callout?: Callout;
   diametricDimension?: DiameterDimension;
   geometricTolerance?: GeometricTolerance;
+  inspectionSymbol?: InspectionSymbol;
   lineToLineAngularDimension?: LineToLineAngularDimension;
   lineToLineDimension?: LineToLineLinearDimension;
   note?: Note;
@@ -531,27 +545,59 @@ export interface GetDrawingJsonExportResponse {
   sheets: Sheet[];
 }
 
-export class SingleRequestResponseStatus {
-  static RequestSucceeded = 'OK';       // Succeeded
-  static RequestFailed = 'Failed';      // Failed
+export class OverallRequestResultStatus {
+  static OverallRequestSuccess = 'OK';                         // All requests succeeded
+  static OverallRequestPartialSuccessed = 'Partial_success';   // Some requests succeeded, some failed
+  static OverallRequestFailed = 'Failed';                      // All requests failed
+}
+
+export class SingleRequestResultStatus {
+  static RequestSuccess = 'OK';       // Success
+  static RequestFailed = 'Failed';    // Failed
 }
 
 export class SingleRequestType {
-  static RequestTypeCreate = "Create";
-  static RequestTypeEdit = "Edit";
-  static RequestTypeDelete = "Delete";
+  static RequestTypeCreate = 'Create';
+  static RequestTypeEdit = 'Edit';
+  static RequestTypeDelete = 'Delete';
 }
  
 // The response to a single JSON request (create, edit, delete) of (annotation, view, sheet, etc.)
 export interface SingleRequestResponse {
-  status: SingleRequestResponseStatus;
-  requestType: SingleRequestType;
-  logicalId: string;
-  objectType: DrawingObjectType
+  status: SingleRequestResultStatus;
+  logicalId?: string;         // Field exists and has a value if status is "OK"
+  errorDescription?: string;  // Field exists and has a value if status is "Failed"
 }
 
-export interface ModifyStatusResponse {
-  overallStatus: boolean;
+export interface ModifyStatusResponseOutput {
+  status: OverallRequestResultStatus;
+  statusCode: number;
+  errorDescription?: string;  // Field exists and has a value if overall status is "Partial_success" or "Failed"
   changeId: string;
-  requests: SingleRequestResponse[];
+  results: SingleRequestResponse[];
 }
+
+export interface DrawingReference {
+  targetElementMicroversionId: string;
+  latestElementMicroversionId: string;
+  resolvedElementMicroversionId: string;
+  sourceElementId: string;
+  idTagIsValid: boolean;
+  targetDocumentId: string;
+  targetVersionId: string;
+  resolvedDocumentMicroversionId: string;
+  targetElementId: string;
+  targetConfiguration: string;
+  changeId: string;
+  idTag: string;
+  referenceId: string;
+  isLocked: boolean;
+  targetDocumentMicroversionId: string;
+  // There are more fields, but they are not needed here
+}
+
+export interface ResolveReferencesResponse {
+  unresolvedReferences: DrawingReference[];
+  resolvedReferences: DrawingReference[];
+}
+
