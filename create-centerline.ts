@@ -34,7 +34,7 @@ if (validArgs) {
     /**
      * Retrieve a drawing view and some of its edges to get information to create the centerline
      */
-    let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
+    let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, 'w', drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
     viewToUse = getRandomViewOnActiveSheetFromExportData(drawingJsonExport);
     
     if (viewToUse !== null) {
@@ -95,14 +95,19 @@ if (validArgs) {
   
       const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
       if (responseOutput) {
-        // Only 1 request was made - verify it succeeded
-        if (responseOutput.results.length == 1 &&
+        if (responseOutput.results.length == 0) {
+          // Success, but the logicalId is not available yet
+          console.log('Create centerline with leader succeeded.');
+        } else {
+          // Only 1 request was made - verify it succeeded
+          if (responseOutput.results.length == 1 &&
             responseOutput.results[0].status === SingleRequestResultStatus.RequestSuccess) {
             // Success - logicalId of new centerline is available
-            const newDimLogicalId = responseOutput.results[0].logicalId;
-            console.log(`Create centerline succeeded and new centerline has a logicalId: ${newDimLogicalId}`);
-        } else {
-          console.log(`Create centerline failed. Response status code: ${responseOutput.statusCode}.`)
+            const newLogicalId = responseOutput.results[0].logicalId;
+            console.log(`Create centerline succeeded and has a logicalId: ${newLogicalId}`);
+          } else {
+            console.log(`Create centerline failed. Response status code: ${responseOutput.statusCode}.`)
+          }
         }
       } else {
         console.log('Create centerline failed waiting for modify to finish.');

@@ -27,7 +27,7 @@ if (validArgs) {
      * Retrieve annotations in the drawing that are associated with views (to avoid annotations in borders, titleblock, etc.).
      * NOTE - THIS MEANS NOTES THAT ARE NOT ASSOCIATED WITH A VIEW (e.g. do not have a leader attached to a view edge) WILL NOT BE EDITED.
      */
-    let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
+    let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, 'w', drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
     let viewAnnotations: Annotation[] = getAllDrawingAnnotationsInViewsFromExportData(drawingJsonExport);
 
     /**
@@ -95,23 +95,28 @@ if (validArgs) {
   
       const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
       if (responseOutput) {
-        let countSucceeded = 0;
-        let countFailed = 0;
-        for (let iResultCount: number = 0; iResultCount < responseOutput.results.length; iResultCount++) {
-          let currentResult = responseOutput.results[iResultCount];
-          if (currentResult.status === SingleRequestResultStatus.RequestSuccess) {
-            countSucceeded++;
-          } else {
-            countFailed++;
+        if (responseOutput.results.length == 0) {
+          // Success, but the logicalId is not available yet
+          console.log('Edit notes succeeded.');
+        } else {
+          let countSucceeded = 0;
+          let countFailed = 0;
+          for (let iResultCount: number = 0; iResultCount < responseOutput.results.length; iResultCount++) {
+            let currentResult = responseOutput.results[iResultCount];
+            if (currentResult.status === SingleRequestResultStatus.RequestSuccess) {
+              countSucceeded++;
+            } else {
+              countFailed++;
+            }
           }
-        }
-        console.log(`Successfully edited ${countSucceeded} of ${editAnnotations.length} notes.`);
-        if (countFailed > 0) {
-          console.log(`Failed to edit ${countFailed} notes.`);
-        }
-        if (editAnnotations.length !== (countSucceeded + countFailed)) {
-          let countTotal = countSucceeded + countFailed;
-          console.log(`Mismatch in number of note edits requested (${editAnnotations.length}) and response (${countTotal}).`);
+          console.log(`Successfully edited ${countSucceeded} of ${editAnnotations.length} notes.`);
+          if (countFailed > 0) {
+            console.log(`Failed to edit ${countFailed} notes.`);
+          }
+          if (editAnnotations.length !== (countSucceeded + countFailed)) {
+            let countTotal = countSucceeded + countFailed;
+            console.log(`Mismatch in number of note edits requested (${editAnnotations.length}) and response (${countTotal}).`);
+          }
         }
       } else {
         console.log('Edit notes failed waiting for modify to finish.');

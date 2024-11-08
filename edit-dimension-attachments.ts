@@ -33,7 +33,7 @@ if (validArgs) {
     /**
      * Retrieve annotations in the drawing
      */
-    let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
+    let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, 'w', drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
     viewAnnotations = getAllDrawingAnnotationsInViewsFromExportData(drawingJsonExport);
 
     /**
@@ -112,17 +112,19 @@ if (validArgs) {
     
       const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
       if (responseOutput) {
-        // Only 1 request was made - verify it succeeded
-        if (responseOutput.results.length == 1 &&
-            responseOutput.results[0].status === SingleRequestResultStatus.RequestSuccess) {
-            // Success - logicalId of edited dimension is available
-            const editedDimLogicalId = responseOutput.results[0].logicalId;
-            console.log(`Edit dimension succeeded and edited dimension has a logicalId: ${editedDimLogicalId}`);
-            if (editedDimLogicalId !== dimensionToEdit.pointToPointDimension.logicalId) {
-              console.log(`ERROR - requested dimension logicalId is ${dimensionToEdit.pointToPointDimension.logicalId} but result logicalId is ${editedDimLogicalId}.`);
-            }
+        if (responseOutput.results.length == 0) {
+          // Success, but the logicalId is not available yet
+          console.log('Edit dimension succeeded.');
         } else {
-          console.log(`Edit dimension failed. Response status code: ${responseOutput.statusCode}.`)
+          // Only 1 request was made - verify it succeeded
+          if (responseOutput.results.length == 1 &&
+            responseOutput.results[0].status === SingleRequestResultStatus.RequestSuccess) {
+            // Success - logicalId of new dimension is available
+            const newLogicalId = responseOutput.results[0].logicalId;
+            console.log(`Edit dimension succeeded and has a logicalId: ${newLogicalId}`);
+          } else {
+            console.log(`Edit dimension failed. Response status code: ${responseOutput.statusCode}.`)
+          }
         }
       } else {
         console.log('Edit dimension failed waiting for modify to finish.');

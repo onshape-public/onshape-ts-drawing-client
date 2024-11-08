@@ -37,7 +37,7 @@ if (validArgs) {
     /**
      * Retrieve a drawing view and some of its edges to get enough information to create the dimension
      */
-    let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
+    let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, 'w', drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
     viewToUse = getRandomViewOnActiveSheetFromExportData(drawingJsonExport);
   
     if (viewToUse !== null) {
@@ -118,14 +118,19 @@ if (validArgs) {
   
       const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
       if (responseOutput) {
-        // Only 1 request was made - verify it succeeded
-        if (responseOutput.results.length == 1 &&
+        if (responseOutput.results.length == 0) {
+          // Success, but the logicalId is not available yet
+          console.log('Create dimension succeeded.');
+        } else {
+          // Only 1 request was made - verify it succeeded
+          if (responseOutput.results.length == 1 &&
             responseOutput.results[0].status === SingleRequestResultStatus.RequestSuccess) {
             // Success - logicalId of new dimension is available
             const newDimLogicalId = responseOutput.results[0].logicalId;
-            console.log(`Create dimension succeeded and new dimension has a logicalId: ${newDimLogicalId}`);
-        } else {
-          console.log(`Create dimension failed. Response status code: ${responseOutput.statusCode}.`)
+            console.log(`Create dimension succeeded and has a logicalId: ${newDimLogicalId}`);
+          } else {
+            console.log(`Create dimension failed. Response status code: ${responseOutput.statusCode}.`)
+          }
         }
       } else {
         console.log('Create dimension failed waiting for modify to finish.');

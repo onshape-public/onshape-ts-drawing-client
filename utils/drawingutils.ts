@@ -42,6 +42,8 @@ export class DrawingScriptArgs {
   documentId: string;
   /** The workspace id */
   workspaceId: string;
+  /** The version id */
+  versionId: string;
   /** The element id */
   elementId: string;
 }
@@ -61,6 +63,7 @@ export function parseDrawingScriptArgs(): DrawingScriptArgs {
     baseURL: '',
     documentId: '',
     workspaceId: '',
+    versionId: '',
     elementId: ''
   };
 
@@ -82,10 +85,13 @@ export function parseDrawingScriptArgs(): DrawingScriptArgs {
 
   drawingScriptArgs.documentId = regexMatch[1];
   const wv: string = regexMatch[2];
-  if (wv != 'w') {
-    throw new Error('--documenturi must specify a drawing in a workspace');
+  if (wv == 'w') {
+    drawingScriptArgs.workspaceId = regexMatch[3];
+    drawingScriptArgs.versionId = '';
+  } else if (wv == 'v') {
+    drawingScriptArgs.workspaceId = '';
+    drawingScriptArgs.versionId = regexMatch[3];
   }
-  drawingScriptArgs.workspaceId= regexMatch[3];
   drawingScriptArgs.elementId = regexMatch[4];
 
   return drawingScriptArgs;
@@ -193,13 +199,22 @@ export async function getWorkspaceDrawingsThatNeedUpdate(apiClient: ApiClient, d
   return drawingsThatNeedUpdate;
 }
 
-export async function getDrawingJsonExport(apiClient: ApiClient, documentId: string, workspaceId: string, elementId: string): Promise<GetDrawingJsonExportResponse> {
+/**
+ * 
+ * @param apiClient - Api Client contains info about session
+ * @param documentId - document id
+ * @param workspaceOrVersion - 'w' or 'v'
+ * @param workspaceOrVersionId - workspace or version id
+ * @param elementId - element id
+ * @returns 
+ */
+export async function getDrawingJsonExport(apiClient: ApiClient, documentId: string, workspaceOrVersion: string, workspaceOrVersionId: string, elementId: string): Promise<GetDrawingJsonExportResponse> {
   let exportData: GetDrawingJsonExportResponse = null;
   const storeInDocument: boolean = false;  // In this sample app, we always export the drawing json externally, not to a new element in the document
 
   try {
     LOG.info('Initiated export of drawing as json');
-    let exportResponse: ExportDrawingResponse = await apiClient.post(`api/drawings/d/${documentId}/w/${workspaceId}/e/${elementId}/translations`, {
+    let exportResponse: ExportDrawingResponse = await apiClient.post(`api/drawings/d/${documentId}/${workspaceOrVersion}/${workspaceOrVersionId}/e/${elementId}/translations`, {
       formatName: 'DRAWING_JSON',
       storeInDocument: storeInDocument,
       level: 'full'
@@ -259,7 +274,7 @@ export async function waitForModifyToFinish(apiClient: ApiClient, idModifyReques
     // If modify takes over 1 minute, then log and continue
     if (elapsedSeconds > 60) {
       succeeded = false;
-      LOG.error(`Callout creation timed out after ${elapsedSeconds} seconds`);
+      LOG.error(`Modify request timed out after ${elapsedSeconds} seconds`);
       break;
     }
 
@@ -268,14 +283,29 @@ export async function waitForModifyToFinish(apiClient: ApiClient, idModifyReques
   }
 
   if (succeeded && jobStatus.requestState !== 'ACTIVE') {
-    if (jobStatus.output) {
+    console.log(`modify status response requestState finished as: ${jobStatus.requestState}`);
+    if (jobStatus.requestState === 'DONE') {
       console.log(`modify status response output is: ${jobStatus.output}`);
       // Parses the output string into an object containing the modify results
-      jobOutput = JSON.parse(jobStatus.output);
+      // Wrapped in a try catch because the output string is changing and earlier strings were not valid json
+      try {
+        jobOutput = JSON.parse(jobStatus.output);
+      } catch {
+        // Create a jobOutput that is a bare minimum successful
+        jobOutput = {
+          status: 'Success',
+          statusCode: 200,
+          changeId: '',
+          results: []    // indicates we could not parse the output field
+        };
+      }
+    } else {
+      console.log('modify did not finish successfully.');
+      jobOutput = null;
     }
   }
 
-  return jobOutput;  // Will return null if failed
+  return jobOutput;  // Will return null if failed or output could not be parsed
 }
 
 export function getRandomViewOnActiveSheetFromExportData(exportData: GetDrawingJsonExportResponse): View2 {

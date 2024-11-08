@@ -161,6 +161,10 @@ export interface ReleasePackageItemUpdate {
 export class DrawingObjectType {
   static CALLOUT = 'Onshape::Callout';
   static CENTERLINE_POINT_TO_POINT = 'Onshape::Centerline::PointToPoint';
+  static CENTERLINE_LINE_TO_LINE = 'Onshape::Centerline::LineToLine';
+  static CENTERLINE_TWO_POINT_CIRCULAR = 'Onshape::Centerline::TwoPointCircleCenterline';
+  static CENTERLINE_THREE_POINT_CIRCULAR = 'Onshape::Centerline::ThreePointCircleCenterline';
+  static CHAMFER_NOTE = 'Onshape::Dimension::ChamferNote';
   static DIMENSION_DIAMETER = 'Onshape::Dimension::Diametric';
   static DIMENSION_LINE_TO_LINE_ANGULAR = 'Onshape::Dimension::LineToLineAngular';
   static DIMENSION_LINE_TO_LINE_LINEAR = 'Onshape::Dimension::LineToLine';
@@ -400,11 +404,50 @@ export interface Note {
   textHeight?: number;
 }
 
+export interface ChamferNote {
+  displayedValue: string;
+  edge1End: AssociatedPoint;
+  edge1Start: AssociatedPoint;
+  edge2End: AssociatedPoint;
+  edge2Start: AssociatedPoint;
+  formatting?: DimensionFormatting;
+  isDangling?: boolean;
+  logicalId: string;
+  measurementAngle: number;
+  measurementLength: number;
+  secondUnit: DimensionUnit;
+  textOverride: string;
+  textPosition: UnassociatedPoint;
+  unit: DimensionUnit;
+}
+
 export interface PointToPointCenterline {
   isDangling: boolean;
   logicalId: string;
   point1: AssociatedPoint;
   point2: AssociatedPoint;
+}
+
+export interface LineToLineCenterline {
+  isDangling?: boolean;
+  logicalId: string;
+  edge1: AssociatedEdge;
+  edge2: AssociatedEdge;
+}
+
+export interface TwoPointCircleCenterline {
+  isDangling?: boolean;
+  logicalId: string;
+  centerPoint: AssociatedPoint;
+  defPoint: AssociatedPoint;
+}
+
+export interface ThreePointCircleCenterline {
+  isDangling?: boolean;
+  logicalId: string;
+  point1: AssociatedPoint;
+  point2: AssociatedPoint;
+  point3: AssociatedPoint;
 }
 
 export interface PointToPointLinearDimension {
@@ -513,10 +556,12 @@ export interface InspectionSymbol {
 export interface Annotation {
   type: string;
   callout?: Callout;
+  chamferNote?: ChamferNote;
   diametricDimension?: DiameterDimension;
   geometricTolerance?: GeometricTolerance;
   inspectionSymbol?: InspectionSymbol;
   lineToLineAngularDimension?: LineToLineAngularDimension;
+  lineToLineCenterline?: LineToLineCenterline;
   lineToLineDimension?: LineToLineLinearDimension;
   note?: Note;
   pointToLineDimension?: PointToLineLinearDimension;
@@ -524,6 +569,8 @@ export interface Annotation {
   pointToPointDimension?: PointToPointLinearDimension;
   radialDimension?: RadialDimension;
   threePointAngularDimension?: ThreePointAngularDimension;
+  threePointCircleCenterline?: ThreePointCircleCenterline;
+  twoPointCircleCenterline?: TwoPointCircleCenterline;
 }
 
 export interface Sheet {
@@ -568,7 +615,6 @@ export interface SingleRequestResponse {
   logicalId?: string;         // Field exists and has a value if status is "OK"
   errorDescription?: string;  // Field exists and has a value if status is "Failed"
 }
-
 export interface ModifyStatusResponseOutput {
   status: OverallRequestResultStatus;
   statusCode: number;

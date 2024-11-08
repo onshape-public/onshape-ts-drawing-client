@@ -32,7 +32,7 @@ if (validArgs) {
     /**
      * Retrieve a drawing view and some of its edges to get enough information to create the inspection symbol
      */
-    let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
+    let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, 'w', drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
     viewToUse = getRandomViewOnActiveSheetFromExportData(drawingJsonExport);
   
     if (viewToUse != null) {
@@ -148,24 +148,50 @@ if (validArgs) {
   
         const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
         if (responseOutput) {
-          let countSucceeded = 0;
-          let countFailed = 0;
-          for (let iResultCount: number = 0; iResultCount < responseOutput.results.length; iResultCount++) {
-            let currentResult = responseOutput.results[iResultCount];
-            // currentResult.logicalId has the logicalId of each created inspection symbol
-            if (currentResult.status === SingleRequestResultStatus.RequestSuccess) {
-              countSucceeded++;
+          if (responseOutput.results.length == 0) {
+            // Success, but the logicalId is not available yet
+            console.log('Create geometric tolerance succeeded.');
+          } else {
+            // Only 1 request was made - verify it succeeded
+            if (responseOutput.results.length == 1 &&
+              responseOutput.results[0].status === SingleRequestResultStatus.RequestSuccess) {
+              // Success - logicalId of new geometric tolerance is available
+              const newLogicalId = responseOutput.results[0].logicalId;
+              console.log(`Create geometric tolerance succeeded and has a logicalId: ${newLogicalId}`);
             } else {
-              countFailed++;
+              console.log(`Create geometric tolerance failed. Response status code: ${responseOutput.statusCode}.`)
             }
           }
-          console.log(`Successfully created ${countSucceeded} of ${annotationsToRequest.length} inspection symbols.`);
-          if (countFailed > 0) {
-            console.log(`Failed to create ${countFailed} inspection symbols.`);
-          }
-          if (annotationsToRequest.length !== (countSucceeded + countFailed)) {
-            let countTotal = countSucceeded + countFailed;
-            console.log(`Mismatch in number of inspection symbols requested (${annotationsToRequest.length}) and response (${countTotal}).`);
+        } else {
+          console.log('Create geometric tolerance failed waiting for modify to finish.');
+          LOG.info('Create geometric tolerance failed waiting for modify to finish.');
+        }
+
+
+        if (responseOutput) {
+          if (responseOutput.results.length == 0) {
+            // Success, but the counts and logicalIds are not available yet
+            console.log('Create inspection symbols succeeded.');
+          } else {
+            let countSucceeded = 0;
+            let countFailed = 0;
+            for (let iResultCount: number = 0; iResultCount < responseOutput.results.length; iResultCount++) {
+              let currentResult = responseOutput.results[iResultCount];
+              // currentResult.logicalId has the logicalId of each created inspection symbol
+              if (currentResult.status === SingleRequestResultStatus.RequestSuccess) {
+                countSucceeded++;
+              } else {
+                countFailed++;
+              }
+            }
+            console.log(`Successfully created ${countSucceeded} of ${annotationsToRequest.length} inspection symbols.`);
+            if (countFailed > 0) {
+              console.log(`Failed to create ${countFailed} inspection symbols.`);
+            }
+            if (annotationsToRequest.length !== (countSucceeded + countFailed)) {
+              let countTotal = countSucceeded + countFailed;
+              console.log(`Mismatch in number of inspection symbols requested (${annotationsToRequest.length}) and response (${countTotal}).`);
+            }
           }
         } else {
           console.log('Create inspection symbols failed waiting for modify to finish.');

@@ -299,14 +299,19 @@ if (validArgs) {
   
     const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
     if (responseOutput) {
-      // Only 1 request was made - verify it succeeded
-      if (responseOutput.results.length == 1 &&
+      if (responseOutput.results.length == 0) {
+        // Success, but the logicalId is not available yet
+        console.log('Create table succeeded.');
+      } else {
+        // Only 1 request was made - verify it succeeded
+        if (responseOutput.results.length == 1 &&
           responseOutput.results[0].status === SingleRequestResultStatus.RequestSuccess) {
           // Success - logicalId of new table is available
-          const newTableLogicalId = responseOutput.results[0].logicalId;
-          console.log(`Create table succeeded and new table has a logicalId: ${newTableLogicalId}`);
-      } else {
-        console.log(`Create table failed. Response status code: ${responseOutput.statusCode}.`)
+          const newLogicalId = responseOutput.results[0].logicalId;
+          console.log(`Create table succeeded and has a logicalId: ${newLogicalId}`);
+        } else {
+          console.log(`Create table failed. Response status code: ${responseOutput.statusCode}.`)
+        }
       }
     } else {
       console.log('Create table failed waiting for modify to finish.');

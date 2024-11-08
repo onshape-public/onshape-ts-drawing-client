@@ -59,18 +59,23 @@ if (validArgs) {
   
     const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
     if (responseOutput) {
-      // Only 1 request was made - verify it succeeded
-      if (responseOutput.results.length == 1 &&
+      if (responseOutput.results.length == 0) {
+        // Success, but the logicalId is not available yet
+        console.log('Create callout succeeded.');
+      } else {
+        // Only 1 request was made - verify it succeeded
+        if (responseOutput.results.length == 1 &&
           responseOutput.results[0].status === SingleRequestResultStatus.RequestSuccess) {
           // Success - logicalId of new callout is available
-          const newDimLogicalId = responseOutput.results[0].logicalId;
-          console.log(`Create callout succeeded and new callout has a logicalId: ${newDimLogicalId}`);
-      } else {
-        console.log(`Create callout failed. Response status code: ${responseOutput.statusCode}.`)
+          const newLogicalId = responseOutput.results[0].logicalId;
+          console.log(`Create callout succeeded and has a logicalId: ${newLogicalId}`);
+        } else {
+          console.log(`Create callout failed. Response status code: ${responseOutput.statusCode}.`)
+        }
       }
     } else {
-      console.log('Create callout failed waiting for modify to finish.');
-      LOG.info('Create callout failed waiting for modify to finish.');
+      console.log('Create callout with leader failed waiting for modify to finish.');
+      LOG.info('Create callout with leader failed waiting for modify to finish.');
     }
   } catch (error) {
     console.error(error);

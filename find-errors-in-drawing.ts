@@ -12,24 +12,36 @@ let apiClient: ApiClient = null;
 let errorValue: string = null;
 let viewErrorsFound: boolean = false;
 let annotationErrorsFound: boolean = false;
+let workspaceOrVersionId = '';
+let workspaceOrVersion = '';
 
 try {
   drawingScriptArgs = parseDrawingScriptArgs();
   apiClient = await ApiClient.createApiClient(drawingScriptArgs.stackToUse);
   validateBaseURLs(apiClient.getBaseURL(), drawingScriptArgs.baseURL);
+
+  // This script can handle both workspaces and versions
+  if (drawingScriptArgs.workspaceId) {
+    workspaceOrVersionId = drawingScriptArgs.workspaceId;
+    workspaceOrVersion = 'w';
+  } else {
+    workspaceOrVersionId = drawingScriptArgs.versionId;
+    workspaceOrVersion = 'v';
+  }  
 } catch (error) {
   validArgs = false;
   usage('find-errors-in-drawing');
 }
 
 if (validArgs) {
+  LOG.info(`documentId=${drawingScriptArgs.documentId}, workspaceId=${drawingScriptArgs.workspaceId}, versionId=${drawingScriptArgs.versionId}, elementId=${drawingScriptArgs.elementId}`);
+
   try {
-    LOG.info(`documentId=${drawingScriptArgs.documentId}, workspaceId=${drawingScriptArgs.workspaceId}, elementId=${drawingScriptArgs.elementId}`);
   
     /**
      * Do a drawing export to get the views and annotations in the drawing
      */
-    let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
+    let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, workspaceOrVersion, workspaceOrVersionId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
     
     for (let indexSheet = 0; indexSheet < drawingJsonExport.sheets.length; indexSheet++) {
 
@@ -142,6 +154,24 @@ if (validArgs) {
             friendlyType = 'Point to point centerline';
             break;
           }
+          case DrawingObjectType.CENTERLINE_LINE_TO_LINE: {
+            isDangling = anAnnotation.lineToLineCenterline.isDangling ?? false;
+            logicalId = anAnnotation.lineToLineCenterline.logicalId ?? '';
+            friendlyType = 'Line to line centerline';
+            break;
+          }
+          case DrawingObjectType.CENTERLINE_TWO_POINT_CIRCULAR: {
+            isDangling = anAnnotation.twoPointCircleCenterline.isDangling ?? false;
+            logicalId = anAnnotation.twoPointCircleCenterline.logicalId ?? '';
+            friendlyType = 'Two point circle centerline';
+            break;
+          }
+          case DrawingObjectType.CENTERLINE_THREE_POINT_CIRCULAR: {
+            isDangling = anAnnotation.threePointCircleCenterline.isDangling ?? false;
+            logicalId = anAnnotation.threePointCircleCenterline.logicalId ?? '';
+            friendlyType = 'Three point circle centerline';
+            break;
+          }
           case DrawingObjectType.GEOMETRIC_TOLERANCE: {
             isDangling = anAnnotation.geometricTolerance.isDangling ?? false;
             logicalId = anAnnotation.geometricTolerance.logicalId ?? '';
@@ -152,6 +182,12 @@ if (validArgs) {
             isDangling = anAnnotation.note.isDangling ?? false;
             logicalId = anAnnotation.note.logicalId ?? '';
             friendlyType = "Note";
+            break;
+          }
+          case DrawingObjectType.CHAMFER_NOTE: {
+            isDangling = anAnnotation.chamferNote.isDangling ?? false;
+            logicalId = anAnnotation.chamferNote.logicalId ?? '';
+            friendlyType = "Chamfer dimension";
             break;
           }
           case DrawingObjectType.INSPECTION_SYMBOL: {
