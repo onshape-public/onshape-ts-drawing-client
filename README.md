@@ -103,7 +103,7 @@ npm run edit-dimension-text-positions --drawinguri=<drawing uri> --stack=cad
 npm run find-errors-in-drawing --drawinguri=<drawing uri> --stack=cad
 ```
 
-The drawinguri argument should be to a drawing in a document to which you have edit access.  The drawing should be in a workspace and have a view that has edges that are lines, arcs and circles. The sample code will pick a view and some of those edges when creating dimensions. For example, this is a possible drawing uri:
+For scripts that create or edit the drawing, the drawinguri argument should be to a drawing in a document to which you have edit access.  The drawing should be in a workspace and have a view that has edges that are lines, arcs and circles. The sample code will pick a view and some of those edges when creating dimensions. For example, this is a possible drawing uri:
 
 ```
 https://cad.onshape.com/documents/61c4c3f6c490bac4c9db5d58/w/289385821d88d91849a7cd70/e/ae3c0bd456a8cd3f3d40dddc
@@ -118,6 +118,8 @@ If you are working with a company, you can specify an optional argument:
 ```
 
 to pick the correct company.
+
+For scripts that only query the drawing (e.g. find-errors-in-drawing), you only need read access to the document and the drawing can be in a version.
 
 #### Logging
 
