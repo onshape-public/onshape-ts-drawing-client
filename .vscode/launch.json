@@ -14,8 +14,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-note.js",
             "args": [
-                "--drawinguri=https://demo-c.dev.onshape.com/documents/479cbd6fead91a4a641198f2/w/c1f63e254fda0e5dc1d8f354/e/29b32be038a4d89c7faeb1fb",
-                "--stack=democ"
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
             ]
         },
         {
@@ -28,8 +28,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-note-with-leader.js",
             "args": [
-                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
-                "--stack=democ"
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
             ]
         },
         {
@@ -42,8 +42,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-callout.js",
             "args": [
-                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
-                "--stack=democ"
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
             ]
         },
         {
@@ -56,8 +56,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-callout-with-leader.js",
             "args": [
-                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
-                "--stack=democ"
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
             ]
         },
         {
@@ -70,8 +70,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-geometric-tolerance.js",
             "args": [
-                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
-                "--stack=democ"
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
             ]
         },
         {
@@ -84,8 +84,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-table.js",
             "args": [
-                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
-                "--stack=democ"
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
             ]
         },
         {
@@ -98,8 +98,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-centerline.js",
             "args": [
-                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
-                "--stack=democ"
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
             ]
         },
         {
@@ -112,7 +112,7 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-point-to-point-linear-dimension.js",
             "args": [
-                "--drawinguri=https://cad.onshape.com/documents/1289d5601707d8aca7270999/w/8aece27f8cbcb0b2553a5031/e/429fb9ca827bf61560120e08",
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
                 "--stack=cad"
             ]
         },
@@ -126,8 +126,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-point-to-line-linear-dimension.js",
             "args": [
-                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
-                "--stack=democ"
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
             ]
         },
         {
@@ -140,8 +140,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-line-to-line-linear-dimension.js",
             "args": [
-                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
-                "--stack=democ"
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
             ]
         },
         {
@@ -154,8 +154,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-aligned-linear-dimension.js",
             "args": [
-                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
-                "--stack=democ"
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
             ]
         },
         {
@@ -168,8 +168,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-line-to-line-angular-dimension.js",
             "args": [
-                "--drawinguri=https://demo-c.dev.onshape.com/documents/479cbd6fead91a4a641198f2/w/c1f63e254fda0e5dc1d8f354/e/29b32be038a4d89c7faeb1fb",
-                "--stack=democ"
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
             ]
         },
         {
@@ -182,8 +182,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-three-point-angular-dimension.js",
             "args": [
-                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
-                "--stack=democ"
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
             ]
         },
         {
@@ -196,8 +196,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-radial-dimension.js",
             "args": [
-                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
-                "--stack=democ"
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
             ]
         },
         {
@@ -210,8 +210,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-diameter-dimension.js",
             "args": [
-                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
-                "--stack=democ"
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
             ]
         },
         {
@@ -224,8 +224,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/create-inspection-symbols.js",
             "args": [
-                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
-                "--stack=democ"
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
             ]
         },
         {
@@ -238,8 +238,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/detect-if-single-drawing-needs-update.js",
             "args": [
-                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/616523b0e7c1e69c8ab40aac",
-                "--stack=democ"
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
             ]
         },
         {
@@ -252,8 +252,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/detect-if-workspace-contains-drawings-needing-update.js",
             "args": [
-                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/616523b0e7c1e69c8ab40aac",
-                "--stack=democ"
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
             ]
         },
         {
@@ -266,8 +266,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/edit-notes.js",
             "args": [
-                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
-                "--stack=democ"
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
             ]
         },
         {
@@ -280,8 +280,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/edit-dimension-attachments.js",
             "args": [
-                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
-                "--stack=democ"
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
             ]
         },
         {
@@ -294,8 +294,8 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/edit-dimension-text-positions.js",
             "args": [
-                "--drawinguri=https://demo-c.dev.onshape.com/documents/62ca01945f8ec38b9e245f3e/w/394fb53994fa4ba2e1d365e2/e/58eda968b0ce825d4ffeac79",
-                "--stack=democ"
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
             ]
         },
         {
@@ -308,7 +308,7 @@
             ],
             "program": "${workspaceFolder}/.compiledjs/find-errors-in-drawing.js",
             "args": [
-                "--drawinguri=https://cad.onshape.com/documents/6c66067eadfef1e3abaca519/v/eaba604a2af4d8cdd4c1fe54/e/ff72f81c3b3061f254aba9e7",
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
                 "--stack=cad"
             ]
         }
