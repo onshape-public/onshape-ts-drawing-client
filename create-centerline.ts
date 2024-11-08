@@ -1,6 +1,6 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, Edge, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2, SnapPointType, DrawingObjectType } from './utils/onshapetypes.js';
+import { BasicNode, Edge, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2, SnapPointType, DrawingObjectType, ModifyStatusResponseOutput, SingleRequestResultStatus } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -34,7 +34,7 @@ if (validArgs) {
     /**
      * Retrieve a drawing view and some of its edges to get information to create the centerline
      */
-    let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
+    let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, 'w', drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
     viewToUse = getRandomViewOnActiveSheetFromExportData(drawingJsonExport);
     
     if (viewToUse !== null) {
@@ -93,10 +93,22 @@ if (validArgs) {
 
       const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`, requestBody) as BasicNode;
   
-      const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
-      if (waitSucceeded) {
-        console.log('Successfully created centerline.');
-        LOG.info(`Successfully created centerline.`);
+      const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
+      if (responseOutput) {
+        if (responseOutput.results.length == 0) {
+          // Success, but the logicalId is not available yet
+          console.log('Create centerline with leader succeeded.');
+        } else {
+          // Only 1 request was made - verify it succeeded
+          if (responseOutput.results.length == 1 &&
+            responseOutput.results[0].status === SingleRequestResultStatus.RequestSuccess) {
+            // Success - logicalId of new centerline is available
+            const newLogicalId = responseOutput.results[0].logicalId;
+            console.log(`Create centerline succeeded and has a logicalId: ${newLogicalId}`);
+          } else {
+            console.log(`Create centerline failed. Response status code: ${responseOutput.statusCode}.`)
+          }
+        }
       } else {
         console.log('Create centerline failed waiting for modify to finish.');
         LOG.info('Create centerline failed waiting for modify to finish.');

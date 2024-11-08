@@ -1,6 +1,6 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, DrawingObjectType } from './utils/onshapetypes.js';
+import { BasicNode, DrawingObjectType, ModifyStatusResponseOutput, SingleRequestResultStatus } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs, getRandomLocation } from './utils/drawingutils.js';
 
 const LOG = mainLog();
@@ -54,16 +54,28 @@ if (validArgs) {
 
     const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`,  requestBody) as BasicNode;
   
-    const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
-    if (waitSucceeded) {
-      console.log('Successfully created geometric tolerance.');
-      LOG.info(`Successfully created geometric tolerance.`);
+    const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
+    if (responseOutput) {
+      if (responseOutput.results.length == 0) {
+        // Success, but the logicalId is not available yet
+        console.log('Create geometric tolerance succeeded.');
+      } else {
+        // Only 1 request was made - verify it succeeded
+        if (responseOutput.results.length == 1 &&
+          responseOutput.results[0].status === SingleRequestResultStatus.RequestSuccess) {
+          // Success - logicalId of new geometric tolerance is available
+          const newLogicalId = responseOutput.results[0].logicalId;
+          console.log(`Create geometric tolerance succeeded and has a logicalId: ${newLogicalId}`);
+        } else {
+          console.log(`Create geometric tolerance failed. Response status code: ${responseOutput.statusCode}.`)
+        }
+      }
     } else {
       console.log('Create geometric tolerance failed waiting for modify to finish.');
       LOG.info('Create geometric tolerance failed waiting for modify to finish.');
     }
   } catch (error) {
     console.error(error);
-    LOG.error('Create geometric tolerance failed', error);
+    LOG.error(`Create geometric tolerance failed: ${error}`);
   }
 }

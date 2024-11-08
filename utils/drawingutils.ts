@@ -2,8 +2,8 @@ import timeSpan from 'time-span';
 import { mainLog } from './logger.js';
 import { ArgumentParser } from './argumentparser.js';
 import { ApiClient } from './apiclient.js';
-import { BasicNode, GetDrawingViewsResponse, Edge, ExportDrawingResponse, GetViewJsonGeometryResponse } from './onshapetypes.js';
-import { GetDrawingJsonExportResponse, Sheet, TranslationStatusResponse, Annotation, View2 } from './onshapetypes.js';
+import { BasicNode, ExportDrawingResponse, ModifyStatusResponseOutput } from './onshapetypes.js';
+import { GetDrawingJsonExportResponse, Sheet, TranslationStatusResponse, Annotation, View2, DrawingReference, ResolveReferencesResponse } from './onshapetypes.js';
 import { DrawingObjectType } from './onshapetypes.js';
 
 const LOG = mainLog();
@@ -42,6 +42,8 @@ export class DrawingScriptArgs {
   documentId: string;
   /** The workspace id */
   workspaceId: string;
+  /** The version id */
+  versionId: string;
   /** The element id */
   elementId: string;
 }
@@ -61,6 +63,7 @@ export function parseDrawingScriptArgs(): DrawingScriptArgs {
     baseURL: '',
     documentId: '',
     workspaceId: '',
+    versionId: '',
     elementId: ''
   };
 
@@ -82,10 +85,13 @@ export function parseDrawingScriptArgs(): DrawingScriptArgs {
 
   drawingScriptArgs.documentId = regexMatch[1];
   const wv: string = regexMatch[2];
-  if (wv != 'w') {
-    throw new Error('--documenturi must specify a drawing in a workspace');
+  if (wv == 'w') {
+    drawingScriptArgs.workspaceId = regexMatch[3];
+    drawingScriptArgs.versionId = '';
+  } else if (wv == 'v') {
+    drawingScriptArgs.workspaceId = '';
+    drawingScriptArgs.versionId = regexMatch[3];
   }
-  drawingScriptArgs.workspaceId= regexMatch[3];
   drawingScriptArgs.elementId = regexMatch[4];
 
   return drawingScriptArgs;
@@ -101,8 +107,13 @@ export function validateBaseURLs(credentialsBaseURL: string, argumentsBaseURL: s
   }
 }
 
+/**
+ * Return a random location between (minLocation[0], minLocation[1]) and (maxLocation[0], maxLocation[1])
+ * @param minLocation 
+ * @param maxLocation 
+ * @returns random location
+ */
 export function getRandomLocation(minLocation: number[], maxLocation: number[]): number[] {
-  // Position of note is random between (minLocation[0], minLocation[1]) and (maxLocation[0], maxLocation[1])
   const xPosition: number = minLocation[0] + (Math.random() * (maxLocation[0] - minLocation[0]));
   const yPosition: number = minLocation[1] + (Math.random() * (maxLocation[1] - minLocation[1]));
   return [xPosition, yPosition, 0.0];
@@ -114,15 +125,99 @@ export function getRandomInt(min: number, max: number) {
   return randomInt;
 }
 
-export async function getDrawingJsonExport(apiClient: ApiClient, documentId: string, workspaceId: string, elementId: string): Promise<GetDrawingJsonExportResponse> {
+/**
+ * Return if a single drawing needs an update (e.g. the yellow update button would be highlighted)
+ * @param apiClient 
+ * @param documentId 
+ * @param workspaceId 
+ * @param elementId 
+ * @returns boolean
+ */
+export async function getIfDrawingNeedsUpdate(apiClient: ApiClient, documentId: string, workspaceId: string, elementId: string): Promise<boolean> {
+  let drawingNeedsUpdate = false;
+
+  try {
+    LOG.info('Initiated retrieval of drawing references');
+    // drawingsOnly=true query parameter is required
+    let resolveReferenceResponse: ResolveReferencesResponse = await apiClient.get(`api/v9/appelements/d/${documentId}/w/${workspaceId}/e/${elementId}/resolvereferences?includeInternal=false`) as any;
+
+    // Loop through drawing resolved references, looking for out-of-date references
+    for (let indexReference = 0; indexReference < resolveReferenceResponse.resolvedReferences.length; indexReference++) {
+      let resolvedReference: DrawingReference = resolveReferenceResponse.resolvedReferences[indexReference];
+      // If the latest element microversion is not the same as the target element microversion, it means
+      // the target element has changed since the last time the drawing was updated.
+      if (resolvedReference.latestElementMicroversionId !== resolvedReference.targetElementMicroversionId) {
+        drawingNeedsUpdate = true;
+        break;
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    LOG.error('Error getting drawing references.', error);
+  }
+
+  return drawingNeedsUpdate;
+}
+
+/**
+ * Return the drawings in a document workspace that need an update (e.g. the yellow update button would be highlighted).
+ * Returns an array of drawing element ids.
+ */
+export async function getWorkspaceDrawingsThatNeedUpdate(apiClient: ApiClient, documentId: string, workspaceId: string): Promise<string[]> {
+  let drawingsThatNeedUpdate: string[] = null;
+
+  try {
+    LOG.info('Initiated retrieval of workspace drawing references');
+    // drawingsOnly=true query parameter is required
+    let resolveReferenceResponse: any = await apiClient.get(`api/v9/appelements/d/${documentId}/w/${workspaceId}/resolvereferences?includeInternal=false&drawingsOnly=true`) as any;
+
+    for (const key in resolveReferenceResponse) {
+      let drawingElementId = key;
+      let drawingReferenceResponse: ResolveReferencesResponse = resolveReferenceResponse[drawingElementId];
+
+      // Loop through drawing references, looking for out-of-date references
+      for (let indexReference = 0; indexReference < drawingReferenceResponse.resolvedReferences.length; indexReference++) {
+        let resolvedReference: DrawingReference = drawingReferenceResponse.resolvedReferences[indexReference];
+        // If the latest element microversion is not the same as the target element microversion, it means
+        // the target element has changed since the last time the drawing was updated.
+        if (resolvedReference.latestElementMicroversionId !== resolvedReference.targetElementMicroversionId) {
+          if (drawingsThatNeedUpdate === null) {
+            drawingsThatNeedUpdate = [drawingElementId];
+          } else {
+            drawingsThatNeedUpdate.push(drawingElementId);
+          }
+          // Only want each drawingElementId in the array once
+          break;
+        }
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    LOG.error('Error getting drawing references.', error);
+  }
+
+  return drawingsThatNeedUpdate;
+}
+
+/**
+ * 
+ * @param apiClient - Api Client contains info about session
+ * @param documentId - document id
+ * @param workspaceOrVersion - 'w' or 'v'
+ * @param workspaceOrVersionId - workspace or version id
+ * @param elementId - element id
+ * @returns 
+ */
+export async function getDrawingJsonExport(apiClient: ApiClient, documentId: string, workspaceOrVersion: string, workspaceOrVersionId: string, elementId: string): Promise<GetDrawingJsonExportResponse> {
   let exportData: GetDrawingJsonExportResponse = null;
+  const storeInDocument: boolean = false;  // In this sample app, we always export the drawing json externally, not to a new element in the document
 
   try {
     LOG.info('Initiated export of drawing as json');
-    let exportResponse: ExportDrawingResponse = await apiClient.post(`api/drawings/d/${documentId}/w/${workspaceId}/e/${elementId}/translations`, {
+    let exportResponse: ExportDrawingResponse = await apiClient.post(`api/drawings/d/${documentId}/${workspaceOrVersion}/${workspaceOrVersionId}/e/${elementId}/translations`, {
       formatName: 'DRAWING_JSON',
-      level: 'full',
-      storeInDocument: false
+      storeInDocument: storeInDocument,
+      level: 'full'
     }) as ExportDrawingResponse;
 
     let translationStatus: TranslationStatusResponse = { requestState: 'ACTIVE', id: exportResponse.id, failureReason: '', resultExternalDataIds: [] };
@@ -141,11 +236,20 @@ export async function getDrawingJsonExport(apiClient: ApiClient, documentId: str
       translationStatus = await apiClient.get(`api/translations/${exportResponse.id}`) as TranslationStatusResponse;
     }
 
-    let translationId: string = translationStatus.resultExternalDataIds[0];
-    console.log(`translation id=`, translationId);
-    
-    let responseAsString: string = await apiClient.get(`api/documents/d/${documentId}/externaldata/${translationStatus.resultExternalDataIds[0]}`) as string;
-    exportData = JSON.parse(responseAsString);
+    // resultElementIds will be non-null if storeInDocument parameter is true
+    // resultExternalDataIds will be non-null if storeInDocument parameter is false
+    if (storeInDocument) {
+      // Data stored as a new element in the document.  Return null, although we could retrieve if from the element if needed
+      // using the /blobelements/d/{did}/w/{wid}/e/{eid} API, which downloads the contents of a blob element.
+      exportData = null;
+    } else {
+      // Data stored externally - retrieve it
+      let translationId: string = translationStatus.resultExternalDataIds[0];
+      console.log(`translation id=`, translationId);
+
+      let responseAsString: string = await apiClient.get(`api/documents/d/${documentId}/externaldata/${translationStatus.resultExternalDataIds[0]}`) as string;
+      exportData = JSON.parse(responseAsString);
+    }
 
   } catch (error) {
     console.error(error);
@@ -155,10 +259,11 @@ export async function getDrawingJsonExport(apiClient: ApiClient, documentId: str
   return exportData;
 }
 
-export async function waitForModifyToFinish(apiClient: ApiClient, idModifyRequest: string): Promise<boolean> {
+export async function waitForModifyToFinish(apiClient: ApiClient, idModifyRequest: string): Promise<ModifyStatusResponseOutput> {
 
   let succeeded: boolean = true;
   let elapsedSeconds: number = 0;
+  let jobOutput: ModifyStatusResponseOutput = null;
 
   let jobStatus: ModifyJob = { requestState: 'ACTIVE', id: '', output: '' };
   const end = timeSpan();
@@ -169,7 +274,7 @@ export async function waitForModifyToFinish(apiClient: ApiClient, idModifyReques
     // If modify takes over 1 minute, then log and continue
     if (elapsedSeconds > 60) {
       succeeded = false;
-      LOG.error(`Callout creation timed out after ${elapsedSeconds} seconds`);
+      LOG.error(`Modify request timed out after ${elapsedSeconds} seconds`);
       break;
     }
 
@@ -177,17 +282,30 @@ export async function waitForModifyToFinish(apiClient: ApiClient, idModifyReques
     jobStatus = await apiClient.get(`api/drawings/modify/status/${idModifyRequest}`) as ModifyJob;
   }
 
-  if (jobStatus.requestState !== 'ACTIVE') {
-    let jobOutput = '';
-    if (jobStatus.output) {
-      jobOutput = jobStatus.output;
+  if (succeeded && jobStatus.requestState !== 'ACTIVE') {
+    console.log(`modify status response requestState finished as: ${jobStatus.requestState}`);
+    if (jobStatus.requestState === 'DONE') {
+      console.log(`modify status response output is: ${jobStatus.output}`);
+      // Parses the output string into an object containing the modify results
+      // Wrapped in a try catch because the output string is changing and earlier strings were not valid json
+      try {
+        jobOutput = JSON.parse(jobStatus.output);
+      } catch {
+        // Create a jobOutput that is a bare minimum successful
+        jobOutput = {
+          status: 'Success',
+          statusCode: 200,
+          changeId: '',
+          results: []    // indicates we could not parse the output field
+        };
+      }
+    } else {
+      console.log('modify did not finish successfully.');
+      jobOutput = null;
     }
-
-    // The output field will soon report details about drawing modifications
-    console.log(`modify/status returned output, but the format of this field will be changing soon: ${jobOutput}`)
   }
 
-  return succeeded;
+  return jobOutput;  // Will return null if failed or output could not be parsed
 }
 
 export function getRandomViewOnActiveSheetFromExportData(exportData: GetDrawingJsonExportResponse): View2 {

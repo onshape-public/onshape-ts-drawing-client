@@ -1,6 +1,6 @@
 import { mainLog } from './utils/logger.js';
 import { ApiClient } from './utils/apiclient.js';
-import { BasicNode, DrawingObjectType, Edge, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2, SnapPointType } from './utils/onshapetypes.js';
+import { BasicNode, DrawingObjectType, Edge, GetViewJsonGeometryResponse, GetDrawingJsonExportResponse, View2, SnapPointType, ModifyStatusResponseOutput, SingleRequestResultStatus } from './utils/onshapetypes.js';
 import { usage, waitForModifyToFinish, DrawingScriptArgs, parseDrawingScriptArgs, validateBaseURLs } from './utils/drawingutils.js';
 import { getDrawingJsonExport, getRandomViewOnActiveSheetFromExportData, convertPointViewToPaper, getMidPoint } from './utils/drawingutils.js';
 
@@ -36,7 +36,7 @@ if (validArgs) {
     /**
      * Retrieve a drawing view and some of its edges to get enough information to create the dimension
      */
-    let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
+    let drawingJsonExport: GetDrawingJsonExportResponse = await getDrawingJsonExport(apiClient, drawingScriptArgs.documentId, 'w', drawingScriptArgs.workspaceId, drawingScriptArgs.elementId) as GetDrawingJsonExportResponse;
     viewToUse = getRandomViewOnActiveSheetFromExportData(drawingJsonExport);
     
     if (viewToUse !== null) {
@@ -114,10 +114,22 @@ if (validArgs) {
        */
       const modifyRequest = await apiClient.post(`api/v6/drawings/d/${drawingScriptArgs.documentId}/w/${drawingScriptArgs.workspaceId}/e/${drawingScriptArgs.elementId}/modify`, requestBody) as BasicNode;
   
-      const waitSucceeded: boolean = await waitForModifyToFinish(apiClient, modifyRequest.id);
-      if (waitSucceeded) {
-        console.log('Successfully created dimension.');
-        LOG.info(`Successfully created dimension.`);
+      const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
+      if (responseOutput) {
+        if (responseOutput.results.length == 0) {
+          // Success, but the logicalId is not available yet
+          console.log('Create dimension succeeded.');
+        } else {
+          // Only 1 request was made - verify it succeeded
+          if (responseOutput.results.length == 1 &&
+            responseOutput.results[0].status === SingleRequestResultStatus.RequestSuccess) {
+            // Success - logicalId of new dimension is available
+            const newLogicalId = responseOutput.results[0].logicalId;
+            console.log(`Create dimension succeeded and has a logicalId: ${newLogicalId}`);
+          } else {
+            console.log(`Create dimension failed. Response status code: ${responseOutput.statusCode}.`)
+          }
+        }
       } else {
         console.log('Create dimension failed waiting for modify to finish.');
         LOG.info('Create dimension failed waiting for modify to finish.');
