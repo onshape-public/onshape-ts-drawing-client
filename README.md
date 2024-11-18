@@ -94,6 +94,10 @@ npm run create-inspection-symbols --drawinguri=<drawing uri> --stack=cad
 
 npm run create-aligned-linear-dimension --drawinguri=<drawing uri> --stack=cad
 
+npm run detect-if-single-drawing-needs-update --drawinguri=<drawing uri> --stack=cad
+
+npm run detect-if-workspace-contains-drawings-needing-update --drawinguri=<drawing uri> --stack=cad
+
 npm run edit-notes --drawinguri=<drawing uri> --stack=cad
 
 npm run edit-dimension-attachments --drawinguri=<drawing uri> --stack=cad
