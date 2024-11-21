@@ -112,19 +112,14 @@ if (validArgs) {
     
       const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
       if (responseOutput) {
-        if (responseOutput.results.length == 0) {
-          // Success, but the logicalId is not available yet
-          console.log('Edit dimension succeeded.');
-        } else {
-          // Only 1 request was made - verify it succeeded
-          if (responseOutput.results.length == 1 &&
+        // Only 1 request was made - verify it succeeded
+        if (responseOutput.results.length == 1 &&
             responseOutput.results[0].status === SingleRequestResultStatus.RequestSuccess) {
-            // Success - logicalId of new dimension is available
-            const newLogicalId = responseOutput.results[0].logicalId;
-            console.log(`Edit dimension succeeded and has a logicalId: ${newLogicalId}`);
-          } else {
-            console.log(`Edit dimension failed. Response status code: ${responseOutput.statusCode}.`)
-          }
+          // Success - logicalId of new dimension is available
+          const newLogicalId = responseOutput.results[0].logicalId;
+          console.log(`Edit dimension succeeded and has a logicalId: ${newLogicalId}`);
+        } else {
+          console.log(`Edit dimension failed. Response status code: ${responseOutput.statusCode}.`)
         }
       } else {
         console.log('Edit dimension failed waiting for modify to finish.');
