@@ -118,19 +118,14 @@ if (validArgs) {
   
       const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
       if (responseOutput) {
-        if (responseOutput.results.length == 0) {
-          // Success, but the logicalId is not available yet
-          console.log('Create dimension succeeded.');
-        } else {
-          // Only 1 request was made - verify it succeeded
-          if (responseOutput.results.length == 1 &&
+        // Only 1 request was made - verify it succeeded
+        if (responseOutput.results.length == 1 &&
             responseOutput.results[0].status === SingleRequestResultStatus.RequestSuccess) {
-            // Success - logicalId of new dimension is available
-            const newDimLogicalId = responseOutput.results[0].logicalId;
-            console.log(`Create dimension succeeded and has a logicalId: ${newDimLogicalId}`);
-          } else {
-            console.log(`Create dimension failed. Response status code: ${responseOutput.statusCode}.`)
-          }
+          // Success - logicalId of new dimension is available
+          const newDimLogicalId = responseOutput.results[0].logicalId;
+          console.log(`Create dimension succeeded and has a logicalId: ${newDimLogicalId}`);
+        } else {
+          console.log(`Create dimension failed. Response status code: ${responseOutput.statusCode}.`)
         }
       } else {
         console.log('Create dimension failed waiting for modify to finish.');

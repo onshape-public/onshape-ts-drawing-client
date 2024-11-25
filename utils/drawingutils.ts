@@ -286,26 +286,15 @@ export async function waitForModifyToFinish(apiClient: ApiClient, idModifyReques
     console.log(`modify status response requestState finished as: ${jobStatus.requestState}`);
     if (jobStatus.requestState === 'DONE') {
       console.log(`modify status response output is: ${jobStatus.output}`);
-      // Parses the output string into an object containing the modify results
-      // Wrapped in a try catch because the output string is changing and earlier strings were not valid json
-      try {
-        jobOutput = JSON.parse(jobStatus.output);
-      } catch {
-        // Create a jobOutput that is a bare minimum successful
-        jobOutput = {
-          status: 'Success',
-          statusCode: 200,
-          changeId: '',
-          results: []    // indicates we could not parse the output field
-        };
-      }
+      // Parse the output string into an object containing the modify results
+      jobOutput = JSON.parse(jobStatus.output);
     } else {
       console.log('modify did not finish successfully.');
       jobOutput = null;
     }
   }
 
-  return jobOutput;  // Will return null if failed or output could not be parsed
+  return jobOutput;  // Will return null if failed
 }
 
 export function getRandomViewOnActiveSheetFromExportData(exportData: GetDrawingJsonExportResponse): View2 {

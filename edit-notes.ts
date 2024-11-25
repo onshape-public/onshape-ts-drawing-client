@@ -95,28 +95,23 @@ if (validArgs) {
   
       const responseOutput: ModifyStatusResponseOutput = await waitForModifyToFinish(apiClient, modifyRequest.id);
       if (responseOutput) {
-        if (responseOutput.results.length == 0) {
-          // Success, but the logicalId is not available yet
-          console.log('Edit notes succeeded.');
-        } else {
-          let countSucceeded = 0;
-          let countFailed = 0;
-          for (let iResultCount: number = 0; iResultCount < responseOutput.results.length; iResultCount++) {
-            let currentResult = responseOutput.results[iResultCount];
-            if (currentResult.status === SingleRequestResultStatus.RequestSuccess) {
-              countSucceeded++;
-            } else {
-              countFailed++;
-            }
+        let countSucceeded = 0;
+        let countFailed = 0;
+        for (let iResultCount: number = 0; iResultCount < responseOutput.results.length; iResultCount++) {
+          let currentResult = responseOutput.results[iResultCount];
+          if (currentResult.status === SingleRequestResultStatus.RequestSuccess) {
+            countSucceeded++;
+          } else {
+            countFailed++;
           }
-          console.log(`Successfully edited ${countSucceeded} of ${editAnnotations.length} notes.`);
-          if (countFailed > 0) {
-            console.log(`Failed to edit ${countFailed} notes.`);
-          }
-          if (editAnnotations.length !== (countSucceeded + countFailed)) {
-            let countTotal = countSucceeded + countFailed;
-            console.log(`Mismatch in number of note edits requested (${editAnnotations.length}) and response (${countTotal}).`);
-          }
+        }
+        console.log(`Successfully edited ${countSucceeded} of ${editAnnotations.length} notes.`);
+        if (countFailed > 0) {
+          console.log(`Failed to edit ${countFailed} notes.`);
+        }
+        if (editAnnotations.length !== (countSucceeded + countFailed)) {
+          let countTotal = countSucceeded + countFailed;
+          console.log(`Mismatch in number of note edits requested (${editAnnotations.length}) and response (${countTotal}).`);
         }
       } else {
         console.log('Edit notes failed waiting for modify to finish.');
