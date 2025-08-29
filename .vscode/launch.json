@@ -189,6 +189,34 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Create part view",
+            "console": "integratedTerminal",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/.compiledjs/create-part-view.js",
+            "args": [
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Edit part view",
+            "console": "integratedTerminal",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/.compiledjs/edit-part-view.js",
+            "args": [
+                "--drawinguri=https://cad.onshape.com/documents/6d7058e0bd1b10f4966186c5/w/5877d326d938676cfd30433c/e/bea35ad394c20ec11b9be87e",
+                "--stack=cad"
+            ]
+        },                
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Create Radial Dimension",
             "console": "integratedTerminal",
             "skipFiles": [

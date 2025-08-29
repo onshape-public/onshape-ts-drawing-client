@@ -156,6 +156,11 @@ export interface ReleasePackageItemUpdate {
   properties: PropertyUpdate[];
 }
 
+export interface PartInfoPartial {
+  name: string,
+  partId: string
+}
+
 // Drawings types
 
 export class DrawingObjectType {

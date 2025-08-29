@@ -104,6 +104,10 @@ npm run edit-dimension-attachments --drawinguri=<drawing uri> --stack=cad
 
 npm run edit-dimension-text-positions --drawinguri=<drawing uri> --stack=cad
 
+npm run create-part-view --drawinguri=<drawing uri> --partElementId=<referencedPartElementId> --partName=<partName> --stack=cad
+
+npm run edit-part-view --drawinguri=<drawing uri> --stack=cad
+
 npm run find-errors-in-drawing --drawinguri=<drawing uri> --stack=cad
 ```
 

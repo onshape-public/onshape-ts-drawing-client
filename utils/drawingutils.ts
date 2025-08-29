@@ -2,7 +2,7 @@ import timeSpan from 'time-span';
 import { mainLog } from './logger.js';
 import { ArgumentParser } from './argumentparser.js';
 import { ApiClient } from './apiclient.js';
-import { BasicNode, ExportDrawingResponse, ModifyStatusResponseOutput } from './onshapetypes.js';
+import { BasicNode, ExportDrawingResponse, ModifyStatusResponseOutput, PartInfoPartial } from './onshapetypes.js';
 import { GetDrawingJsonExportResponse, Sheet, TranslationStatusResponse, Annotation, View2, DrawingReference, ResolveReferencesResponse } from './onshapetypes.js';
 import { DrawingObjectType } from './onshapetypes.js';
 
@@ -198,6 +198,26 @@ export async function getWorkspaceDrawingsThatNeedUpdate(apiClient: ApiClient, d
 
   return drawingsThatNeedUpdate;
 }
+
+export async function getPartId(apiClient: ApiClient, documentId: string, workspaceId: string, elementId: string, partName: string): Promise<string> {
+  try {
+    LOG.info('Get partId from part name:',partName, partName.length);
+    const parts = await apiClient.get(`api/parts/d/${documentId}/w/${workspaceId}/e/${elementId}?withThumbnails=false&includePropertyDefaults=false`) as PartInfoPartial[];
+    if (parts) {
+      for (const part of parts) {
+        if (part.name === partName) {
+          return part.partId;
+        }
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    LOG.error('Error getting parts.', error);
+  }
+
+  return null;
+}
+
 
 /**
  * 
