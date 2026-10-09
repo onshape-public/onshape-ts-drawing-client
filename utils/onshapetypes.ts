@@ -618,6 +618,7 @@ export class SingleRequestType {
 export interface SingleRequestResponse {
   status: SingleRequestResultStatus;
   logicalId?: string;         // Field exists and has a value if status is "OK"
+  viewId?: string;            // Field exists and has a value if status is "OK" and the request was for a view
   errorDescription?: string;  // Field exists and has a value if status is "Failed"
 }
 export interface ModifyStatusResponseOutput {
