@@ -23,12 +23,13 @@
     "create-table": "node .compiledjs/create-table.js",
     "create-three-point-angular-dimension": "node .compiledjs/create-three-point-angular-dimension.js",
     "create-part-view": "node .compiledjs/create-part-view.js",
+    "create-section-view": "node .compiledjs/create-section-view.js",
     "detect-if-single-drawing-needs-update": "node .compiledjs/detect-if-single-drawing-needs-update.js",
     "detect-if-workspace-contains-drawings-needing-update": "node .compiledjs/detect-if-workspace-contains-drawings-needing-update.js",
     "edit-notes": "node .compiledjs/edit-notes.js",
     "edit-dimension-attachments": "node .compiledjs/edit-dimension-attachments.js",
     "edit-dimension-text-positions": "node .compiledjs/edit-dimension-text-positions.js",
-    "edit-part-view": "node .compiledjs/edit-part-view.js",    
+    "edit-section-view": "node .compiledjs/edit-section-view.js",
     "find-errors-in-drawing": "node .compiledjs/find-errors-in-drawing.js"
   },
   "repository": {
