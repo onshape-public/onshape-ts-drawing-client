@@ -108,6 +108,11 @@ npm run create-part-view --drawinguri=<drawing uri> --partElementId=<referencedP
 
 npm run edit-part-view --drawinguri=<drawing uri> --stack=cad
 
+
+npm run create-auxiliary-view --drawinguri=<drawing uri> --partElementId=<referencedPartElementId> --partName=<partName> --stack=cad
+
+npm run edit-auxiliary-view --drawinguri=<drawing uri> --stack=cad
+
 npm run find-errors-in-drawing --drawinguri=<drawing uri> --stack=cad
 ```
 

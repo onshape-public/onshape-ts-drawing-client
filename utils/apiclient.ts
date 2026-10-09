@@ -156,12 +156,12 @@ export class ApiClient {
   private validateApiResponse(response: IUniResponse) {
     const statusCode: number = response.statusCode;
     if ((statusCode >= 300 || statusCode <= 100) || response.error) {
-      const errorMessage = response.statusMessage || response?.error?.message || 'Unknown Onshape API Error';
-      const errorOpts = {
-        cause: statusCode || 'UNKNOWN_STATUS_CODE',
-        body: response.body || 'NO_BODY',
-      };
-      return new Error(errorMessage, errorOpts);
+      let bodyMessage: string = null;
+      if (response.body) {
+        bodyMessage = typeof response.body === 'string' ? response.body : ((response.body as { message?: string })?.message || JSON.stringify(response.body));
+      }
+      const errorMessage = bodyMessage || response.statusMessage || response?.error?.message || 'Unknown Onshape API Error';
+      return new Error(errorMessage, { cause: statusCode || 'UNKNOWN_STATUS_CODE' });
     }
     return null;
   }
